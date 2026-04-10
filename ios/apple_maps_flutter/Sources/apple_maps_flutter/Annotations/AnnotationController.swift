@@ -45,7 +45,7 @@ extension AppleMapController: AnnotationDelegate {
         var annotationView = self.mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
         let oldflutterAnnoation = annotationView?.annotation as? FlutterAnnotation
         if annotationView == nil || oldflutterAnnoation?.icon.iconType != annotation.icon.iconType {
-            if #available(iOS 11.0, *), annotation.icon.iconType == IconType.MARKER {
+            if annotation.icon.iconType == IconType.MARKER {
                 annotationView = getMarkerAnnotationView(annotation: annotation, id: identifier)
             } else if annotation.icon.iconType == .CUSTOM_FROM_ASSET || annotation.icon.iconType == .CUSTOM_FROM_BYTES {
                 annotationView = getCustomAnnotationView(annotation: annotation, id: identifier)
@@ -150,20 +150,18 @@ extension AppleMapController: AnnotationDelegate {
         let x = self.getInfoWindowXOffset(annotationView: annotationView, annotation: annotation)
         let y = self.getInfoWindowYOffset(annotationView: annotationView, annotation: annotation)
         annotationView.calloutOffset = CGPoint(x: x, y: y)
-        if #available(iOS 9.0, *) {
-            let lines = annotation.subtitle?.split(whereSeparator: { $0.isNewline })
-            if lines != nil {
-                let customCallout = UIStackView()
-                customCallout.axis = .vertical
-                customCallout.alignment = .fill
-                customCallout.distribution = .fill
-                for line in lines! {
-                    let subtitle = UILabel()
-                    subtitle.text = String(line)
-                    customCallout.addArrangedSubview(subtitle)
-                }
-                annotationView.detailCalloutAccessoryView = customCallout
+        let lines = annotation.subtitle?.split(whereSeparator: { $0.isNewline })
+        if lines != nil {
+            let customCallout = UIStackView()
+            customCallout.axis = .vertical
+            customCallout.alignment = .fill
+            customCallout.distribution = .fill
+            for line in lines! {
+                let subtitle = UILabel()
+                subtitle.text = String(line)
+                customCallout.addArrangedSubview(subtitle)
             }
+            annotationView.detailCalloutAccessoryView = customCallout
         }
     }
 
@@ -238,12 +236,8 @@ extension AppleMapController: AnnotationDelegate {
 
     private func getPinAnnotationView(annotation: FlutterAnnotation, id: String) -> MKPinAnnotationView {
         var pinAnnotationView: MKPinAnnotationView
-        if #available(iOS 11.0, *) {
-            self.mapView.register(MKPinAnnotationView.self, forAnnotationViewWithReuseIdentifier: id)
-            pinAnnotationView = self.mapView.dequeueReusableAnnotationView(withIdentifier: id, for: annotation) as! MKPinAnnotationView
-        } else {
-            pinAnnotationView = MKPinAnnotationView.init(annotation: annotation, reuseIdentifier: id)
-        }
+        self.mapView.register(MKPinAnnotationView.self, forAnnotationViewWithReuseIdentifier: id)
+        pinAnnotationView = self.mapView.dequeueReusableAnnotationView(withIdentifier: id, for: annotation) as! MKPinAnnotationView
         pinAnnotationView.layer.zPosition = annotation.zIndex
 
         if let hueColor: Double = annotation.icon.hueColor {
@@ -253,7 +247,6 @@ extension AppleMapController: AnnotationDelegate {
         return pinAnnotationView
     }
 
-    @available(iOS 11.0, *)
     private func getMarkerAnnotationView(annotation: FlutterAnnotation, id: String) -> FlutterMarkerAnnotationView {
         self.mapView.register(FlutterMarkerAnnotationView.self, forAnnotationViewWithReuseIdentifier: id)
         let markerAnnotationView: FlutterMarkerAnnotationView = self.mapView.dequeueReusableAnnotationView(withIdentifier: id, for: annotation) as! FlutterMarkerAnnotationView
@@ -268,12 +261,8 @@ extension AppleMapController: AnnotationDelegate {
 
     private func getCustomAnnotationView(annotation: FlutterAnnotation, id: String) -> FlutterAnnotationView {
         let annotationView: FlutterAnnotationView
-        if #available(iOS 11.0, *) {
-            self.mapView.register(FlutterAnnotationView.self, forAnnotationViewWithReuseIdentifier: id)
-            annotationView = self.mapView.dequeueReusableAnnotationView(withIdentifier: id, for: annotation) as! FlutterAnnotationView
-        } else {
-            annotationView = FlutterAnnotationView(annotation: annotation, reuseIdentifier: id)
-        }
+        self.mapView.register(FlutterAnnotationView.self, forAnnotationViewWithReuseIdentifier: id)
+        annotationView = self.mapView.dequeueReusableAnnotationView(withIdentifier: id, for: annotation) as! FlutterAnnotationView
         annotationView.image = annotation.icon.image
         annotationView.stickyZPosition = annotation.zIndex
         return annotationView

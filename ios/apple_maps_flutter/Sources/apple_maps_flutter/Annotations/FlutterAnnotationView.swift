@@ -33,7 +33,6 @@ class FlutterAnnotationView: MKAnnotationView {
     }
 }
 
-@available(iOS 11.0, *)
 class FlutterMarkerAnnotationView: MKMarkerAnnotationView {
     /// Override the layer factory for this class to return a custom CALayer class
     override class var layerClass: AnyClass {
@@ -41,7 +40,6 @@ class FlutterMarkerAnnotationView: MKMarkerAnnotationView {
     }
 }
 
-@available(iOS 11.0, *)
 extension FlutterMarkerAnnotationView: ZPositionableAnnotation {
     /// convenience accessor for setting zPosition
     var stickyZPosition: CGFloat {

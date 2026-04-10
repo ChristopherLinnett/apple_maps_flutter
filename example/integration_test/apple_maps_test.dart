@@ -353,6 +353,159 @@ void main() {
     expect(scrollGesturesEnabled, true);
   });
 
+  testWidgets('testBuildingsToggle', (WidgetTester tester) async {
+    final Key key = GlobalKey();
+    final Completer<AppleMapInspector> inspectorCompleter =
+        Completer<AppleMapInspector>();
+
+    await _pumpMap(
+      tester,
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          key: key,
+          initialCameraPosition: _kInitialCameraPosition,
+          buildingsEnabled: false,
+          onMapCreated: (AppleMapController controller) {
+            // ignore: invalid_use_of_visible_for_testing_member
+            final AppleMapInspector inspector = AppleMapInspector(controller.mapId);
+            inspectorCompleter.complete(inspector);
+          },
+        ),
+      ),
+    );
+
+    final AppleMapInspector inspector = await inspectorCompleter.future;
+    bool buildingsEnabled = await _waitForValue<bool>(
+      read: () async => await inspector.isBuildingsEnabled(),
+      matches: (bool value) => value == false,
+    );
+    expect(buildingsEnabled, false);
+
+    await _pumpMap(
+      tester,
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          key: key,
+          initialCameraPosition: _kInitialCameraPosition,
+          buildingsEnabled: true,
+          onMapCreated: (AppleMapController controller) {
+            fail("OnMapCreated should get called only once.");
+          },
+        ),
+      ),
+    );
+
+    buildingsEnabled = await _waitForValue<bool>(
+      read: () async => await inspector.isBuildingsEnabled(),
+      matches: (bool value) => value,
+    );
+    expect(buildingsEnabled, true);
+  });
+
+  testWidgets('testScaleToggle', (WidgetTester tester) async {
+    final Key key = GlobalKey();
+    final Completer<AppleMapInspector> inspectorCompleter =
+        Completer<AppleMapInspector>();
+
+    await _pumpMap(
+      tester,
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          key: key,
+          initialCameraPosition: _kInitialCameraPosition,
+          scaleEnabled: true,
+          onMapCreated: (AppleMapController controller) {
+            // ignore: invalid_use_of_visible_for_testing_member
+            final AppleMapInspector inspector = AppleMapInspector(controller.mapId);
+            inspectorCompleter.complete(inspector);
+          },
+        ),
+      ),
+    );
+
+    final AppleMapInspector inspector = await inspectorCompleter.future;
+    bool scaleEnabled = await _waitForValue<bool>(
+      read: () async => await inspector.isScaleEnabled(),
+      matches: (bool value) => value,
+    );
+    expect(scaleEnabled, true);
+
+    await _pumpMap(
+      tester,
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          key: key,
+          initialCameraPosition: _kInitialCameraPosition,
+          scaleEnabled: false,
+          onMapCreated: (AppleMapController controller) {
+            fail("OnMapCreated should get called only once.");
+          },
+        ),
+      ),
+    );
+
+    scaleEnabled = await _waitForValue<bool>(
+      read: () async => await inspector.isScaleEnabled(),
+      matches: (bool value) => value == false,
+    );
+    expect(scaleEnabled, false);
+  });
+
+  testWidgets('testPointsOfInterestToggle', (WidgetTester tester) async {
+    final Key key = GlobalKey();
+    final Completer<AppleMapInspector> inspectorCompleter =
+        Completer<AppleMapInspector>();
+
+    await _pumpMap(
+      tester,
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          key: key,
+          initialCameraPosition: _kInitialCameraPosition,
+          pointsOfInterestEnabled: false,
+          onMapCreated: (AppleMapController controller) {
+            // ignore: invalid_use_of_visible_for_testing_member
+            final AppleMapInspector inspector = AppleMapInspector(controller.mapId);
+            inspectorCompleter.complete(inspector);
+          },
+        ),
+      ),
+    );
+
+    final AppleMapInspector inspector = await inspectorCompleter.future;
+    bool poiEnabled = await _waitForValue<bool>(
+      read: () async => await inspector.isPointsOfInterestEnabled(),
+      matches: (bool value) => value == false,
+    );
+    expect(poiEnabled, false);
+
+    await _pumpMap(
+      tester,
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          key: key,
+          initialCameraPosition: _kInitialCameraPosition,
+          pointsOfInterestEnabled: true,
+          onMapCreated: (AppleMapController controller) {
+            fail("OnMapCreated should get called only once.");
+          },
+        ),
+      ),
+    );
+
+    poiEnabled = await _waitForValue<bool>(
+      read: () async => await inspector.isPointsOfInterestEnabled(),
+      matches: (bool value) => value,
+    );
+    expect(poiEnabled, true);
+  });
+
   // test('testGetVisibleRegion', () async {
   //   final Key key = GlobalKey();
   //   final LatLngBounds zeroLatLngBounds = LatLngBounds(

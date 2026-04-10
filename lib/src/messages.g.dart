@@ -401,6 +401,47 @@ class PlatformPadding {
 ;
 }
 
+class PlatformCameraTargetBounds {
+  PlatformCameraTargetBounds({
+    this.bounds,
+  });
+
+  PlatformLatLngBounds? bounds;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      bounds,
+    ];
+  }
+
+  Object encode() {
+    return _toList();  }
+
+  static PlatformCameraTargetBounds decode(Object result) {
+    result as List<Object?>;
+    return PlatformCameraTargetBounds(
+      bounds: result[0] as PlatformLatLngBounds?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! PlatformCameraTargetBounds || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(encode(), other.encode());
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => Object.hashAll(_toList())
+;
+}
+
 class PlatformMapOptions {
   PlatformMapOptions({
     this.compassEnabled,
@@ -416,6 +457,10 @@ class PlatformMapOptions {
     this.myLocationButtonEnabled,
     this.padding,
     this.insetsLayoutMarginsFromSafeArea,
+    this.cameraTargetBounds,
+    this.buildingsEnabled,
+    this.pointsOfInterestEnabled,
+    this.scaleEnabled,
   });
 
   bool? compassEnabled;
@@ -444,6 +489,14 @@ class PlatformMapOptions {
 
   bool? insetsLayoutMarginsFromSafeArea;
 
+  PlatformCameraTargetBounds? cameraTargetBounds;
+
+  bool? buildingsEnabled;
+
+  bool? pointsOfInterestEnabled;
+
+  bool? scaleEnabled;
+
   List<Object?> _toList() {
     return <Object?>[
       compassEnabled,
@@ -459,6 +512,10 @@ class PlatformMapOptions {
       myLocationButtonEnabled,
       padding,
       insetsLayoutMarginsFromSafeArea,
+      cameraTargetBounds,
+      buildingsEnabled,
+      pointsOfInterestEnabled,
+      scaleEnabled,
     ];
   }
 
@@ -481,6 +538,10 @@ class PlatformMapOptions {
       myLocationButtonEnabled: result[10] as bool?,
       padding: result[11] as PlatformPadding?,
       insetsLayoutMarginsFromSafeArea: result[12] as bool?,
+      cameraTargetBounds: result[13] as PlatformCameraTargetBounds?,
+      buildingsEnabled: result[14] as bool?,
+      pointsOfInterestEnabled: result[15] as bool?,
+      scaleEnabled: result[16] as bool?,
     );
   }
 
@@ -1361,47 +1422,50 @@ class _PigeonCodec extends StandardMessageCodec {
     }    else if (value is PlatformPadding) {
       buffer.putUint8(139);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformMapOptions) {
+    }    else if (value is PlatformCameraTargetBounds) {
       buffer.putUint8(140);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformInfoWindow) {
+    }    else if (value is PlatformMapOptions) {
       buffer.putUint8(141);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformBitmapDescriptor) {
+    }    else if (value is PlatformInfoWindow) {
       buffer.putUint8(142);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformAnnotation) {
+    }    else if (value is PlatformBitmapDescriptor) {
       buffer.putUint8(143);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformAnnotationUpdates) {
+    }    else if (value is PlatformAnnotation) {
       buffer.putUint8(144);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformPatternItem) {
+    }    else if (value is PlatformAnnotationUpdates) {
       buffer.putUint8(145);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformPolyline) {
+    }    else if (value is PlatformPatternItem) {
       buffer.putUint8(146);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformPolylineUpdates) {
+    }    else if (value is PlatformPolyline) {
       buffer.putUint8(147);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformPolygon) {
+    }    else if (value is PlatformPolylineUpdates) {
       buffer.putUint8(148);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformPolygonUpdates) {
+    }    else if (value is PlatformPolygon) {
       buffer.putUint8(149);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformCircle) {
+    }    else if (value is PlatformPolygonUpdates) {
       buffer.putUint8(150);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformCircleUpdates) {
+    }    else if (value is PlatformCircle) {
       buffer.putUint8(151);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformSnapshotOptions) {
+    }    else if (value is PlatformCircleUpdates) {
       buffer.putUint8(152);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformCameraUpdate) {
+    }    else if (value is PlatformSnapshotOptions) {
       buffer.putUint8(153);
+      writeValue(buffer, value.encode());
+    }    else if (value is PlatformCameraUpdate) {
+      buffer.putUint8(154);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -1438,32 +1502,34 @@ class _PigeonCodec extends StandardMessageCodec {
       case 139: 
         return PlatformPadding.decode(readValue(buffer)!);
       case 140: 
-        return PlatformMapOptions.decode(readValue(buffer)!);
+        return PlatformCameraTargetBounds.decode(readValue(buffer)!);
       case 141: 
-        return PlatformInfoWindow.decode(readValue(buffer)!);
+        return PlatformMapOptions.decode(readValue(buffer)!);
       case 142: 
-        return PlatformBitmapDescriptor.decode(readValue(buffer)!);
+        return PlatformInfoWindow.decode(readValue(buffer)!);
       case 143: 
-        return PlatformAnnotation.decode(readValue(buffer)!);
+        return PlatformBitmapDescriptor.decode(readValue(buffer)!);
       case 144: 
-        return PlatformAnnotationUpdates.decode(readValue(buffer)!);
+        return PlatformAnnotation.decode(readValue(buffer)!);
       case 145: 
-        return PlatformPatternItem.decode(readValue(buffer)!);
+        return PlatformAnnotationUpdates.decode(readValue(buffer)!);
       case 146: 
-        return PlatformPolyline.decode(readValue(buffer)!);
+        return PlatformPatternItem.decode(readValue(buffer)!);
       case 147: 
-        return PlatformPolylineUpdates.decode(readValue(buffer)!);
+        return PlatformPolyline.decode(readValue(buffer)!);
       case 148: 
-        return PlatformPolygon.decode(readValue(buffer)!);
+        return PlatformPolylineUpdates.decode(readValue(buffer)!);
       case 149: 
-        return PlatformPolygonUpdates.decode(readValue(buffer)!);
+        return PlatformPolygon.decode(readValue(buffer)!);
       case 150: 
-        return PlatformCircle.decode(readValue(buffer)!);
+        return PlatformPolygonUpdates.decode(readValue(buffer)!);
       case 151: 
-        return PlatformCircleUpdates.decode(readValue(buffer)!);
+        return PlatformCircle.decode(readValue(buffer)!);
       case 152: 
-        return PlatformSnapshotOptions.decode(readValue(buffer)!);
+        return PlatformCircleUpdates.decode(readValue(buffer)!);
       case 153: 
+        return PlatformSnapshotOptions.decode(readValue(buffer)!);
+      case 154: 
         return PlatformCameraUpdate.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -2004,6 +2070,90 @@ class AppleMapHostApi {
 
   Future<bool> isMyLocationButtonEnabled() async {
     final String pigeonVar_channelName = 'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isMyLocationButtonEnabled$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else if (pigeonVar_replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return (pigeonVar_replyList[0] as bool?)!;
+    }
+  }
+
+  Future<bool> isBuildingsEnabled() async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isBuildingsEnabled$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else if (pigeonVar_replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return (pigeonVar_replyList[0] as bool?)!;
+    }
+  }
+
+  Future<bool> isPointsOfInterestEnabled() async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isPointsOfInterestEnabled$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_sendFuture as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else if (pigeonVar_replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return (pigeonVar_replyList[0] as bool?)!;
+    }
+  }
+
+  Future<bool> isScaleEnabled() async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isScaleEnabled$pigeonVar_messageChannelSuffix';
     final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
