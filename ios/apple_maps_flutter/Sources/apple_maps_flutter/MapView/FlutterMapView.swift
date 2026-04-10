@@ -10,8 +10,8 @@ import Flutter
 import MapKit
 import CoreLocation
 
-enum BUTTON_IDS: Int {
-    case LOCATION = 100
+private enum ButtonId: Int {
+    case location = 100
 }
 
 
@@ -20,7 +20,7 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
     weak var channel: FlutterMethodChannel?
     var oldBounds: CGRect?
     var options: Dictionary<String, Any>?
-    var isMyLocationButtonShowing: Bool? = false
+    var isMyLocationButtonShowing: Bool = false
     var currentMapTypeIndex: Int = 0
     // Tracks whether location services should start once the user grants permission.
     // Set when requestWhenInUseAuthorization is called; cleared on authorization or removal.
@@ -29,7 +29,7 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
         (self.pointOfInterestFilter ?? .includingAll) != .excludingAll
     }
     
-    fileprivate let locationManager: CLLocationManager = CLLocationManager()
+    private let locationManager: CLLocationManager = CLLocationManager()
     
     let mapTypes: Array<MKMapType> = [
         MKMapType.standard,
@@ -47,6 +47,8 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
         self.init(frame: CGRect.zero)
         self.channel = channel
         self.options = options
+        // Delegate is set once here so the callback is active for the view's full lifetime.
+        locationManager.delegate = self
         initialiseTapGestureRecognizers()
     }
     
@@ -118,9 +120,7 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
     func interpretOptions(options: Dictionary<String, Any>) {
         if let isCompassEnabled: Bool = options["compassEnabled"] as? Bool {
             self.showsCompass = isCompassEnabled
-            self.mapTrackingButton(isVisible: self.isMyLocationButtonShowing ?? false)
-        }
-
+            self.mapTrackingButton(isVisible: isMyLocationButtonShowing)
         if let padding: Array<Any> = options["padding"] as? Array<Any> {
             var margins = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
             
@@ -215,8 +215,8 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
             self.mapTrackingButton(isVisible: myLocationButtonEnabled)
         }
         
-        if let userTackingMode: Int = options["trackingMode"] as? Int {
-            self.setUserTrackingMode(self.userTrackingModes[userTackingMode], animated: false)
+        if let userTrackingMode: Int = options["trackingMode"] as? Int {
+            self.setUserTrackingMode(self.userTrackingModes[userTrackingMode], animated: false)
         }
         
         if let minMaxZoom: Array<Any> = options["minMaxZoomPreference"] as? Array<Any>{
@@ -258,7 +258,6 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
     }
     
     func setUserLocation() {
-        locationManager.delegate = self
         let authorizationStatus: CLAuthorizationStatus
         if #available(iOS 14.0, *) {
             authorizationStatus = locationManager.authorizationStatus
@@ -268,6 +267,8 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
 
         switch authorizationStatus {
         case .notDetermined:
+            // Guard against requesting authorization a second time if a prompt is already showing.
+            guard !pendingUserLocationEnabled else { return }
             // Store intent so the delegate can start location once the user grants permission.
             pendingUserLocationEnabled = true
             locationManager.requestWhenInUseAuthorization()
@@ -295,8 +296,8 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
     
     // Functions used for the mapTrackingButton
     func mapTrackingButton(isVisible visible: Bool) {
-        self.isMyLocationButtonShowing = visible
-        if let _locationButton = self.viewWithTag(BUTTON_IDS.LOCATION.rawValue) {
+        isMyLocationButtonShowing = visible
+        if let _locationButton = self.viewWithTag(ButtonId.location.rawValue) {
            _locationButton.removeFromSuperview()
         }
         if visible {
@@ -305,7 +306,7 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
             buttonContainer.widthAnchor.constraint(equalToConstant: 35).isActive = true
             buttonContainer.heightAnchor.constraint(equalToConstant: 35).isActive = true
             buttonContainer.layer.cornerRadius = 8
-            buttonContainer.tag = BUTTON_IDS.LOCATION.rawValue
+            buttonContainer.tag = ButtonId.location.rawValue
             buttonContainer.backgroundColor = .white
             let userTrackingButton = MKUserTrackingButton(mapView: self)
             userTrackingButton.translatesAutoresizingMaskIntoConstraints = false
@@ -406,7 +407,8 @@ extension FlutterMapView: CLLocationManagerDelegate {
         handleAuthorizationChange(status: manager.authorizationStatus)
     }
 
-    // iOS 13 authorization callback.
+    // Called on iOS 13 only. iOS 14+ uses locationManagerDidChangeAuthorization(_:) above.
+    // When both are implemented, Apple guarantees only one fires per OS version.
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         handleAuthorizationChange(status: status)
     }
@@ -417,6 +419,10 @@ extension FlutterMapView: CLLocationManagerDelegate {
         case .authorizedWhenInUse, .authorizedAlways:
             pendingUserLocationEnabled = false
             startUpdatingUserLocation()
+        case .denied, .restricted:
+            // Clear the flag so a later setUserLocation() call re-evaluates correctly.
+            pendingUserLocationEnabled = false
+            channel?.invokeMethod("map#onPermissionDenied", arguments: nil)
         default:
             break
         }

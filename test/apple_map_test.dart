@@ -1803,4 +1803,58 @@ void main() {
     expect(platformAppleMap.trackingMode, TrackingMode.followWithHeading);
     debugDefaultTargetPlatformOverride = null;
   });
+
+  testWidgets('Default trackingMode is null when not set', (
+    WidgetTester tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: CameraPosition(target: LatLng(10.0, 15.0)),
+        ),
+      ),
+    );
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+
+    // trackingMode defaults to TrackingMode.none; the fake records the value
+    // sent over the channel, which is the none index (0).
+    expect(platformAppleMap.trackingMode, TrackingMode.none);
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets('Equal trackingMode does not trigger a redundant map update', (
+    WidgetTester tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: CameraPosition(target: LatLng(10.0, 15.0)),
+          trackingMode: TrackingMode.follow,
+        ),
+      ),
+    );
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+    expect(platformAppleMap.mapUpdateCallCount, 0);
+
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: CameraPosition(target: LatLng(10.0, 15.0)),
+          trackingMode: TrackingMode.follow,
+        ),
+      ),
+    );
+
+    expect(platformAppleMap.mapUpdateCallCount, 0);
+    debugDefaultTargetPlatformOverride = null;
+  });
 }
