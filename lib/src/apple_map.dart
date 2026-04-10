@@ -417,9 +417,18 @@ class _AppleMapOptions {
   Map<String, dynamic> updatesMap(_AppleMapOptions newOptions) {
     final Map<String, dynamic> prevOptionsMap = toMap();
 
+    // `toMap()` serialises some options (e.g. `minMaxZoomPreference`,
+    // `padding`) as `List<dynamic>`. Dart's default `List.==` is identity-
+    // based, so two lists with identical content are considered unequal.
+    // This caused the diff to always include those keys, triggering a
+    // redundant native update on every widget rebuild. Using `listEquals`
+    // for `List` values produces a correct element-wise comparison.
     return newOptions.toMap()
-      ..removeWhere(
-          (String key, dynamic value) => prevOptionsMap[key] == value);
+      ..removeWhere((String key, dynamic value) {
+        final prev = prevOptionsMap[key];
+        if (prev is List && value is List) return listEquals(prev, value);
+        return prev == value;
+      });
   }
 
   List<double>? _serializePadding(EdgeInsets? insets) {
