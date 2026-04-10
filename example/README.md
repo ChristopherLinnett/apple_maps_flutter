@@ -8,7 +8,7 @@ Compatibility:
 - Dart `^3.11.0`
 - iOS `13.0+`
 
-If you want to exercise the Swift Package Manager path locally, run `flutter config --enable-swift-package-manager` before building the example on iOS.
+The example app uses the Swift Package Manager iOS path only. Run `flutter config --enable-swift-package-manager` before building the example on iOS.
 
 # Sample usage
 

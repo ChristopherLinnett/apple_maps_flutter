@@ -14,7 +14,7 @@ The package still follows the familiar `google_maps_flutter`-style API shape whe
 - Dart: `^3.11.0`
 - iOS deployment target: `13.0`
 - Modern MapKit configuration APIs are feature-gated for iOS `16+`
-- iOS dependency managers: CocoaPods and Swift Package Manager
+- iOS dependency manager: Swift Package Manager
 
 ## Current feature surface
 
@@ -38,7 +38,9 @@ The package still follows the familiar `google_maps_flutter`-style API shape whe
 
 Add `NSLocationWhenInUseUsageDescription` to the host app if you enable user location features.
 
-If you want to validate Swift Package Manager integration locally, enable it with `flutter config --enable-swift-package-manager` before building the example app.
+This fork supports iOS integration through Swift Package Manager only. Enable it with `flutter config --enable-swift-package-manager` before generating or building the iOS host app.
+
+If you are migrating an existing app from CocoaPods, remove the old Pod-based iOS integration artifacts from the host app and rebuild with Swift Package Manager enabled.
 
 # Android
 
