@@ -18,7 +18,7 @@ That means future work should prioritize:
 
 - current stable Flutter and Dart
 - typed plugin transport instead of raw channel payload maps
-- dual CocoaPods and Swift Package Manager support
+- Swift Package Manager as the only supported iOS dependency path for this fork
 - deliberate adoption of current MapKit configuration APIs
 - stronger automated testing across Dart, integration, and native iOS layers
 
@@ -109,20 +109,20 @@ The current codebase still contains legacy assumptions that should guide future 
 
 ### Packaging
 
-- `ios/apple_maps_flutter.podspec` still declares iOS `9.0`
-- the podspec still uses placeholder metadata and `s.swift_version = '5.0'`
-- there is no `Package.swift` and no SwiftPM-ready source layout
+- CocoaPods support has been removed for this fork
+- `ios/apple_maps_flutter/Package.swift` defines the supported package boundary
+- the example app now uses the SwiftPM-only iOS integration path
 
 ### CI and testing
 
-- `.github/workflows/dart.yml` still installs Flutter `3.27.3`
-- the example app still uses `flutter_driver`
-- there is no minimum-runtime or SwiftPM validation matrix
+- `.github/workflows/dart.yml` validates the SwiftPM path only
+- the example app uses `integration_test`
+- iOS CI runs on the default `self-hosted` plus `macOS` runner labels with Flutter/Xcode/simulator preflight checks
 
 ### Documentation
 
-- `README.md` still describes platform views as a preview
-- `README.md` still instructs users to set `io.flutter.embedded_views_preview`
+- `README.md` no longer carries the old embedded-views preview guidance
+- package docs now describe the SwiftPM-only integration path for this fork
 
 ### Native implementation
 
@@ -164,4 +164,4 @@ The baseline for ongoing modernization is:
 - Swift `5.9` minimum
 - iOS deployment target `13.0`
 - explicit iOS 16 gating for modern MapKit configuration and feature-selection APIs
-- dual CocoaPods and Swift Package Manager support
+- Swift Package Manager only for this fork's supported iOS integration path

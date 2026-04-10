@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+* Breaking: remove CocoaPods support for this fork and standardize iOS integration on Swift Package Manager.
+* Move iOS CI validation to a self-hosted macOS runner with toolchain preflight checks.
+
 ## 1.4.0
 
 * Flutter 3.27.1 compatibility, replace `ui.hash*` with `Object.hash*
