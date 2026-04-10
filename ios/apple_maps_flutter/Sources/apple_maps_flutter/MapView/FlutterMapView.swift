@@ -17,7 +17,7 @@ private enum ButtonId: Int {
 
 class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
     weak var mapContainerView: UIView?
-    weak var channel: FlutterMethodChannel?
+    var flutterApi: AppleMapFlutterApi?
     var oldBounds: CGRect?
     var options: Dictionary<String, Any>?
     var isMyLocationButtonShowing: Bool = false
@@ -43,9 +43,9 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
         MKUserTrackingMode.followWithHeading,
     ]
     
-    convenience init(channel: FlutterMethodChannel, options: Dictionary<String, Any>) {
+    convenience init(flutterApi: AppleMapFlutterApi, options: Dictionary<String, Any>) {
         self.init(frame: CGRect.zero)
-        self.channel = channel
+        self.flutterApi = flutterApi
         self.options = options
         // Delegate is set once here so the callback is active for the view's full lifetime.
         locationManager.delegate = self
@@ -370,13 +370,15 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
            let locationInView = sender.location(in: self)
            let locationOnMap = self.convert(locationInView, toCoordinateFrom: self)
            
-           channel?.invokeMethod("map#onLongPress", arguments: ["position": [locationOnMap.latitude, locationOnMap.longitude]])
+           flutterApi?.onMapLongPress(
+               position: PlatformLatLng(latitude: locationOnMap.latitude, longitude: locationOnMap.longitude)
+           ) { _ in }
         }
     }
 
     @objc func onTap(tap: UITapGestureRecognizer) {
         if tap.state == .recognized {
-            TouchHandler.handleMapTaps(tap: tap, overlays: self.overlays, channel: self.channel, in: self)
+            TouchHandler.handleMapTaps(tap: tap, overlays: self.overlays, flutterApi: self.flutterApi, in: self)
         }
     }
     
@@ -423,7 +425,7 @@ extension FlutterMapView: CLLocationManagerDelegate {
         case .denied, .restricted:
             // Clear the flag so a later setUserLocation() call re-evaluates correctly.
             pendingUserLocationEnabled = false
-            channel?.invokeMethod("map#onPermissionDenied", arguments: nil)
+            flutterApi?.onPermissionDenied { _ in }
         default:
             break
         }

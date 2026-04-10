@@ -14,6 +14,16 @@ PlatformException _createConnectionError(String channelName) {
     message: 'Unable to establish connection on channel: "$channelName".',
   );
 }
+
+List<Object?> wrapResponse({Object? result, PlatformException? error, bool empty = false}) {
+  if (empty) {
+    return <Object?>[];
+  }
+  if (error == null) {
+    return <Object?>[result];
+  }
+  return <Object?>[error.code, error.message, error.details];
+}
 bool _deepEquals(Object? a, Object? b) {
   if (a is List && b is List) {
     return a.length == b.length &&
@@ -2258,6 +2268,354 @@ class AppleMapHostApi {
       );
     } else {
       return (pigeonVar_replyList[0] as PlatformCameraTargetBounds?);
+    }
+  }
+}
+
+/// Callbacks from the native map to Flutter.
+abstract class AppleMapFlutterApi {
+  static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
+
+  void onCameraMoveStarted();
+
+  void onCameraMove(PlatformCameraPosition position);
+
+  void onCameraIdle();
+
+  void onMapTap(PlatformLatLng position);
+
+  void onMapLongPress(PlatformLatLng position);
+
+  void onAnnotationTap(String annotationId);
+
+  void onAnnotationDragEnd(String annotationId, PlatformLatLng position);
+
+  void onAnnotationZIndexChanged(String annotationId, double zIndex);
+
+  void onInfoWindowTap(String annotationId);
+
+  void onPolylineTap(String polylineId);
+
+  void onPolygonTap(String polygonId);
+
+  void onCircleTap(String circleId);
+
+  void onPermissionDenied();
+
+  static void setUp(AppleMapFlutterApi? api, {BinaryMessenger? binaryMessenger, String messageChannelSuffix = '',}) {
+    messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
+    {
+      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onCameraMoveStarted$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          try {
+            api.onCameraMoveStarted();
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onCameraMove$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onCameraMove was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final PlatformCameraPosition? arg_position = (args[0] as PlatformCameraPosition?);
+          assert(arg_position != null,
+              'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onCameraMove was null, expected non-null PlatformCameraPosition.');
+          try {
+            api.onCameraMove(arg_position!);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onCameraIdle$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          try {
+            api.onCameraIdle();
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onMapTap$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onMapTap was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final PlatformLatLng? arg_position = (args[0] as PlatformLatLng?);
+          assert(arg_position != null,
+              'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onMapTap was null, expected non-null PlatformLatLng.');
+          try {
+            api.onMapTap(arg_position!);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onMapLongPress$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onMapLongPress was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final PlatformLatLng? arg_position = (args[0] as PlatformLatLng?);
+          assert(arg_position != null,
+              'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onMapLongPress was null, expected non-null PlatformLatLng.');
+          try {
+            api.onMapLongPress(arg_position!);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationTap$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationTap was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final String? arg_annotationId = (args[0] as String?);
+          assert(arg_annotationId != null,
+              'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationTap was null, expected non-null String.');
+          try {
+            api.onAnnotationTap(arg_annotationId!);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationDragEnd$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationDragEnd was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final String? arg_annotationId = (args[0] as String?);
+          assert(arg_annotationId != null,
+              'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationDragEnd was null, expected non-null String.');
+          final PlatformLatLng? arg_position = (args[1] as PlatformLatLng?);
+          assert(arg_position != null,
+              'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationDragEnd was null, expected non-null PlatformLatLng.');
+          try {
+            api.onAnnotationDragEnd(arg_annotationId!, arg_position!);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationZIndexChanged$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationZIndexChanged was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final String? arg_annotationId = (args[0] as String?);
+          assert(arg_annotationId != null,
+              'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationZIndexChanged was null, expected non-null String.');
+          final double? arg_zIndex = (args[1] as double?);
+          assert(arg_zIndex != null,
+              'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationZIndexChanged was null, expected non-null double.');
+          try {
+            api.onAnnotationZIndexChanged(arg_annotationId!, arg_zIndex!);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onInfoWindowTap$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onInfoWindowTap was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final String? arg_annotationId = (args[0] as String?);
+          assert(arg_annotationId != null,
+              'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onInfoWindowTap was null, expected non-null String.');
+          try {
+            api.onInfoWindowTap(arg_annotationId!);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onPolylineTap$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onPolylineTap was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final String? arg_polylineId = (args[0] as String?);
+          assert(arg_polylineId != null,
+              'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onPolylineTap was null, expected non-null String.');
+          try {
+            api.onPolylineTap(arg_polylineId!);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onPolygonTap$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onPolygonTap was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final String? arg_polygonId = (args[0] as String?);
+          assert(arg_polygonId != null,
+              'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onPolygonTap was null, expected non-null String.');
+          try {
+            api.onPolygonTap(arg_polygonId!);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onCircleTap$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onCircleTap was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final String? arg_circleId = (args[0] as String?);
+          assert(arg_circleId != null,
+              'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onCircleTap was null, expected non-null String.');
+          try {
+            api.onCircleTap(arg_circleId!);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onPermissionDenied$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          try {
+            api.onPermissionDenied();
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
     }
   }
 }

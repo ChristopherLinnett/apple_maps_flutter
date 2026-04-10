@@ -6,12 +6,11 @@
 //
 
 import Foundation
-import Flutter
 import MapKit
 
 class TouchHandler {
     
-    static func handleMapTaps(tap: UITapGestureRecognizer, overlays: [MKOverlay], channel: FlutterMethodChannel?, in view: MKMapView) {
+    static func handleMapTaps(tap: UITapGestureRecognizer, overlays: [MKOverlay], flutterApi: AppleMapFlutterApi?, in view: MKMapView) {
         let locationInView = tap.location(in: view)
         let touchPt: CGPoint = tap.location(in: view)
         let coord: CLLocationCoordinate2D = view.convert(touchPt, toCoordinateFrom: view)
@@ -19,24 +18,24 @@ class TouchHandler {
         for overlay: MKOverlay in overlays {
             if let flutterPolyline: FlutterPolyline = overlay as?  FlutterPolyline {
                 if  flutterPolyline.isConsumingTapEvents ?? false && flutterPolyline.contains(coordinate: coord, mapView: view) {
-                    channel?.invokeMethod("polyline#onTap", arguments: ["polylineId": flutterPolyline.id])
+                    flutterApi?.onPolylineTap(polylineId: flutterPolyline.id) { _ in }
                     didOverlayConsumeTapEvent = true
                 }
             } else if let flutterPolygon: FlutterPolygon = overlay as?  FlutterPolygon {
                 if  flutterPolygon.isConsumingTapEvents ?? false && flutterPolygon.contains(coordinate: coord) {
-                    channel?.invokeMethod("polygon#onTap", arguments: ["polygonId": flutterPolygon.id])
+                    flutterApi?.onPolygonTap(polygonId: flutterPolygon.id) { _ in }
                     didOverlayConsumeTapEvent = true
                 }
             } else if let flutterCircle: FlutterCircle = overlay as?  FlutterCircle {
                 if  flutterCircle.isConsumingTapEvents ?? false && flutterCircle.contains(coordinate: coord) {
-                    channel?.invokeMethod("circle#onTap", arguments: ["circleId": flutterCircle.id])
+                    flutterApi?.onCircleTap(circleId: flutterCircle.id) { _ in }
                     didOverlayConsumeTapEvent = true
                 }
             }
         }
         if !didOverlayConsumeTapEvent {
             let locationOnMap = view.convert(locationInView, toCoordinateFrom: view)
-            channel?.invokeMethod("map#onTap", arguments: ["position": [locationOnMap.latitude, locationOnMap.longitude]])
+            flutterApi?.onMapTap(position: PlatformLatLng(latitude: locationOnMap.latitude, longitude: locationOnMap.longitude)) { _ in }
         }
     }
 }

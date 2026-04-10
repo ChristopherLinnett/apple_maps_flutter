@@ -5,15 +5,19 @@
 part of apple_maps_flutter;
 
 /// Controller for a single AppleMap instance running on the host platform.
-class AppleMapController {
+class AppleMapController implements AppleMapFlutterApi {
   AppleMapController._(
     this.mapId,
-    this.channel,
     this._hostApi,
     CameraPosition initialCameraPosition,
     this._appleMapState,
+    BinaryMessenger? binaryMessenger,
   ) {
-    channel.setMethodCallHandler(_handleMethodCall);
+    AppleMapFlutterApi.setUp(
+      this,
+      binaryMessenger: binaryMessenger,
+      messageChannelSuffix: '$mapId',
+    );
   }
 
   static Future<AppleMapController> init(
@@ -21,23 +25,17 @@ class AppleMapController {
     CameraPosition initialCameraPosition,
     _AppleMapState appleMapState,
   ) async {
-    final MethodChannel channel = MethodChannel(
-      'apple_maps_plugin.luisthein.de/apple_maps_$id',
-    );
     return AppleMapController._(
       id,
-      channel,
       AppleMapHostApi(messageChannelSuffix: '$id'),
       initialCameraPosition,
       appleMapState,
+      null,
     );
   }
 
   @visibleForTesting
   final int mapId;
-
-  @visibleForTesting
-  final MethodChannel channel;
 
   final AppleMapHostApi _hostApi;
 
@@ -53,60 +51,81 @@ class AppleMapController {
     }
   }
 
-  Future<dynamic> _handleMethodCall(MethodCall call) async {
-    switch (call.method) {
-      case 'camera#onMoveStarted':
-        _appleMapState.widget.onCameraMoveStarted?.call();
-        break;
-      case 'camera#onMove':
-        _appleMapState.widget.onCameraMove?.call(
-          CameraPosition.fromMap(call.arguments['position'])!,
-        );
-        break;
-      case 'camera#onIdle':
-        _appleMapState.widget.onCameraIdle?.call();
-        break;
-      case 'annotation#onTap':
-        _appleMapState.onAnnotationTap(call.arguments['annotationId']);
-        break;
-      case 'polyline#onTap':
-        _appleMapState.onPolylineTap(call.arguments['polylineId']);
-        break;
-      case 'polygon#onTap':
-        _appleMapState.onPolygonTap(call.arguments['polygonId']);
-        break;
-      case 'circle#onTap':
-        _appleMapState.onCircleTap(call.arguments['circleId']);
-        break;
-      case 'annotation#onDragEnd':
-        _appleMapState.onAnnotationDragEnd(
-          call.arguments['annotationId'],
-          LatLng._fromJson(call.arguments['position'])!,
-        );
-        break;
-      case 'infoWindow#onTap':
-        _appleMapState.onInfoWindowTap(call.arguments['annotationId']);
-        break;
-      case 'annotation#onZIndexChanged':
-        _appleMapState.onAnnotationZIndexChanged(
-          call.arguments['annotationId'],
-          call.arguments['zIndex'],
-        );
-        break;
-      case 'map#onTap':
-        _appleMapState.onTap(LatLng._fromJson(call.arguments['position'])!);
-        break;
-      case 'map#onLongPress':
-        _appleMapState.onLongPress(
-          LatLng._fromJson(call.arguments['position'])!,
-        );
-        break;
-      case 'map#onPermissionDenied':
-        _appleMapState.onPermissionDenied();
-        break;
-      default:
-        throw MissingPluginException();
-    }
+  // ── AppleMapFlutterApi ────────────────────────────────────────────────────
+
+  @override
+  void onCameraMoveStarted() {
+    _appleMapState.widget.onCameraMoveStarted?.call();
+  }
+
+  @override
+  void onCameraMove(PlatformCameraPosition position) {
+    _appleMapState.widget.onCameraMove?.call(
+      CameraPosition(
+        target: LatLng(position.target.latitude, position.target.longitude),
+        heading: position.heading,
+        pitch: position.pitch,
+        zoom: position.zoom,
+      ),
+    );
+  }
+
+  @override
+  void onCameraIdle() {
+    _appleMapState.widget.onCameraIdle?.call();
+  }
+
+  @override
+  void onMapTap(PlatformLatLng position) {
+    _appleMapState.onTap(LatLng(position.latitude, position.longitude));
+  }
+
+  @override
+  void onMapLongPress(PlatformLatLng position) {
+    _appleMapState.onLongPress(LatLng(position.latitude, position.longitude));
+  }
+
+  @override
+  void onAnnotationTap(String annotationId) {
+    _appleMapState.onAnnotationTap(annotationId);
+  }
+
+  @override
+  void onAnnotationDragEnd(String annotationId, PlatformLatLng position) {
+    _appleMapState.onAnnotationDragEnd(
+      annotationId,
+      LatLng(position.latitude, position.longitude),
+    );
+  }
+
+  @override
+  void onAnnotationZIndexChanged(String annotationId, double zIndex) {
+    _appleMapState.onAnnotationZIndexChanged(annotationId, zIndex);
+  }
+
+  @override
+  void onInfoWindowTap(String annotationId) {
+    _appleMapState.onInfoWindowTap(annotationId);
+  }
+
+  @override
+  void onPolylineTap(String polylineId) {
+    _appleMapState.onPolylineTap(polylineId);
+  }
+
+  @override
+  void onPolygonTap(String polygonId) {
+    _appleMapState.onPolygonTap(polygonId);
+  }
+
+  @override
+  void onCircleTap(String circleId) {
+    _appleMapState.onCircleTap(circleId);
+  }
+
+  @override
+  void onPermissionDenied() {
+    _appleMapState.onPermissionDenied();
   }
 
   /// Updates configuration options of the map user interface.
@@ -285,7 +304,7 @@ class AppleMapController {
       return;
     }
     _disposed = true;
-    channel.setMethodCallHandler(null);
+    AppleMapFlutterApi.setUp(null, messageChannelSuffix: '$mapId');
     try {
       await _hostApi.dispose();
     } on PlatformException {
