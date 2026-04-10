@@ -18,7 +18,7 @@ extension AppleMapController: CircleDelegate {
         let circleRenderer = MKCircleRenderer(overlay: circle)
 
         if let flutterCircle: FlutterCircle = overlay as? FlutterCircle {
-            if flutterCircle.isVisible! {
+            if flutterCircle.isVisible ?? true {
                 circleRenderer.strokeColor = flutterCircle.strokeColor
                 circleRenderer.fillColor = flutterCircle.fillColor
                 circleRenderer.lineWidth = flutterCircle.strokeWidth ?? 1.0

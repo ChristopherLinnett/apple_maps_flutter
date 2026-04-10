@@ -37,9 +37,18 @@ class _PolylineUpdates {
         .map(idToCurrentPolyline)
         .toSet();
     polylineIdsToRemove = prevPolylineIds.difference(currentPolylineIds);
+
+    /// Returns `true` if [current] is not equal to the previous one with the
+    /// same id.
+    bool hasChanged(Polyline current) {
+      final Polyline? previous = previousPolylines[current.polylineId];
+      return current != previous;
+    }
+
     polylinesToChange = currentPolylineIds
         .intersection(prevPolylineIds)
         .map(idToCurrentPolyline)
+        .where(hasChanged)
         .toSet();
   }
 
@@ -58,8 +67,11 @@ class _PolylineUpdates {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(polylinesToAdd, polylineIdsToRemove, polylinesToChange);
+  int get hashCode => Object.hash(
+        Object.hashAllUnordered(polylinesToAdd),
+        Object.hashAllUnordered(polylineIdsToRemove),
+        Object.hashAllUnordered(polylinesToChange),
+      );
 
   @override
   String toString() {

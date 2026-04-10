@@ -107,7 +107,7 @@ void main() {
     debugDefaultTargetPlatformOverride = null;
   });
 
-  testWidgets("Updating a circle", (WidgetTester tester) async {
+  testWidgets("Updating a circle — radius", (WidgetTester tester) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     final Circle c1 = Circle(circleId: CircleId("circle_1"));
     final Circle c2 = Circle(circleId: CircleId("circle_1"), radius: 10);
@@ -125,10 +125,13 @@ void main() {
     debugDefaultTargetPlatformOverride = null;
   });
 
-  testWidgets("Updating a circle", (WidgetTester tester) async {
+  testWidgets("Updating a circle — fillColor", (WidgetTester tester) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     final Circle c1 = Circle(circleId: CircleId("circle_1"));
-    final Circle c2 = Circle(circleId: CircleId("circle_1"), radius: 10);
+    final Circle c2 = Circle(
+      circleId: CircleId("circle_1"),
+      fillColor: const Color(0xFF0000FF),
+    );
 
     await tester.pumpWidget(_mapWithCircles(_toSet(c1: c1)));
     await tester.pumpWidget(_mapWithCircles(_toSet(c1: c2)));
@@ -139,11 +142,13 @@ void main() {
 
     final Circle update = platformAppleMap.circlesToChange!.first;
     expect(update, equals(c2));
-    expect(update.radius, 10);
+    expect(update.fillColor, const Color(0xFF0000FF));
     debugDefaultTargetPlatformOverride = null;
   });
 
-  testWidgets("Multi Update", (WidgetTester tester) async {
+  testWidgets("Multi Update — all circles changed", (
+    WidgetTester tester,
+  ) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     Circle c1 = Circle(circleId: CircleId("circle_1"));
     Circle c2 = Circle(circleId: CircleId("circle_2"));
@@ -164,7 +169,9 @@ void main() {
     debugDefaultTargetPlatformOverride = null;
   });
 
-  testWidgets("Multi Update", (WidgetTester tester) async {
+  testWidgets("Multi Update — add, update, and remove combined", (
+    WidgetTester tester,
+  ) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     Circle c2 = Circle(circleId: CircleId("circle_2"));
     final Circle c3 = Circle(circleId: CircleId("circle_3"));
@@ -246,6 +253,51 @@ void main() {
     expect(payload.strokeWidth, 6);
     expect(payload.visible, false);
     expect(payload.zIndex, 8);
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets('Circle with onTap is not resent when callback changes', (
+    WidgetTester tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    // Different lambda instances should not trigger a diff when all value
+    // fields are identical (onTap is excluded from ==).
+    final Circle c1 = Circle(circleId: CircleId('circle_1'), onTap: () {});
+    final Set<Circle> prev = _toSet(c1: c1);
+    final Circle c1Rebuilt = Circle(
+      circleId: CircleId('circle_1'),
+      onTap: () {}, // different lambda instance
+    );
+    final Set<Circle> cur = _toSet(c1: c1Rebuilt);
+
+    await tester.pumpWidget(_mapWithCircles(prev));
+    await tester.pumpWidget(_mapWithCircles(cur));
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+
+    expect(platformAppleMap.circlesToChange!.isEmpty, true);
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets("Updating a circle — center", (WidgetTester tester) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    final Circle c1 = Circle(circleId: CircleId("circle_1"));
+    final Circle c2 = Circle(
+      circleId: CircleId("circle_1"),
+      center: const LatLng(37.0, -122.0),
+    );
+
+    await tester.pumpWidget(_mapWithCircles(_toSet(c1: c1)));
+    await tester.pumpWidget(_mapWithCircles(_toSet(c1: c2)));
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+    expect(platformAppleMap.circlesToChange!.length, 1);
+
+    final Circle update = platformAppleMap.circlesToChange!.first;
+    expect(update, equals(c2));
+    expect(update.center, const LatLng(37.0, -122.0));
     debugDefaultTargetPlatformOverride = null;
   });
 }

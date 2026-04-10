@@ -86,8 +86,8 @@ void main() {
     expect(addedPolyline, equals(p2));
     expect(platformAppleMap.polylineIdsToRemove!.isEmpty, true);
 
-    expect(platformAppleMap.polylinesToChange!.length, 1);
-    expect(platformAppleMap.polylinesToChange!.first, equals(p1));
+    // p1 is unchanged — it must not appear in polylinesToChange
+    expect(platformAppleMap.polylinesToChange!.isEmpty, true);
     debugDefaultTargetPlatformOverride = null;
   });
 
@@ -108,12 +108,12 @@ void main() {
     debugDefaultTargetPlatformOverride = null;
   });
 
-  testWidgets("Updating a polyline", (WidgetTester tester) async {
+  testWidgets("Updating a polyline — visibility", (WidgetTester tester) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     final Polyline p1 = Polyline(polylineId: PolylineId("polyline_1"));
     final Polyline p2 = Polyline(
       polylineId: PolylineId("polyline_1"),
-      visible: true,
+      visible: false,
     );
 
     await tester.pumpWidget(_mapWithPolylines(_toSet(p1: p1)));
@@ -129,12 +129,12 @@ void main() {
     debugDefaultTargetPlatformOverride = null;
   });
 
-  testWidgets("Updating a polyline", (WidgetTester tester) async {
+  testWidgets("Updating a polyline — color", (WidgetTester tester) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     final Polyline p1 = Polyline(polylineId: PolylineId("polyline_1"));
     final Polyline p2 = Polyline(
       polylineId: PolylineId("polyline_1"),
-      visible: true,
+      color: const Color(0xFF123456),
     );
 
     await tester.pumpWidget(_mapWithPolylines(_toSet(p1: p1)));
@@ -146,11 +146,13 @@ void main() {
 
     final Polyline update = platformAppleMap.polylinesToChange!.first;
     expect(update, equals(p2));
-    expect(update.visible, true);
+    expect(update.color, const Color(0xFF123456));
     debugDefaultTargetPlatformOverride = null;
   });
 
-  testWidgets("Multi Update", (WidgetTester tester) async {
+  testWidgets("Multi Update — all polylines changed", (
+    WidgetTester tester,
+  ) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     Polyline p1 = Polyline(polylineId: PolylineId("polyline_1"));
     Polyline p2 = Polyline(polylineId: PolylineId("polyline_2"));
@@ -171,7 +173,9 @@ void main() {
     debugDefaultTargetPlatformOverride = null;
   });
 
-  testWidgets("Multi Update", (WidgetTester tester) async {
+  testWidgets("Multi Update — add, update, and remove combined", (
+    WidgetTester tester,
+  ) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     Polyline p2 = Polyline(polylineId: PolylineId("polyline_2"));
     final Polyline p3 = Polyline(polylineId: PolylineId("polyline_3"));
@@ -179,7 +183,7 @@ void main() {
 
     // p1 is added, p2 is updated, p3 is removed.
     final Polyline p1 = Polyline(polylineId: PolylineId("polyline_1"));
-    p2 = Polyline(polylineId: PolylineId("polyline_2"), visible: true);
+    p2 = Polyline(polylineId: PolylineId("polyline_2"), visible: false);
     final Set<Polyline> cur = _toSet(p1: p1, p2: p2);
 
     await tester.pumpWidget(_mapWithPolylines(prev));
@@ -203,7 +207,7 @@ void main() {
     final Polyline p1 = Polyline(polylineId: PolylineId("polyline_1"));
     Polyline p2 = Polyline(polylineId: PolylineId("polyline_2"));
     final Set<Polyline> prev = _toSet(p1: p1, p2: p2);
-    p2 = Polyline(polylineId: PolylineId("polyline_2"), visible: true);
+    p2 = Polyline(polylineId: PolylineId("polyline_2"), visible: false);
     final Set<Polyline> cur = _toSet(p1: p1, p2: p2);
 
     await tester.pumpWidget(_mapWithPolylines(prev));
@@ -216,7 +220,7 @@ void main() {
     expect(platformAppleMap.polylineIdsToRemove!.isEmpty, true);
     expect(platformAppleMap.polylinesToAdd!.isEmpty, true);
     debugDefaultTargetPlatformOverride = null;
-  }, skip: true);
+  });
 
   testWidgets('Typed polyline payload preserves fields', (
     WidgetTester tester,
@@ -261,6 +265,82 @@ void main() {
     expect(payload.patterns.first.length, 5.0);
     expect(payload.patterns.last.type, PatternItemType.gap);
     expect(payload.patterns.last.length, 2.0);
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets('Unchanged polyline is not resent as a change', (
+    WidgetTester tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    final Polyline p1 = Polyline(polylineId: PolylineId('polyline_1'));
+    final Polyline p2 = Polyline(polylineId: PolylineId('polyline_2'));
+    final Set<Polyline> prev = _toSet(p1: p1, p2: p2);
+    // Only p2 changes; p1 is identical to the previous render.
+    final Polyline p2Updated = Polyline(
+      polylineId: PolylineId('polyline_2'),
+      visible: false,
+    );
+    final Set<Polyline> cur = _toSet(p1: p1, p2: p2Updated);
+
+    await tester.pumpWidget(_mapWithPolylines(prev));
+    await tester.pumpWidget(_mapWithPolylines(cur));
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+
+    expect(platformAppleMap.polylinesToChange!.length, 1);
+    expect(
+      platformAppleMap.polylinesToChange!.first.polylineId.value,
+      'polyline_2',
+    );
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets('Polyline with onTap is not resent when callback changes', (
+    WidgetTester tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    // Different lambda instances should not trigger a diff when all value
+    // fields are identical (onTap is excluded from ==).
+    final Polyline p1 = Polyline(
+      polylineId: PolylineId('polyline_1'),
+      onTap: () {},
+    );
+    final Set<Polyline> prev = _toSet(p1: p1);
+    final Polyline p1Rebuilt = Polyline(
+      polylineId: PolylineId('polyline_1'),
+      onTap: () {}, // different lambda instance
+    );
+    final Set<Polyline> cur = _toSet(p1: p1Rebuilt);
+
+    await tester.pumpWidget(_mapWithPolylines(prev));
+    await tester.pumpWidget(_mapWithPolylines(cur));
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+
+    expect(platformAppleMap.polylinesToChange!.isEmpty, true);
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets("Updating a polyline — points", (WidgetTester tester) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    final Polyline p1 = Polyline(polylineId: PolylineId("polyline_1"));
+    final Polyline p2 = Polyline(
+      polylineId: PolylineId("polyline_1"),
+      points: const <LatLng>[LatLng(1.0, 2.0), LatLng(3.0, 4.0)],
+    );
+
+    await tester.pumpWidget(_mapWithPolylines(_toSet(p1: p1)));
+    await tester.pumpWidget(_mapWithPolylines(_toSet(p1: p2)));
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+    expect(platformAppleMap.polylinesToChange!.length, 1);
+
+    final Polyline update = platformAppleMap.polylinesToChange!.first;
+    expect(update, equals(p2));
+    expect(update.points, const [LatLng(1.0, 2.0), LatLng(3.0, 4.0)]);
     debugDefaultTargetPlatformOverride = null;
   });
 }

@@ -146,6 +146,7 @@ class Circle {
     if (identical(this, other)) return true;
     if (other is! Circle) return false;
     final Circle typedOther = other;
+    // onTap intentionally excluded: callback equality is not reliable
     return circleId == typedOther.circleId &&
         consumeTapEvents == typedOther.consumeTapEvents &&
         fillColor == typedOther.fillColor &&
@@ -154,12 +155,21 @@ class Circle {
         strokeColor == typedOther.strokeColor &&
         strokeWidth == typedOther.strokeWidth &&
         visible == typedOther.visible &&
-        zIndex == typedOther.zIndex &&
-        onTap == typedOther.onTap;
+        zIndex == typedOther.zIndex;
   }
 
   @override
-  int get hashCode => circleId.hashCode;
+  int get hashCode => Object.hash(
+    circleId,
+    consumeTapEvents,
+    fillColor,
+    center,
+    radius,
+    strokeColor,
+    strokeWidth,
+    visible,
+    zIndex,
+  );
 }
 
 Map<CircleId, Circle> _keyByCircleId(Iterable<Circle>? circles) {

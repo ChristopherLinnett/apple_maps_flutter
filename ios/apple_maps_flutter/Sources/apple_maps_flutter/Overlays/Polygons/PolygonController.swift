@@ -18,7 +18,7 @@ extension AppleMapController: PolygonDelegate {
         let polygonRenderer = MKPolygonRenderer(overlay: polygon)
 
         if let flutterPolygon: FlutterPolygon = overlay as? FlutterPolygon {
-            if flutterPolygon.isVisible! {
+            if flutterPolygon.isVisible ?? true {
                 polygonRenderer.strokeColor = flutterPolygon.strokeColor
                 polygonRenderer.fillColor = flutterPolygon.fillColor
                 polygonRenderer.lineWidth = flutterPolygon.width ?? 1.0

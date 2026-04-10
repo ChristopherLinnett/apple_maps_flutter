@@ -28,11 +28,9 @@ class _CircleUpdates {
       return currentCircles[id]!;
     }
 
-    final Set<CircleId> _circleIdsToRemove = prevCircleIds.difference(
-      currentCircleIds,
-    );
+    circleIdsToRemove = prevCircleIds.difference(currentCircleIds);
 
-    final Set<Circle> _circlesToAdd = currentCircleIds
+    circlesToAdd = currentCircleIds
         .difference(prevCircleIds)
         .map(idToCurrentCircle)
         .toSet();
@@ -44,15 +42,11 @@ class _CircleUpdates {
       return current != previous;
     }
 
-    final Set<Circle> _circlesToChange = currentCircleIds
+    circlesToChange = currentCircleIds
         .intersection(prevCircleIds)
         .map(idToCurrentCircle)
         .where(hasChanged)
         .toSet();
-
-    this.circlesToAdd = _circlesToAdd;
-    this.circleIdsToRemove = _circleIdsToRemove;
-    this.circlesToChange = _circlesToChange;
   }
 
   late Set<Circle> circlesToAdd;
@@ -70,8 +64,11 @@ class _CircleUpdates {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(circlesToAdd, circleIdsToRemove, circlesToChange);
+  int get hashCode => Object.hash(
+        Object.hashAllUnordered(circlesToAdd),
+        Object.hashAllUnordered(circleIdsToRemove),
+        Object.hashAllUnordered(circlesToChange),
+      );
 
   @override
   String toString() {
