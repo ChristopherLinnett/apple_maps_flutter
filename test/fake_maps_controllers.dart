@@ -800,6 +800,30 @@ class FakePlatformAppleMap {
     _registerTypedHandler('isScaleEnabled', (Object? message) async {
       return <Object?>[scaleEnabled ?? false];
     });
+    _registerTypedHandler('isTrafficEnabled', (Object? message) async {
+      return <Object?>[false];
+    });
+    _registerTypedHandler('getCameraTargetBounds', (Object? message) async {
+      if (cameraTargetBounds == null ||
+          cameraTargetBounds == CameraTargetBounds.unbounded) {
+        return <Object?>[null];
+      }
+      final LatLngBounds bounds = cameraTargetBounds!.bounds!;
+      return <Object?>[
+        PlatformCameraTargetBounds(
+          bounds: PlatformLatLngBounds(
+            southwest: PlatformLatLng(
+              latitude: bounds.southwest.latitude,
+              longitude: bounds.southwest.longitude,
+            ),
+            northeast: PlatformLatLng(
+              latitude: bounds.northeast.latitude,
+              longitude: bounds.northeast.longitude,
+            ),
+          ),
+        ),
+      ];
+    });
   }
 
   CameraUpdate _cameraUpdateFromPlatform(PlatformCameraUpdate update) {

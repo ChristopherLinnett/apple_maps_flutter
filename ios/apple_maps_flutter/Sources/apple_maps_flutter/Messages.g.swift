@@ -1249,6 +1249,8 @@ protocol AppleMapHostApi {
   func isBuildingsEnabled() throws -> Bool
   func isPointsOfInterestEnabled() throws -> Bool
   func isScaleEnabled() throws -> Bool
+  func isTrafficEnabled() throws -> Bool
+  func getCameraTargetBounds() throws -> PlatformCameraTargetBounds?
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -1607,6 +1609,32 @@ class AppleMapHostApiSetup {
       }
     } else {
       isScaleEnabledChannel.setMessageHandler(nil)
+    }
+    let isTrafficEnabledChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isTrafficEnabled\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      isTrafficEnabledChannel.setMessageHandler { _, reply in
+        do {
+          let result = try api.isTrafficEnabled()
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      isTrafficEnabledChannel.setMessageHandler(nil)
+    }
+    let getCameraTargetBoundsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.getCameraTargetBounds\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      getCameraTargetBoundsChannel.setMessageHandler { _, reply in
+        do {
+          let result = try api.getCameraTargetBounds()
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      getCameraTargetBoundsChannel.setMessageHandler(nil)
     }
   }
 }

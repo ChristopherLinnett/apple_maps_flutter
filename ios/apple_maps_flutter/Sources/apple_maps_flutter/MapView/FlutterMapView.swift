@@ -142,9 +142,11 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
         let newMapType = options["mapType"] as? Int
         let newTraffic = options["trafficEnabled"] as? Bool
         let newPoi = options["pointsOfInterestEnabled"] as? Bool
-        if newMapType != nil || newTraffic != nil || newPoi != nil {
+        let newBuildings = options["buildingsEnabled"] as? Bool
+        if newMapType != nil || newTraffic != nil || newPoi != nil || newBuildings != nil {
             let mapTypeIndex = newMapType ?? self.mapTypes.firstIndex(of: self.mapType) ?? 0
             let traffic = newTraffic ?? self.showsTraffic
+            let buildings = newBuildings ?? self.showsBuildings
             let poi: MKPointOfInterestFilter = {
                 if let newPoi {
                     return newPoi ? .includingAll : .excludingAll
@@ -153,17 +155,18 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
             }()
 
             if #available(iOS 16.0, *) {
+                let elevation: MKMapConfiguration.ElevationStyle = buildings ? .realistic : .flat
                 let config: MKMapConfiguration
                 switch mapTypeIndex {
                 case 1:
-                    config = MKImageryMapConfiguration()
+                    config = MKImageryMapConfiguration(elevationStyle: elevation)
                 case 2:
-                    let c = MKHybridMapConfiguration(elevationStyle: .realistic)
+                    let c = MKHybridMapConfiguration(elevationStyle: elevation)
                     c.showsTraffic = traffic
                     c.pointOfInterestFilter = poi
                     config = c
                 default:
-                    let c = MKStandardMapConfiguration(elevationStyle: .realistic)
+                    let c = MKStandardMapConfiguration(elevationStyle: elevation)
                     c.showsTraffic = traffic
                     c.pointOfInterestFilter = poi
                     config = c
@@ -172,6 +175,7 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
             } else {
                 self.mapType = self.mapTypes[mapTypeIndex]
                 self.showsTraffic = traffic
+                self.showsBuildings = buildings
                 self.pointOfInterestFilter = poi
             }
 
@@ -240,10 +244,6 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
             } else {
                 self.cameraBoundary = nil
             }
-        }
-
-        if let buildingsEnabled: Bool = options["buildingsEnabled"] as? Bool {
-            self.showsBuildings = buildingsEnabled
         }
 
         if let scaleEnabled: Bool = options["scaleEnabled"] as? Bool {

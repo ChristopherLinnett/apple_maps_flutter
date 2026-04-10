@@ -399,4 +399,8 @@ abstract class AppleMapHostApi {
   bool isPointsOfInterestEnabled();
 
   bool isScaleEnabled();
+
+  bool isTrafficEnabled();
+
+  PlatformCameraTargetBounds? getCameraTargetBounds();
 }

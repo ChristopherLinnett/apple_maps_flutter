@@ -218,7 +218,10 @@ public class AppleMapController: NSObject, FlutterPlatformView, AppleMapHostApi 
     }
 
     func isBuildingsEnabled() throws -> Bool {
-        mapView.showsBuildings
+        if #available(iOS 16.0, *) {
+            return mapView.preferredConfiguration.elevationStyle == .realistic
+        }
+        return mapView.showsBuildings
     }
 
     func isPointsOfInterestEnabled() throws -> Bool {
@@ -227,6 +230,27 @@ public class AppleMapController: NSObject, FlutterPlatformView, AppleMapHostApi 
 
     func isScaleEnabled() throws -> Bool {
         mapView.showsScale
+    }
+
+    func isTrafficEnabled() throws -> Bool {
+        mapView.showsTraffic
+    }
+
+    func getCameraTargetBounds() throws -> PlatformCameraTargetBounds? {
+        guard let boundary = mapView.cameraBoundary else {
+            return nil
+        }
+        let region = boundary.region
+        let sw = region.center.latitude - region.span.latitudeDelta / 2.0
+        let ne = region.center.latitude + region.span.latitudeDelta / 2.0
+        let wLng = region.center.longitude - region.span.longitudeDelta / 2.0
+        let eLng = region.center.longitude + region.span.longitudeDelta / 2.0
+        return PlatformCameraTargetBounds(
+            bounds: PlatformLatLngBounds(
+                southwest: PlatformLatLng(latitude: sw, longitude: wLng),
+                northeast: PlatformLatLng(latitude: ne, longitude: eLng)
+            )
+        )
     }
 
     private func updateCamera(cameraUpdate: PlatformCameraUpdate, animated: Bool) {

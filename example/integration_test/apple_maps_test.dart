@@ -5,6 +5,7 @@
 import 'dart:async';
 
 import 'package:apple_maps_flutter/apple_maps_flutter.dart';
+import 'package:apple_maps_flutter/src/messages.g.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/widgets.dart';
 import 'package:integration_test/integration_test.dart';
@@ -453,6 +454,115 @@ void main() {
       matches: (bool value) => value == false,
     );
     expect(scaleEnabled, false);
+  });
+
+  testWidgets('testTrafficToggle', (WidgetTester tester) async {
+    final Key key = GlobalKey();
+    final Completer<AppleMapInspector> inspectorCompleter =
+        Completer<AppleMapInspector>();
+
+    await _pumpMap(
+      tester,
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          key: key,
+          initialCameraPosition: _kInitialCameraPosition,
+          trafficEnabled: true,
+          onMapCreated: (AppleMapController controller) {
+            // ignore: invalid_use_of_visible_for_testing_member
+            final AppleMapInspector inspector = AppleMapInspector(controller.mapId);
+            inspectorCompleter.complete(inspector);
+          },
+        ),
+      ),
+    );
+
+    final AppleMapInspector inspector = await inspectorCompleter.future;
+    bool trafficEnabled = await _waitForValue<bool>(
+      read: () async => await inspector.isTrafficEnabled(),
+      matches: (bool value) => value,
+    );
+    expect(trafficEnabled, true);
+
+    await _pumpMap(
+      tester,
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          key: key,
+          initialCameraPosition: _kInitialCameraPosition,
+          trafficEnabled: false,
+          onMapCreated: (AppleMapController controller) {
+            fail("OnMapCreated should get called only once.");
+          },
+        ),
+      ),
+    );
+
+    trafficEnabled = await _waitForValue<bool>(
+      read: () async => await inspector.isTrafficEnabled(),
+      matches: (bool value) => value == false,
+    );
+    expect(trafficEnabled, false);
+  });
+
+  testWidgets('testCameraTargetBounds', (WidgetTester tester) async {
+    final Key key = GlobalKey();
+    final Completer<AppleMapInspector> inspectorCompleter =
+        Completer<AppleMapInspector>();
+
+    await _pumpMap(
+      tester,
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          key: key,
+          initialCameraPosition: _kInitialCameraPosition,
+          cameraTargetBounds: CameraTargetBounds(
+            LatLngBounds(
+              southwest: const LatLng(-10.0, -10.0),
+              northeast: const LatLng(10.0, 10.0),
+            ),
+          ),
+          onMapCreated: (AppleMapController controller) {
+            // ignore: invalid_use_of_visible_for_testing_member
+            final AppleMapInspector inspector = AppleMapInspector(controller.mapId);
+            inspectorCompleter.complete(inspector);
+          },
+        ),
+      ),
+    );
+
+    final AppleMapInspector inspector = await inspectorCompleter.future;
+    final PlatformCameraTargetBounds? bounds = await _waitForValue(
+      read: () async => await inspector.getCameraTargetBounds(),
+      matches: (PlatformCameraTargetBounds? value) => value != null,
+    );
+    expect(bounds, isNotNull);
+    expect(bounds!.bounds, isNotNull);
+
+    // Set to unbounded.
+    await _pumpMap(
+      tester,
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          key: key,
+          initialCameraPosition: _kInitialCameraPosition,
+          cameraTargetBounds: CameraTargetBounds.unbounded,
+          onMapCreated: (AppleMapController controller) {
+            fail("OnMapCreated should get called only once.");
+          },
+        ),
+      ),
+    );
+
+    final PlatformCameraTargetBounds? unbounded = await _waitForValue(
+      read: () async => await inspector.getCameraTargetBounds(),
+      matches: (PlatformCameraTargetBounds? value) => value == null,
+    );
+    expect(unbounded, isNull);
   });
 
   testWidgets('testPointsOfInterestToggle', (WidgetTester tester) async {

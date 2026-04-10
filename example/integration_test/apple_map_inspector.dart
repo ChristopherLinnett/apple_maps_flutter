@@ -57,4 +57,12 @@ class AppleMapInspector {
   Future<bool> isScaleEnabled() async {
     return _hostApi.isScaleEnabled();
   }
+
+  Future<bool> isTrafficEnabled() async {
+    return _hostApi.isTrafficEnabled();
+  }
+
+  Future<PlatformCameraTargetBounds?> getCameraTargetBounds() async {
+    return _hostApi.getCameraTargetBounds();
+  }
 }
