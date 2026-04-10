@@ -27,6 +27,8 @@ jobs:
       run: flutter analyze
     - name: Run tests
       run: flutter test --coverage
+    - name: Publish dry run
+      run: flutter pub publish --dry-run
     - name: Install example dependencies
       working-directory: ./example
       run: flutter pub get
@@ -35,8 +37,6 @@ jobs:
       run: flutter build ios --release --no-codesign
     - name: CocoaPods lint
       run: pod lib lint ios/apple_maps_flutter.podspec --configuration=Debug --skip-tests --use-modular-headers
-    - name: Publish dry run
-      run: flutter pub publish --dry-run
     # TODO: Re-enable coverage publishing once a reporting backend is configured.
     # - name: Upload coverage report
     #   uses: codecov/codecov-action@v5
