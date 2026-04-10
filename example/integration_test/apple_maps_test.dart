@@ -634,9 +634,10 @@ void main() {
     );
 
     final AppleMapController controller = await controllerCompleter.future;
-    await Future<void>.delayed(const Duration(seconds: 1));
-
-    final LatLngBounds region = await controller.getVisibleRegion();
+    final LatLngBounds region = await _waitForValue<LatLngBounds>(
+      read: () async => controller.getVisibleRegion(),
+      matches: (LatLngBounds value) => value.contains(_kInitialMapCenter),
+    );
     expect(region.southwest, isNotNull);
     expect(region.northeast, isNotNull);
     expect(region.contains(_kInitialMapCenter), isTrue);
@@ -779,10 +780,9 @@ void main() {
     );
 
     final AppleMapController controller = await controllerCompleter.future;
-    await Future<void>.delayed(const Duration(seconds: 1));
-
-    final Offset? screenPoint = await controller.getScreenCoordinate(
-      _kInitialMapCenter,
+    final Offset? screenPoint = await _waitForValue<Offset?>(
+      read: () => controller.getScreenCoordinate(_kInitialMapCenter),
+      matches: (Offset? value) => value != null,
     );
     expect(screenPoint, isNotNull);
 
@@ -824,7 +824,10 @@ void main() {
     );
 
     final AppleMapController controller = await controllerCompleter.future;
-    await Future<void>.delayed(const Duration(seconds: 1));
+    await _waitForValue<LatLngBounds>(
+      read: () => controller.getVisibleRegion(),
+      matches: (LatLngBounds value) => value.contains(_kInitialMapCenter),
+    );
     events.clear();
 
     await controller.moveCamera(
@@ -833,7 +836,9 @@ void main() {
 
     await idleCompleter.future.timeout(
       const Duration(seconds: 5),
-      onTimeout: () {},
+      onTimeout: () => throw TimeoutException(
+        'Timed out waiting for onCameraIdle after moveCamera.',
+      ),
     );
 
     expect(events, contains('moveStarted'));
