@@ -193,6 +193,8 @@ class Polyline {
     color,
     polylineCap,
     jointType,
+    Object.hashAll(patterns),
+    Object.hashAll(points),
     visible,
     width,
     zIndex,

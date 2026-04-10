@@ -160,6 +160,7 @@ class Polygon {
     polygonId,
     consumeTapEvents,
     fillColor,
+    Object.hashAll(points),
     strokeColor,
     strokeWidth,
     visible,
