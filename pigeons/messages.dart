@@ -184,6 +184,7 @@ class PlatformAnnotation {
   bool visible;
   PlatformLatLng position;
   double zIndex;
+
   /// When set, annotations with the same identifier are eligible for clustering.
   /// Maps to MKAnnotationView.clusteringIdentifier on iOS 11+.
   String? clusteringIdentifier;

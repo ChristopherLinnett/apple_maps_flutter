@@ -44,7 +44,10 @@ class _AnnotationUpdates {
     // widget rebuilds with the same annotation set.
     annotationsToChange = currentAnnotationIds
         .intersection(prevAnnotationIds)
-        .where((AnnotationId id) => previousAnnotations[id] != currentAnnotations[id])
+        .where(
+          (AnnotationId id) =>
+              previousAnnotations[id] != currentAnnotations[id],
+        )
         .map(idToCurrentAnnotation)
         .toSet();
   }

@@ -433,8 +433,14 @@ class FakePlatformAppleMap {
       } else {
         cameraTargetBounds = CameraTargetBounds(
           LatLngBounds(
-            southwest: LatLng(bounds.southwest.latitude, bounds.southwest.longitude),
-            northeast: LatLng(bounds.northeast.latitude, bounds.northeast.longitude),
+            southwest: LatLng(
+              bounds.southwest.latitude,
+              bounds.southwest.longitude,
+            ),
+            northeast: LatLng(
+              bounds.northeast.latitude,
+              bounds.northeast.longitude,
+            ),
           ),
         );
       }
@@ -735,9 +741,7 @@ class FakePlatformAppleMap {
       if (getLatLngReturnsNull) {
         return <Object?>[null];
       }
-      return <Object?>[
-        PlatformLatLng(latitude: sc.x, longitude: sc.y),
-      ];
+      return <Object?>[PlatformLatLng(latitude: sc.x, longitude: sc.y)];
     });
     _registerTypedHandler('isMarkerInfoWindowShown', (Object? message) async {
       return <Object?>[infoWindowShown];

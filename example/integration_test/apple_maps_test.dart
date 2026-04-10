@@ -60,7 +60,9 @@ void main() {
           compassEnabled: false,
           onMapCreated: (AppleMapController controller) {
             // ignore: invalid_use_of_visible_for_testing_member
-            final AppleMapInspector inspector = AppleMapInspector(controller.mapId);
+            final AppleMapInspector inspector = AppleMapInspector(
+              controller.mapId,
+            );
             inspectorCompleter.complete(inspector);
           },
         ),
@@ -114,7 +116,9 @@ void main() {
           minMaxZoomPreference: initialZoomLevel,
           onMapCreated: (AppleMapController controller) {
             // ignore: invalid_use_of_visible_for_testing_member
-            final AppleMapInspector inspector = AppleMapInspector(controller.mapId);
+            final AppleMapInspector inspector = AppleMapInspector(
+              controller.mapId,
+            );
             inspectorCompleter.complete(inspector);
           },
         ),
@@ -165,7 +169,9 @@ void main() {
           zoomGesturesEnabled: false,
           onMapCreated: (AppleMapController controller) {
             // ignore: invalid_use_of_visible_for_testing_member
-            final AppleMapInspector inspector = AppleMapInspector(controller.mapId);
+            final AppleMapInspector inspector = AppleMapInspector(
+              controller.mapId,
+            );
             inspectorCompleter.complete(inspector);
           },
         ),
@@ -216,7 +222,9 @@ void main() {
           rotateGesturesEnabled: false,
           onMapCreated: (AppleMapController controller) {
             // ignore: invalid_use_of_visible_for_testing_member
-            final AppleMapInspector inspector = AppleMapInspector(controller.mapId);
+            final AppleMapInspector inspector = AppleMapInspector(
+              controller.mapId,
+            );
             inspectorCompleter.complete(inspector);
           },
         ),
@@ -267,7 +275,9 @@ void main() {
           pitchGesturesEnabled: false,
           onMapCreated: (AppleMapController controller) {
             // ignore: invalid_use_of_visible_for_testing_member
-            final AppleMapInspector inspector = AppleMapInspector(controller.mapId);
+            final AppleMapInspector inspector = AppleMapInspector(
+              controller.mapId,
+            );
             inspectorCompleter.complete(inspector);
           },
         ),
@@ -318,7 +328,9 @@ void main() {
           scrollGesturesEnabled: false,
           onMapCreated: (AppleMapController controller) {
             // ignore: invalid_use_of_visible_for_testing_member
-            final AppleMapInspector inspector = AppleMapInspector(controller.mapId);
+            final AppleMapInspector inspector = AppleMapInspector(
+              controller.mapId,
+            );
             inspectorCompleter.complete(inspector);
           },
         ),
@@ -369,7 +381,9 @@ void main() {
           buildingsEnabled: false,
           onMapCreated: (AppleMapController controller) {
             // ignore: invalid_use_of_visible_for_testing_member
-            final AppleMapInspector inspector = AppleMapInspector(controller.mapId);
+            final AppleMapInspector inspector = AppleMapInspector(
+              controller.mapId,
+            );
             inspectorCompleter.complete(inspector);
           },
         ),
@@ -420,7 +434,9 @@ void main() {
           scaleEnabled: true,
           onMapCreated: (AppleMapController controller) {
             // ignore: invalid_use_of_visible_for_testing_member
-            final AppleMapInspector inspector = AppleMapInspector(controller.mapId);
+            final AppleMapInspector inspector = AppleMapInspector(
+              controller.mapId,
+            );
             inspectorCompleter.complete(inspector);
           },
         ),
@@ -471,7 +487,9 @@ void main() {
           trafficEnabled: true,
           onMapCreated: (AppleMapController controller) {
             // ignore: invalid_use_of_visible_for_testing_member
-            final AppleMapInspector inspector = AppleMapInspector(controller.mapId);
+            final AppleMapInspector inspector = AppleMapInspector(
+              controller.mapId,
+            );
             inspectorCompleter.complete(inspector);
           },
         ),
@@ -527,7 +545,9 @@ void main() {
           ),
           onMapCreated: (AppleMapController controller) {
             // ignore: invalid_use_of_visible_for_testing_member
-            final AppleMapInspector inspector = AppleMapInspector(controller.mapId);
+            final AppleMapInspector inspector = AppleMapInspector(
+              controller.mapId,
+            );
             inspectorCompleter.complete(inspector);
           },
         ),
@@ -580,7 +600,9 @@ void main() {
           pointsOfInterestEnabled: false,
           onMapCreated: (AppleMapController controller) {
             // ignore: invalid_use_of_visible_for_testing_member
-            final AppleMapInspector inspector = AppleMapInspector(controller.mapId);
+            final AppleMapInspector inspector = AppleMapInspector(
+              controller.mapId,
+            );
             inspectorCompleter.complete(inspector);
           },
         ),
@@ -659,7 +681,9 @@ void main() {
           myLocationEnabled: false,
           onMapCreated: (AppleMapController controller) {
             // ignore: invalid_use_of_visible_for_testing_member
-            final AppleMapInspector inspector = AppleMapInspector(controller.mapId);
+            final AppleMapInspector inspector = AppleMapInspector(
+              controller.mapId,
+            );
             inspectorCompleter.complete(inspector);
           },
         ),
@@ -714,7 +738,9 @@ void main() {
           myLocationEnabled: false,
           onMapCreated: (AppleMapController controller) {
             // ignore: invalid_use_of_visible_for_testing_member
-            final AppleMapInspector inspector = AppleMapInspector(controller.mapId);
+            final AppleMapInspector inspector = AppleMapInspector(
+              controller.mapId,
+            );
             inspectorCompleter.complete(inspector);
           },
         ),
@@ -747,7 +773,9 @@ void main() {
           myLocationEnabled: false,
           onMapCreated: (AppleMapController controller) {
             // ignore: invalid_use_of_visible_for_testing_member
-            final AppleMapInspector inspector = AppleMapInspector(controller.mapId);
+            final AppleMapInspector inspector = AppleMapInspector(
+              controller.mapId,
+            );
             inspectorCompleter.complete(inspector);
           },
         ),
@@ -789,8 +817,9 @@ void main() {
       matches: (LatLngBounds value) => value.contains(_kInitialMapCenter),
     );
 
-    final Offset? screenPoint =
-        await controller.getScreenCoordinate(_kInitialMapCenter);
+    final Offset? screenPoint = await controller.getScreenCoordinate(
+      _kInitialMapCenter,
+    );
     expect(screenPoint, isNotNull);
 
     final LatLng? latLng = await controller.getLatLng(screenPoint!);

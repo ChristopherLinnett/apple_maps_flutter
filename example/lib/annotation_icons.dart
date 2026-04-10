@@ -57,11 +57,13 @@ class AnnotationIconsBodyState extends State<AnnotationIconsBody> {
 
   Future<void> _createAnnotationImageFromAsset(BuildContext context) async {
     if (_annotationIcon == null) {
-      final ImageConfiguration imageConfiguration =
-          new ImageConfiguration(devicePixelRatio: 1.0);
+      final ImageConfiguration imageConfiguration = new ImageConfiguration(
+        devicePixelRatio: 1.0,
+      );
       BitmapDescriptor.fromAssetImage(
-              imageConfiguration, 'assets/test_marker.png')
-          .then(_updateBitmap);
+        imageConfiguration,
+        'assets/test_marker.png',
+      ).then(_updateBitmap);
     }
   }
 

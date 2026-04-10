@@ -107,9 +107,7 @@ class PlaceCircleBodyState extends State<PlaceCircleBody> {
   void _toggleVisible() {
     final Circle circle = circles[selectedCircle]!;
     setState(() {
-      circles[selectedCircle!] = circle.copyWith(
-        visibleParam: !circle.visible,
-      );
+      circles[selectedCircle!] = circle.copyWith(visibleParam: !circle.visible);
     });
   }
 
@@ -158,10 +156,7 @@ class PlaceCircleBodyState extends State<PlaceCircleBody> {
           Wrap(
             alignment: WrapAlignment.spaceEvenly,
             children: [
-              TextButton(
-                child: const Text('add'),
-                onPressed: _add,
-              ),
+              TextButton(child: const Text('add'), onPressed: _add),
               TextButton(
                 child: const Text('remove'),
                 onPressed: (selectedCircle == null) ? null : _remove,
@@ -189,9 +184,9 @@ class PlaceCircleBodyState extends State<PlaceCircleBody> {
               TextButton(
                 child: Text('Take a snapshot'),
                 onPressed: () async {
-                  final imageBytes = await this
-                      .controller
-                      .takeSnapshot(SnapshotOptions(showOverlays: true));
+                  final imageBytes = await this.controller.takeSnapshot(
+                    SnapshotOptions(showOverlays: true),
+                  );
                   setState(() {
                     _imageBytes = imageBytes;
                   });

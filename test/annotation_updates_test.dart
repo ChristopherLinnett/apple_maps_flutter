@@ -144,8 +144,9 @@ void main() {
     debugDefaultTargetPlatformOverride = null;
   });
 
-  testWidgets("Updating an annotation — infoWindow snippet",
-      (WidgetTester tester) async {
+  testWidgets("Updating an annotation — infoWindow snippet", (
+    WidgetTester tester,
+  ) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     final Annotation m1 = Annotation(
       annotationId: AnnotationId("annotation_1"),
@@ -168,7 +169,9 @@ void main() {
     debugDefaultTargetPlatformOverride = null;
   });
 
-  testWidgets("Multi Update — all annotations changed", (WidgetTester tester) async {
+  testWidgets("Multi Update — all annotations changed", (
+    WidgetTester tester,
+  ) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     Annotation m1 = Annotation(annotationId: AnnotationId("annotation_1"));
     Annotation m2 = Annotation(annotationId: AnnotationId("annotation_2"));
@@ -192,8 +195,9 @@ void main() {
     debugDefaultTargetPlatformOverride = null;
   });
 
-  testWidgets("Multi Update — add, update, and remove combined",
-      (WidgetTester tester) async {
+  testWidgets("Multi Update — add, update, and remove combined", (
+    WidgetTester tester,
+  ) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     Annotation m2 = Annotation(annotationId: AnnotationId("annotation_2"));
     final Annotation m3 = Annotation(
@@ -305,8 +309,9 @@ void main() {
     debugDefaultTargetPlatformOverride = null;
   });
 
-  testWidgets('Unchanged annotation is not resent as a change',
-      (WidgetTester tester) async {
+  testWidgets('Unchanged annotation is not resent as a change', (
+    WidgetTester tester,
+  ) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     final Annotation m1 = Annotation(
       annotationId: AnnotationId('annotation_1'),
@@ -328,8 +333,9 @@ void main() {
     debugDefaultTargetPlatformOverride = null;
   });
 
-  testWidgets('clusteringIdentifier is forwarded through Pigeon payload',
-      (WidgetTester tester) async {
+  testWidgets('clusteringIdentifier is forwarded through Pigeon payload', (
+    WidgetTester tester,
+  ) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     final Annotation m1 = Annotation(
       annotationId: AnnotationId('annotation_1'),
@@ -341,15 +347,18 @@ void main() {
 
     final FakePlatformAppleMap platformAppleMap =
         fakePlatformViewsController.lastCreatedView!;
-    final PlatformAnnotation payload =
-        platformAppleMap.lastPlatformAnnotationUpdates!.annotationsToAdd!.single;
+    final PlatformAnnotation payload = platformAppleMap
+        .lastPlatformAnnotationUpdates!
+        .annotationsToAdd!
+        .single;
 
     expect(payload.clusteringIdentifier, 'group_a');
     debugDefaultTargetPlatformOverride = null;
   });
 
-  testWidgets('Null clusteringIdentifier is forwarded as null',
-      (WidgetTester tester) async {
+  testWidgets('Null clusteringIdentifier is forwarded as null', (
+    WidgetTester tester,
+  ) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     final Annotation m1 = Annotation(
       annotationId: AnnotationId('annotation_1'),
@@ -360,16 +369,18 @@ void main() {
 
     final FakePlatformAppleMap platformAppleMap =
         fakePlatformViewsController.lastCreatedView!;
-    final PlatformAnnotation payload =
-        platformAppleMap.lastPlatformAnnotationUpdates!.annotationsToAdd!.single;
+    final PlatformAnnotation payload = platformAppleMap
+        .lastPlatformAnnotationUpdates!
+        .annotationsToAdd!
+        .single;
 
     expect(payload.clusteringIdentifier, isNull);
     debugDefaultTargetPlatformOverride = null;
   });
 
-  testWidgets(
-      'Changing clusteringIdentifier triggers an annotation change',
-      (WidgetTester tester) async {
+  testWidgets('Changing clusteringIdentifier triggers an annotation change', (
+    WidgetTester tester,
+  ) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     final Annotation m1 = Annotation(
       annotationId: AnnotationId('annotation_1'),
@@ -393,20 +404,22 @@ void main() {
     debugDefaultTargetPlatformOverride = null;
   });
 
-  testWidgets('copyWith can clear clusteringIdentifier to null',
-      (WidgetTester tester) async {
+  testWidgets('copyWith can clear clusteringIdentifier to null', (
+    WidgetTester tester,
+  ) async {
     final Annotation original = Annotation(
       annotationId: AnnotationId('ann1'),
       clusteringIdentifier: 'group_a',
     );
-    final Annotation cleared =
-        original.copyWith(clusteringIdentifierParam: null);
+    final Annotation cleared = original.copyWith(
+      clusteringIdentifierParam: null,
+    );
     expect(cleared.clusteringIdentifier, isNull);
   });
 
-  testWidgets(
-      'Annotation with InfoWindow(onTap:) is not resent when unchanged',
-      (WidgetTester tester) async {
+  testWidgets('Annotation with InfoWindow(onTap:) is not resent when unchanged', (
+    WidgetTester tester,
+  ) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     // InfoWindow carries a tap callback; rebuild with equal model state must
     // not be misidentified as a change (InfoWindow.== must not compare onTap).

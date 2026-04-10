@@ -291,17 +291,17 @@ class Annotation {
 
   @override
   int get hashCode => Object.hash(
-        annotationId,
-        alpha,
-        anchor,
-        clusteringIdentifier,
-        draggable,
-        icon,
-        infoWindow,
-        position,
-        visible,
-        zIndex,
-      );
+    annotationId,
+    alpha,
+    anchor,
+    clusteringIdentifier,
+    draggable,
+    icon,
+    infoWindow,
+    position,
+    visible,
+    zIndex,
+  );
 
   @override
   String toString() {

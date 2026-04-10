@@ -99,7 +99,6 @@ class FlutterAnnotation: NSObject, MKAnnotation {
             && lhs.wasDragged == rhs.wasDragged
             && lhs.zIndex == rhs.zIndex
     }
-    }
     
     static func != (lhs: FlutterAnnotation, rhs: FlutterAnnotation) -> Bool {
         return !(lhs == rhs)
