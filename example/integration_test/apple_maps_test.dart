@@ -780,10 +780,17 @@ void main() {
     );
 
     final AppleMapController controller = await controllerCompleter.future;
-    final Offset? screenPoint = await _waitForValue<Offset?>(
-      read: () => controller.getScreenCoordinate(_kInitialMapCenter),
-      matches: (Offset? value) => value != null,
+    // Wait until the camera has settled at the initial position before
+    // projecting. getScreenCoordinate returns non-null as soon as the channel
+    // is live, but the round-trip is only meaningful once the map is actually
+    // showing the initial center.
+    await _waitForValue<LatLngBounds>(
+      read: () => controller.getVisibleRegion(),
+      matches: (LatLngBounds value) => value.contains(_kInitialMapCenter),
     );
+
+    final Offset? screenPoint =
+        await controller.getScreenCoordinate(_kInitialMapCenter);
     expect(screenPoint, isNotNull);
 
     final LatLng? latLng = await controller.getLatLng(screenPoint!);
