@@ -45,4 +45,24 @@ class AppleMapInspector {
   Future<bool> isMyLocationButtonEnabled() async {
     return _hostApi.isMyLocationButtonEnabled();
   }
+
+  Future<bool> isBuildingsEnabled() async {
+    return _hostApi.isBuildingsEnabled();
+  }
+
+  Future<bool> isPointsOfInterestEnabled() async {
+    return _hostApi.isPointsOfInterestEnabled();
+  }
+
+  Future<bool> isScaleEnabled() async {
+    return _hostApi.isScaleEnabled();
+  }
+
+  Future<bool> isTrafficEnabled() async {
+    return _hostApi.isTrafficEnabled();
+  }
+
+  Future<PlatformCameraTargetBounds?> getCameraTargetBounds() async {
+    return _hostApi.getCameraTargetBounds();
+  }
 }

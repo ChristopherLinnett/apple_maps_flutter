@@ -147,6 +147,22 @@ extension PlatformMapOptions {
         if let insetsLayoutMarginsFromSafeArea {
             options["insetsLayoutMarginsFromSafeArea"] = insetsLayoutMarginsFromSafeArea
         }
+        if let cameraTargetBounds {
+            if let bounds = cameraTargetBounds.bounds {
+                options["cameraTargetBounds"] = bounds.asTargetList
+            } else {
+                options["cameraTargetBounds"] = NSNull()
+            }
+        }
+        if let buildingsEnabled {
+            options["buildingsEnabled"] = buildingsEnabled
+        }
+        if let pointsOfInterestEnabled {
+            options["pointsOfInterestEnabled"] = pointsOfInterestEnabled
+        }
+        if let scaleEnabled {
+            options["scaleEnabled"] = scaleEnabled
+        }
 
         return options
     }

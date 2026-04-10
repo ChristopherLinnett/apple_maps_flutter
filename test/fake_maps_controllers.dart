@@ -72,6 +72,14 @@ class FakePlatformAppleMap {
 
   bool? myLocationButtonEnabled;
 
+  bool? buildingsEnabled;
+
+  bool? pointsOfInterestEnabled;
+
+  bool? scaleEnabled;
+
+  CameraTargetBounds? cameraTargetBounds;
+
   Set<AnnotationId>? annotationIdsToRemove;
 
   Set<Annotation>? annotationsToAdd;
@@ -343,6 +351,29 @@ class FakePlatformAppleMap {
         paddingList[2] as double,
       );
     }
+    if (options.containsKey('buildingsEnabled')) {
+      buildingsEnabled = options['buildingsEnabled'];
+    }
+    if (options.containsKey('pointsOfInterestEnabled')) {
+      pointsOfInterestEnabled = options['pointsOfInterestEnabled'];
+    }
+    if (options.containsKey('scaleEnabled')) {
+      scaleEnabled = options['scaleEnabled'];
+    }
+    if (options.containsKey('cameraTargetBounds')) {
+      final dynamic boundsData = options['cameraTargetBounds'];
+      if (boundsData == null) {
+        cameraTargetBounds = CameraTargetBounds.unbounded;
+      } else {
+        final List<dynamic> flat = boundsData as List<dynamic>;
+        cameraTargetBounds = CameraTargetBounds(
+          LatLngBounds(
+            southwest: LatLng(flat[0] as double, flat[1] as double),
+            northeast: LatLng(flat[2] as double, flat[3] as double),
+          ),
+        );
+      }
+    }
   }
 
   void updateOptionsFromPlatform(PlatformMapOptions options) {
@@ -383,6 +414,28 @@ class FakePlatformAppleMap {
         options.padding!.right,
         options.padding!.bottom,
       );
+    }
+    if (options.buildingsEnabled != null) {
+      buildingsEnabled = options.buildingsEnabled;
+    }
+    if (options.pointsOfInterestEnabled != null) {
+      pointsOfInterestEnabled = options.pointsOfInterestEnabled;
+    }
+    if (options.scaleEnabled != null) {
+      scaleEnabled = options.scaleEnabled;
+    }
+    if (options.cameraTargetBounds != null) {
+      final PlatformLatLngBounds? bounds = options.cameraTargetBounds!.bounds;
+      if (bounds == null) {
+        cameraTargetBounds = CameraTargetBounds.unbounded;
+      } else {
+        cameraTargetBounds = CameraTargetBounds(
+          LatLngBounds(
+            southwest: LatLng(bounds.southwest.latitude, bounds.southwest.longitude),
+            northeast: LatLng(bounds.northeast.latitude, bounds.northeast.longitude),
+          ),
+        );
+      }
     }
   }
 
@@ -737,6 +790,39 @@ class FakePlatformAppleMap {
     });
     _registerTypedHandler('isMyLocationButtonEnabled', (Object? message) async {
       return <Object?>[myLocationButtonEnabled ?? false];
+    });
+    _registerTypedHandler('isBuildingsEnabled', (Object? message) async {
+      return <Object?>[buildingsEnabled ?? true];
+    });
+    _registerTypedHandler('isPointsOfInterestEnabled', (Object? message) async {
+      return <Object?>[pointsOfInterestEnabled ?? true];
+    });
+    _registerTypedHandler('isScaleEnabled', (Object? message) async {
+      return <Object?>[scaleEnabled ?? false];
+    });
+    _registerTypedHandler('isTrafficEnabled', (Object? message) async {
+      return <Object?>[false];
+    });
+    _registerTypedHandler('getCameraTargetBounds', (Object? message) async {
+      if (cameraTargetBounds == null ||
+          cameraTargetBounds == CameraTargetBounds.unbounded) {
+        return <Object?>[null];
+      }
+      final LatLngBounds bounds = cameraTargetBounds!.bounds!;
+      return <Object?>[
+        PlatformCameraTargetBounds(
+          bounds: PlatformLatLngBounds(
+            southwest: PlatformLatLng(
+              latitude: bounds.southwest.latitude,
+              longitude: bounds.southwest.longitude,
+            ),
+            northeast: PlatformLatLng(
+              latitude: bounds.northeast.latitude,
+              longitude: bounds.northeast.longitude,
+            ),
+          ),
+        ),
+      ];
     });
   }
 

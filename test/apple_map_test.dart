@@ -1393,4 +1393,252 @@ void main() {
     expect(ppg.points[2].longitude, 10.0);
     debugDefaultTargetPlatformOverride = null;
   });
+
+  // ------------------------------------------------------------------
+  // New map configuration options
+  // ------------------------------------------------------------------
+
+  testWidgets('Can update buildingsEnabled', (WidgetTester tester) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: CameraPosition(target: LatLng(10.0, 15.0)),
+          buildingsEnabled: false,
+        ),
+      ),
+    );
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+
+    expect(platformAppleMap.buildingsEnabled, false);
+
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: CameraPosition(target: LatLng(10.0, 15.0)),
+          buildingsEnabled: true,
+        ),
+      ),
+    );
+
+    expect(platformAppleMap.buildingsEnabled, true);
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets('Can update pointsOfInterestEnabled', (
+    WidgetTester tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: CameraPosition(target: LatLng(10.0, 15.0)),
+          pointsOfInterestEnabled: false,
+        ),
+      ),
+    );
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+
+    expect(platformAppleMap.pointsOfInterestEnabled, false);
+
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: CameraPosition(target: LatLng(10.0, 15.0)),
+          pointsOfInterestEnabled: true,
+        ),
+      ),
+    );
+
+    expect(platformAppleMap.pointsOfInterestEnabled, true);
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets('Can update scaleEnabled', (WidgetTester tester) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: CameraPosition(target: LatLng(10.0, 15.0)),
+          scaleEnabled: true,
+        ),
+      ),
+    );
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+
+    expect(platformAppleMap.scaleEnabled, true);
+
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: CameraPosition(target: LatLng(10.0, 15.0)),
+          scaleEnabled: false,
+        ),
+      ),
+    );
+
+    expect(platformAppleMap.scaleEnabled, false);
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets('Can update cameraTargetBounds', (WidgetTester tester) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    await tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: const CameraPosition(
+            target: LatLng(10.0, 15.0),
+          ),
+          cameraTargetBounds: CameraTargetBounds(
+            LatLngBounds(
+              southwest: LatLng(1.0, 2.0),
+              northeast: LatLng(3.0, 4.0),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+
+    expect(platformAppleMap.cameraTargetBounds, isNotNull);
+    expect(platformAppleMap.cameraTargetBounds!.bounds, isNotNull);
+    expect(
+      platformAppleMap.cameraTargetBounds!.bounds!.southwest,
+      const LatLng(1.0, 2.0),
+    );
+    expect(
+      platformAppleMap.cameraTargetBounds!.bounds!.northeast,
+      const LatLng(3.0, 4.0),
+    );
+
+    // Set to unbounded.
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: CameraPosition(target: LatLng(10.0, 15.0)),
+          cameraTargetBounds: CameraTargetBounds.unbounded,
+        ),
+      ),
+    );
+
+    expect(platformAppleMap.cameraTargetBounds, isNotNull);
+    expect(platformAppleMap.cameraTargetBounds!.bounds, isNull);
+
+    // Set to bounded again.
+    await tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: const CameraPosition(
+            target: LatLng(10.0, 15.0),
+          ),
+          cameraTargetBounds: CameraTargetBounds(
+            LatLngBounds(
+              southwest: LatLng(5.0, 6.0),
+              northeast: LatLng(7.0, 8.0),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(
+      platformAppleMap.cameraTargetBounds!.bounds!.southwest,
+      const LatLng(5.0, 6.0),
+    );
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets('Equal cameraTargetBounds does not trigger a redundant update', (
+    WidgetTester tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    final CameraTargetBounds bounds = CameraTargetBounds(
+      LatLngBounds(
+        southwest: LatLng(1.0, 2.0),
+        northeast: LatLng(3.0, 4.0),
+      ),
+    );
+
+    await tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: const CameraPosition(
+            target: LatLng(10.0, 15.0),
+          ),
+          cameraTargetBounds: bounds,
+        ),
+      ),
+    );
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+    expect(platformAppleMap.mapUpdateCallCount, 0);
+
+    // Rebuild with identical bounds — should NOT trigger a map update.
+    await tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: const CameraPosition(
+            target: LatLng(10.0, 15.0),
+          ),
+          cameraTargetBounds: bounds,
+        ),
+      ),
+    );
+
+    expect(platformAppleMap.mapUpdateCallCount, 0);
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets('Equal unbounded cameraTargetBounds does not trigger update', (
+    WidgetTester tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: CameraPosition(target: LatLng(10.0, 15.0)),
+          cameraTargetBounds: CameraTargetBounds.unbounded,
+        ),
+      ),
+    );
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+    expect(platformAppleMap.mapUpdateCallCount, 0);
+
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: CameraPosition(target: LatLng(10.0, 15.0)),
+          cameraTargetBounds: CameraTargetBounds.unbounded,
+        ),
+      ),
+    );
+
+    expect(platformAppleMap.mapUpdateCallCount, 0);
+    debugDefaultTargetPlatformOverride = null;
+  });
 }

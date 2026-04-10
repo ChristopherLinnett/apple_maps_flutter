@@ -85,6 +85,12 @@ class PlatformPadding {
   double right;
 }
 
+class PlatformCameraTargetBounds {
+  PlatformCameraTargetBounds({this.bounds});
+
+  PlatformLatLngBounds? bounds;
+}
+
 class PlatformMapOptions {
   PlatformMapOptions({
     this.compassEnabled,
@@ -100,6 +106,10 @@ class PlatformMapOptions {
     this.myLocationButtonEnabled,
     this.padding,
     this.insetsLayoutMarginsFromSafeArea,
+    this.cameraTargetBounds,
+    this.buildingsEnabled,
+    this.pointsOfInterestEnabled,
+    this.scaleEnabled,
   });
 
   bool? compassEnabled;
@@ -115,6 +125,10 @@ class PlatformMapOptions {
   bool? myLocationButtonEnabled;
   PlatformPadding? padding;
   bool? insetsLayoutMarginsFromSafeArea;
+  PlatformCameraTargetBounds? cameraTargetBounds;
+  bool? buildingsEnabled;
+  bool? pointsOfInterestEnabled;
+  bool? scaleEnabled;
 }
 
 class PlatformInfoWindow {
@@ -379,4 +393,14 @@ abstract class AppleMapHostApi {
   bool isScrollGesturesEnabled();
 
   bool isMyLocationButtonEnabled();
+
+  bool isBuildingsEnabled();
+
+  bool isPointsOfInterestEnabled();
+
+  bool isScaleEnabled();
+
+  bool isTrafficEnabled();
+
+  PlatformCameraTargetBounds? getCameraTargetBounds();
 }

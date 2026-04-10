@@ -378,6 +378,31 @@ struct PlatformPadding: Hashable {
 }
 
 /// Generated class from Pigeon that represents data sent in messages.
+struct PlatformCameraTargetBounds: Hashable {
+  var bounds: PlatformLatLngBounds? = nil
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> PlatformCameraTargetBounds? {
+    let bounds: PlatformLatLngBounds? = nilOrValue(pigeonVar_list[0])
+
+    return PlatformCameraTargetBounds(
+      bounds: bounds
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      bounds
+    ]
+  }
+  static func == (lhs: PlatformCameraTargetBounds, rhs: PlatformCameraTargetBounds) -> Bool {
+    return deepEqualsMessages(lhs.toList(), rhs.toList())  }
+  func hash(into hasher: inout Hasher) {
+    deepHashMessages(value: toList(), hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
 struct PlatformMapOptions: Hashable {
   var compassEnabled: Bool? = nil
   var trafficEnabled: Bool? = nil
@@ -392,6 +417,10 @@ struct PlatformMapOptions: Hashable {
   var myLocationButtonEnabled: Bool? = nil
   var padding: PlatformPadding? = nil
   var insetsLayoutMarginsFromSafeArea: Bool? = nil
+  var cameraTargetBounds: PlatformCameraTargetBounds? = nil
+  var buildingsEnabled: Bool? = nil
+  var pointsOfInterestEnabled: Bool? = nil
+  var scaleEnabled: Bool? = nil
 
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
@@ -409,6 +438,10 @@ struct PlatformMapOptions: Hashable {
     let myLocationButtonEnabled: Bool? = nilOrValue(pigeonVar_list[10])
     let padding: PlatformPadding? = nilOrValue(pigeonVar_list[11])
     let insetsLayoutMarginsFromSafeArea: Bool? = nilOrValue(pigeonVar_list[12])
+    let cameraTargetBounds: PlatformCameraTargetBounds? = nilOrValue(pigeonVar_list[13])
+    let buildingsEnabled: Bool? = nilOrValue(pigeonVar_list[14])
+    let pointsOfInterestEnabled: Bool? = nilOrValue(pigeonVar_list[15])
+    let scaleEnabled: Bool? = nilOrValue(pigeonVar_list[16])
 
     return PlatformMapOptions(
       compassEnabled: compassEnabled,
@@ -423,7 +456,11 @@ struct PlatformMapOptions: Hashable {
       myLocationEnabled: myLocationEnabled,
       myLocationButtonEnabled: myLocationButtonEnabled,
       padding: padding,
-      insetsLayoutMarginsFromSafeArea: insetsLayoutMarginsFromSafeArea
+      insetsLayoutMarginsFromSafeArea: insetsLayoutMarginsFromSafeArea,
+      cameraTargetBounds: cameraTargetBounds,
+      buildingsEnabled: buildingsEnabled,
+      pointsOfInterestEnabled: pointsOfInterestEnabled,
+      scaleEnabled: scaleEnabled
     )
   }
   func toList() -> [Any?] {
@@ -441,6 +478,10 @@ struct PlatformMapOptions: Hashable {
       myLocationButtonEnabled,
       padding,
       insetsLayoutMarginsFromSafeArea,
+      cameraTargetBounds,
+      buildingsEnabled,
+      pointsOfInterestEnabled,
+      scaleEnabled,
     ]
   }
   static func == (lhs: PlatformMapOptions, rhs: PlatformMapOptions) -> Bool {
@@ -1045,32 +1086,34 @@ private class MessagesPigeonCodecReader: FlutterStandardReader {
     case 139:
       return PlatformPadding.fromList(self.readValue() as! [Any?])
     case 140:
-      return PlatformMapOptions.fromList(self.readValue() as! [Any?])
+      return PlatformCameraTargetBounds.fromList(self.readValue() as! [Any?])
     case 141:
-      return PlatformInfoWindow.fromList(self.readValue() as! [Any?])
+      return PlatformMapOptions.fromList(self.readValue() as! [Any?])
     case 142:
-      return PlatformBitmapDescriptor.fromList(self.readValue() as! [Any?])
+      return PlatformInfoWindow.fromList(self.readValue() as! [Any?])
     case 143:
-      return PlatformAnnotation.fromList(self.readValue() as! [Any?])
+      return PlatformBitmapDescriptor.fromList(self.readValue() as! [Any?])
     case 144:
-      return PlatformAnnotationUpdates.fromList(self.readValue() as! [Any?])
+      return PlatformAnnotation.fromList(self.readValue() as! [Any?])
     case 145:
-      return PlatformPatternItem.fromList(self.readValue() as! [Any?])
+      return PlatformAnnotationUpdates.fromList(self.readValue() as! [Any?])
     case 146:
-      return PlatformPolyline.fromList(self.readValue() as! [Any?])
+      return PlatformPatternItem.fromList(self.readValue() as! [Any?])
     case 147:
-      return PlatformPolylineUpdates.fromList(self.readValue() as! [Any?])
+      return PlatformPolyline.fromList(self.readValue() as! [Any?])
     case 148:
-      return PlatformPolygon.fromList(self.readValue() as! [Any?])
+      return PlatformPolylineUpdates.fromList(self.readValue() as! [Any?])
     case 149:
-      return PlatformPolygonUpdates.fromList(self.readValue() as! [Any?])
+      return PlatformPolygon.fromList(self.readValue() as! [Any?])
     case 150:
-      return PlatformCircle.fromList(self.readValue() as! [Any?])
+      return PlatformPolygonUpdates.fromList(self.readValue() as! [Any?])
     case 151:
-      return PlatformCircleUpdates.fromList(self.readValue() as! [Any?])
+      return PlatformCircle.fromList(self.readValue() as! [Any?])
     case 152:
-      return PlatformSnapshotOptions.fromList(self.readValue() as! [Any?])
+      return PlatformCircleUpdates.fromList(self.readValue() as! [Any?])
     case 153:
+      return PlatformSnapshotOptions.fromList(self.readValue() as! [Any?])
+    case 154:
       return PlatformCameraUpdate.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
@@ -1113,47 +1156,50 @@ private class MessagesPigeonCodecWriter: FlutterStandardWriter {
     } else if let value = value as? PlatformPadding {
       super.writeByte(139)
       super.writeValue(value.toList())
-    } else if let value = value as? PlatformMapOptions {
+    } else if let value = value as? PlatformCameraTargetBounds {
       super.writeByte(140)
       super.writeValue(value.toList())
-    } else if let value = value as? PlatformInfoWindow {
+    } else if let value = value as? PlatformMapOptions {
       super.writeByte(141)
       super.writeValue(value.toList())
-    } else if let value = value as? PlatformBitmapDescriptor {
+    } else if let value = value as? PlatformInfoWindow {
       super.writeByte(142)
       super.writeValue(value.toList())
-    } else if let value = value as? PlatformAnnotation {
+    } else if let value = value as? PlatformBitmapDescriptor {
       super.writeByte(143)
       super.writeValue(value.toList())
-    } else if let value = value as? PlatformAnnotationUpdates {
+    } else if let value = value as? PlatformAnnotation {
       super.writeByte(144)
       super.writeValue(value.toList())
-    } else if let value = value as? PlatformPatternItem {
+    } else if let value = value as? PlatformAnnotationUpdates {
       super.writeByte(145)
       super.writeValue(value.toList())
-    } else if let value = value as? PlatformPolyline {
+    } else if let value = value as? PlatformPatternItem {
       super.writeByte(146)
       super.writeValue(value.toList())
-    } else if let value = value as? PlatformPolylineUpdates {
+    } else if let value = value as? PlatformPolyline {
       super.writeByte(147)
       super.writeValue(value.toList())
-    } else if let value = value as? PlatformPolygon {
+    } else if let value = value as? PlatformPolylineUpdates {
       super.writeByte(148)
       super.writeValue(value.toList())
-    } else if let value = value as? PlatformPolygonUpdates {
+    } else if let value = value as? PlatformPolygon {
       super.writeByte(149)
       super.writeValue(value.toList())
-    } else if let value = value as? PlatformCircle {
+    } else if let value = value as? PlatformPolygonUpdates {
       super.writeByte(150)
       super.writeValue(value.toList())
-    } else if let value = value as? PlatformCircleUpdates {
+    } else if let value = value as? PlatformCircle {
       super.writeByte(151)
       super.writeValue(value.toList())
-    } else if let value = value as? PlatformSnapshotOptions {
+    } else if let value = value as? PlatformCircleUpdates {
       super.writeByte(152)
       super.writeValue(value.toList())
-    } else if let value = value as? PlatformCameraUpdate {
+    } else if let value = value as? PlatformSnapshotOptions {
       super.writeByte(153)
+      super.writeValue(value.toList())
+    } else if let value = value as? PlatformCameraUpdate {
+      super.writeByte(154)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -1200,6 +1246,11 @@ protocol AppleMapHostApi {
   func isPitchGesturesEnabled() throws -> Bool
   func isScrollGesturesEnabled() throws -> Bool
   func isMyLocationButtonEnabled() throws -> Bool
+  func isBuildingsEnabled() throws -> Bool
+  func isPointsOfInterestEnabled() throws -> Bool
+  func isScaleEnabled() throws -> Bool
+  func isTrafficEnabled() throws -> Bool
+  func getCameraTargetBounds() throws -> PlatformCameraTargetBounds?
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -1519,6 +1570,71 @@ class AppleMapHostApiSetup {
       }
     } else {
       isMyLocationButtonEnabledChannel.setMessageHandler(nil)
+    }
+    let isBuildingsEnabledChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isBuildingsEnabled\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      isBuildingsEnabledChannel.setMessageHandler { _, reply in
+        do {
+          let result = try api.isBuildingsEnabled()
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      isBuildingsEnabledChannel.setMessageHandler(nil)
+    }
+    let isPointsOfInterestEnabledChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isPointsOfInterestEnabled\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      isPointsOfInterestEnabledChannel.setMessageHandler { _, reply in
+        do {
+          let result = try api.isPointsOfInterestEnabled()
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      isPointsOfInterestEnabledChannel.setMessageHandler(nil)
+    }
+    let isScaleEnabledChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isScaleEnabled\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      isScaleEnabledChannel.setMessageHandler { _, reply in
+        do {
+          let result = try api.isScaleEnabled()
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      isScaleEnabledChannel.setMessageHandler(nil)
+    }
+    let isTrafficEnabledChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isTrafficEnabled\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      isTrafficEnabledChannel.setMessageHandler { _, reply in
+        do {
+          let result = try api.isTrafficEnabled()
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      isTrafficEnabledChannel.setMessageHandler(nil)
+    }
+    let getCameraTargetBoundsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.getCameraTargetBounds\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      getCameraTargetBoundsChannel.setMessageHandler { _, reply in
+        do {
+          let result = try api.getCameraTargetBounds()
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      getCameraTargetBoundsChannel.setMessageHandler(nil)
     }
   }
 }

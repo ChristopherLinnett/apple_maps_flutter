@@ -8,6 +8,13 @@ PlatformMapOptions _platformMapOptionsFromMap(Map<String, dynamic> map) {
     minMaxZoomPreference: _platformMinMaxZoomPreferenceFromDynamic(
       map['minMaxZoomPreference'],
     ),
+    cameraTargetBounds: map.containsKey('cameraTargetBounds')
+        ? PlatformCameraTargetBounds(
+            bounds: _platformLatLngBoundsFromFlatList(
+              map['cameraTargetBounds'],
+            ),
+          )
+        : null,
     rotateGesturesEnabled: map['rotateGesturesEnabled'] as bool?,
     scrollGesturesEnabled: map['scrollGesturesEnabled'] as bool?,
     pitchGesturesEnabled: map['pitchGesturesEnabled'] as bool?,
@@ -15,6 +22,9 @@ PlatformMapOptions _platformMapOptionsFromMap(Map<String, dynamic> map) {
     zoomGesturesEnabled: map['zoomGesturesEnabled'] as bool?,
     myLocationEnabled: map['myLocationEnabled'] as bool?,
     myLocationButtonEnabled: map['myLocationButtonEnabled'] as bool?,
+    buildingsEnabled: map['buildingsEnabled'] as bool?,
+    pointsOfInterestEnabled: map['pointsOfInterestEnabled'] as bool?,
+    scaleEnabled: map['scaleEnabled'] as bool?,
     padding: _platformPaddingFromDynamic(map['padding']),
     insetsLayoutMarginsFromSafeArea:
         map['insetsLayoutMarginsFromSafeArea'] as bool?,
@@ -190,6 +200,23 @@ PlatformMinMaxZoomPreference? _platformMinMaxZoomPreferenceFromDynamic(
   return PlatformMinMaxZoomPreference(
     minZoom: (zoomRange[0] as num?)?.toDouble(),
     maxZoom: (zoomRange[1] as num?)?.toDouble(),
+  );
+}
+
+PlatformLatLngBounds? _platformLatLngBoundsFromFlatList(dynamic value) {
+  if (value == null) {
+    return null;
+  }
+  final List<dynamic> flat = value as List<dynamic>;
+  return PlatformLatLngBounds(
+    southwest: PlatformLatLng(
+      latitude: (flat[0] as num).toDouble(),
+      longitude: (flat[1] as num).toDouble(),
+    ),
+    northeast: PlatformLatLng(
+      latitude: (flat[2] as num).toDouble(),
+      longitude: (flat[3] as num).toDouble(),
+    ),
   );
 }
 

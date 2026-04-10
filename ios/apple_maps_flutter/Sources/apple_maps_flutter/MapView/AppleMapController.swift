@@ -190,10 +190,7 @@ public class AppleMapController: NSObject, FlutterPlatformView, AppleMapHostApi 
     }
 
     func isCompassEnabled() throws -> Bool {
-        if #available(iOS 9.0, *) {
-            return mapView.showsCompass
-        }
-        return true
+        mapView.showsCompass
     }
 
     func getMinMaxZoomLevels() throws -> PlatformMinMaxZoomPreference {
@@ -218,6 +215,42 @@ public class AppleMapController: NSObject, FlutterPlatformView, AppleMapHostApi 
 
     func isMyLocationButtonEnabled() throws -> Bool {
         mapView.isMyLocationButtonShowing ?? false
+    }
+
+    func isBuildingsEnabled() throws -> Bool {
+        if #available(iOS 16.0, *) {
+            return mapView.preferredConfiguration.elevationStyle == .realistic
+        }
+        return mapView.showsBuildings
+    }
+
+    func isPointsOfInterestEnabled() throws -> Bool {
+        mapView.isPointsOfInterestEnabled
+    }
+
+    func isScaleEnabled() throws -> Bool {
+        mapView.showsScale
+    }
+
+    func isTrafficEnabled() throws -> Bool {
+        mapView.showsTraffic
+    }
+
+    func getCameraTargetBounds() throws -> PlatformCameraTargetBounds? {
+        guard let boundary = mapView.cameraBoundary else {
+            return nil
+        }
+        let region = boundary.region
+        let sw = region.center.latitude - region.span.latitudeDelta / 2.0
+        let ne = region.center.latitude + region.span.latitudeDelta / 2.0
+        let wLng = region.center.longitude - region.span.longitudeDelta / 2.0
+        let eLng = region.center.longitude + region.span.longitudeDelta / 2.0
+        return PlatformCameraTargetBounds(
+            bounds: PlatformLatLngBounds(
+                southwest: PlatformLatLng(latitude: sw, longitude: wLng),
+                northeast: PlatformLatLng(latitude: ne, longitude: eLng)
+            )
+        )
     }
 
     private func updateCamera(cameraUpdate: PlatformCameraUpdate, animated: Bool) {
@@ -304,20 +337,15 @@ extension AppleMapController {
         snapShotOptions.size = self.mapView.frame.size
         snapShotOptions.scale = UIScreen.main.scale
         snapShotOptions.showsBuildings = options.showBuildings
-        if #available(iOS 13.0, *) {
-            snapShotOptions.pointOfInterestFilter = options.showPointsOfInterest
-                ? .includingAll
-                : .excludingAll
-        } else {
-            snapShotOptions.showsPointsOfInterest = options.showPointsOfInterest
-        }
+        snapShotOptions.pointOfInterestFilter = options.showPointsOfInterest
+            ? .includingAll
+            : .excludingAll
         
         // Cancel any in-flight snapshot before creating a new one.
         snapShot?.cancel()
         snapShot = MKMapSnapshotter(options: snapShotOptions)
         
-        if #available(iOS 10.0, *) {
-            snapShot?.start { [weak self] snapshot, error in
+        snapShot?.start { [weak self] snapshot, error in
                 guard let self = self else {
                     return
                 }
@@ -351,7 +379,6 @@ extension AppleMapController {
                     onCompletion(FlutterStandardTypedData.init(bytes: imageData), nil)
                 }
             }
-        }
     }
     
     private func drawAnnotations(annotation: FlutterAnnotation?, point: CGPoint) {
@@ -366,7 +393,7 @@ extension AppleMapController {
         offsetPoint.y -= annotationView.bounds.height / 2
         
         
-        if #available(iOS 11.0, *), annotationView is MKMarkerAnnotationView {
+        if annotationView is MKMarkerAnnotationView {
             annotationView.drawHierarchy(in: CGRect(x: offsetPoint.x, y: offsetPoint.y, width: annotationView.bounds.width, height: annotationView.bounds.height), afterScreenUpdates: true)
         } else {
             offsetPoint.x += annotationView.centerOffset.x
@@ -376,7 +403,6 @@ extension AppleMapController {
         }
     }
     
-    @available(iOS 10.0, *)
     private func drawOverlays(overlay: MKOverlay?, snapshot: MKMapSnapshotter.Snapshot, context: UIGraphicsRendererContext) {
         guard overlay != nil else {
             return

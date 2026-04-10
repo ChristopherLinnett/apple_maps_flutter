@@ -24,6 +24,7 @@ class AppleMap extends StatefulWidget {
     this.trafficEnabled = false,
     this.mapType = MapType.standard,
     this.minMaxZoomPreference = MinMaxZoomPreference.unbounded,
+    this.cameraTargetBounds = CameraTargetBounds.unbounded,
     this.trackingMode = TrackingMode.none,
     this.rotateGesturesEnabled = true,
     this.scrollGesturesEnabled = true,
@@ -31,6 +32,9 @@ class AppleMap extends StatefulWidget {
     this.pitchGesturesEnabled = true,
     this.myLocationEnabled = false,
     this.myLocationButtonEnabled = false,
+    this.buildingsEnabled = true,
+    this.pointsOfInterestEnabled = true,
+    this.scaleEnabled = false,
     this.padding = EdgeInsets.zero,
     this.annotations,
     this.polylines,
@@ -66,6 +70,12 @@ class AppleMap extends StatefulWidget {
   ///
   /// Actual bounds depend on map data and device.
   final MinMaxZoomPreference minMaxZoomPreference;
+
+  /// Geographical bounding box for the camera target.
+  ///
+  /// When set, the map camera will be constrained to the specified region.
+  /// Use [CameraTargetBounds.unbounded] to remove the constraint.
+  final CameraTargetBounds cameraTargetBounds;
 
   /// True if the map view should respond to rotate gestures.
   final bool rotateGesturesEnabled;
@@ -133,6 +143,15 @@ class AppleMap extends StatefulWidget {
   /// `Info.plist` file. This will automatically prompt the user for permissions
   /// when the map tries to turn on the My Location layer.
   final bool myLocationEnabled;
+
+  /// True if 3D buildings should be shown on the map.
+  final bool buildingsEnabled;
+
+  /// True if points of interest should be shown on the map.
+  final bool pointsOfInterestEnabled;
+
+  /// True if the map scale indicator should be shown.
+  final bool scaleEnabled;
 
   /// Enables or disables the my-location button.
   ///
@@ -390,6 +409,7 @@ class _AppleMapOptions {
     this.trafficEnabled,
     this.mapType,
     this.minMaxZoomPreference,
+    this.cameraTargetBounds,
     this.rotateGesturesEnabled,
     this.scrollGesturesEnabled,
     this.pitchGesturesEnabled,
@@ -397,6 +417,9 @@ class _AppleMapOptions {
     this.zoomGesturesEnabled,
     this.myLocationEnabled,
     this.myLocationButtonEnabled,
+    this.buildingsEnabled,
+    this.pointsOfInterestEnabled,
+    this.scaleEnabled,
     this.padding,
     this.insetsLayoutMarginsFromSafeArea,
   });
@@ -407,6 +430,7 @@ class _AppleMapOptions {
       trafficEnabled: map.trafficEnabled,
       mapType: map.mapType,
       minMaxZoomPreference: map.minMaxZoomPreference,
+      cameraTargetBounds: map.cameraTargetBounds,
       rotateGesturesEnabled: map.rotateGesturesEnabled,
       scrollGesturesEnabled: map.scrollGesturesEnabled,
       pitchGesturesEnabled: map.pitchGesturesEnabled,
@@ -414,6 +438,9 @@ class _AppleMapOptions {
       zoomGesturesEnabled: map.zoomGesturesEnabled,
       myLocationEnabled: map.myLocationEnabled,
       myLocationButtonEnabled: map.myLocationButtonEnabled,
+      buildingsEnabled: map.buildingsEnabled,
+      pointsOfInterestEnabled: map.pointsOfInterestEnabled,
+      scaleEnabled: map.scaleEnabled,
       padding: map.padding,
       insetsLayoutMarginsFromSafeArea: map.insetsLayoutMarginsFromSafeArea,
     );
@@ -426,6 +453,8 @@ class _AppleMapOptions {
   final MapType? mapType;
 
   final MinMaxZoomPreference? minMaxZoomPreference;
+
+  final CameraTargetBounds? cameraTargetBounds;
 
   final bool? rotateGesturesEnabled;
 
@@ -440,6 +469,12 @@ class _AppleMapOptions {
   final bool? myLocationEnabled;
 
   final bool? myLocationButtonEnabled;
+
+  final bool? buildingsEnabled;
+
+  final bool? pointsOfInterestEnabled;
+
+  final bool? scaleEnabled;
 
   final EdgeInsets? padding;
 
@@ -465,6 +500,22 @@ class _AppleMapOptions {
     addIfNonNull('trackingMode', trackingMode?.index);
     addIfNonNull('myLocationEnabled', myLocationEnabled);
     addIfNonNull('myLocationButtonEnabled', myLocationButtonEnabled);
+    addIfNonNull('buildingsEnabled', buildingsEnabled);
+    addIfNonNull('pointsOfInterestEnabled', pointsOfInterestEnabled);
+    addIfNonNull('scaleEnabled', scaleEnabled);
+    // CameraTargetBounds is always included so that unbounded (null) is
+    // distinguishable from "no change" (key absent) in the diff.
+    // Serialized as a flat list [swLat, swLng, neLat, neLng] so that
+    // updatesMap()'s listEquals comparison works correctly.
+    final LatLngBounds? bounds = cameraTargetBounds?.bounds;
+    optionsMap['cameraTargetBounds'] = bounds == null
+        ? null
+        : <double>[
+            bounds.southwest.latitude,
+            bounds.southwest.longitude,
+            bounds.northeast.latitude,
+            bounds.northeast.longitude,
+          ];
     addIfNonNull('padding', _serializePadding(padding));
     addIfNonNull(
       'insetsLayoutMarginsFromSafeArea',

@@ -21,6 +21,10 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
     var oldBounds: CGRect?
     var options: Dictionary<String, Any>?
     var isMyLocationButtonShowing: Bool? = false
+    var currentMapTypeIndex: Int = 0
+    var isPointsOfInterestEnabled: Bool {
+        (self.pointOfInterestFilter ?? .includingAll) != .excludingAll
+    }
     
     fileprivate let locationManager: CLLocationManager = CLLocationManager()
     
@@ -75,12 +79,8 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
             if self.options != nil {
                 self.interpretOptions(options: self.options!)
             }
-            if #available(iOS 9.0, *) {
-                setCenterCoordinateWithAltitude(centerCoordinate: centerCoordinate, zoomLevel: zoomLevel, animated: false)
-                mapContainerView = self.findViewOfType("MKScrollContainerView", inView: self)
-            } else {
-                setCenterCoordinateRegion(centerCoordinate: centerCoordinate, zoomLevel: zoomLevel, animated: false)
-            }
+            setCenterCoordinateWithAltitude(centerCoordinate: centerCoordinate, zoomLevel: zoomLevel, animated: false)
+            mapContainerView = self.findViewOfType("MKScrollContainerView", inView: self)
         }
         oldBounds = self.bounds
     }
@@ -114,10 +114,8 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
     
     func interpretOptions(options: Dictionary<String, Any>) {
         if let isCompassEnabled: Bool = options["compassEnabled"] as? Bool {
-            if #available(iOS 9.0, *) {
-                self.showsCompass = isCompassEnabled
-                self.mapTrackingButton(isVisible: self.isMyLocationButtonShowing ?? false)
-            }
+            self.showsCompass = isCompassEnabled
+            self.mapTrackingButton(isVisible: self.isMyLocationButtonShowing ?? false)
         }
 
         if let padding: Array<Any> = options["padding"] as? Array<Any> {
@@ -142,16 +140,47 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
             self.layoutMargins = margins
         }
         
-        if let mapType: Int = options["mapType"] as? Int {
-            self.mapType = self.mapTypes[mapType]
-        }
-        
-        if let trafficEnabled: Bool = options["trafficEnabled"] as? Bool {
-            if #available(iOS 9.0, *) {
-                self.showsTraffic = trafficEnabled
+        let newMapType = options["mapType"] as? Int
+        let newTraffic = options["trafficEnabled"] as? Bool
+        let newPoi = options["pointsOfInterestEnabled"] as? Bool
+        let newBuildings = options["buildingsEnabled"] as? Bool
+        if newMapType != nil || newTraffic != nil || newPoi != nil || newBuildings != nil {
+            let mapTypeIndex = newMapType ?? self.currentMapTypeIndex
+            let traffic = newTraffic ?? self.showsTraffic
+            let buildings = newBuildings ?? self.showsBuildings
+            let poi: MKPointOfInterestFilter = {
+                if let newPoi {
+                    return newPoi ? .includingAll : .excludingAll
+                }
+                return self.pointOfInterestFilter ?? .includingAll
+            }()
+
+            if #available(iOS 16.0, *) {
+                let elevation: MKMapConfiguration.ElevationStyle = buildings ? .realistic : .flat
+                let config: MKMapConfiguration
+                switch mapTypeIndex {
+                case 1:
+                    config = MKImageryMapConfiguration(elevationStyle: elevation)
+                case 2:
+                    let c = MKHybridMapConfiguration(elevationStyle: elevation)
+                    c.showsTraffic = traffic
+                    c.pointOfInterestFilter = poi
+                    config = c
+                default:
+                    let c = MKStandardMapConfiguration(elevationStyle: elevation)
+                    c.showsTraffic = traffic
+                    c.pointOfInterestFilter = poi
+                    config = c
+                }
+                self.preferredConfiguration = config
             } else {
-                // do nothing
+                self.mapType = self.mapTypes[mapTypeIndex]
+                self.showsTraffic = traffic
+                self.showsBuildings = buildings
+                self.pointOfInterestFilter = poi
             }
+            self.currentMapTypeIndex = mapTypeIndex
+
         }
         
         if let rotateGesturesEnabled: Bool = options["rotateGesturesEnabled"] as? Bool {
@@ -197,9 +226,30 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
         }
         
         if let insetsSafeArea: Bool = options["insetsLayoutMarginsFromSafeArea"] as? Bool {
-            if #available(iOS 11.0, *) {
-                self.insetsLayoutMarginsFromSafeArea = insetsSafeArea
+            self.insetsLayoutMarginsFromSafeArea = insetsSafeArea
+        }
+
+        if options.keys.contains("cameraTargetBounds") {
+            if let boundsData = options["cameraTargetBounds"] as? [[Double]] {
+                let sw = CLLocationCoordinate2D(latitude: boundsData[0][0], longitude: boundsData[0][1])
+                let ne = CLLocationCoordinate2D(latitude: boundsData[1][0], longitude: boundsData[1][1])
+                let center = CLLocationCoordinate2D(
+                    latitude: (sw.latitude + ne.latitude) / 2.0,
+                    longitude: (sw.longitude + ne.longitude) / 2.0
+                )
+                let span = MKCoordinateSpan(
+                    latitudeDelta: abs(ne.latitude - sw.latitude),
+                    longitudeDelta: abs(ne.longitude - sw.longitude)
+                )
+                let region = MKCoordinateRegion(center: center, span: span)
+                self.cameraBoundary = MKMapView.CameraBoundary(coordinateRegion: region)
+            } else {
+                self.cameraBoundary = nil
             }
+        }
+
+        if let scaleEnabled: Bool = options["scaleEnabled"] as? Bool {
+            self.showsScale = scaleEnabled
         }
 
     }
@@ -240,39 +290,21 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
         }
         if visible {
             let buttonContainer = UIView()
-            if #available(iOS 9.0, *) {
-                buttonContainer.translatesAutoresizingMaskIntoConstraints = false
-                buttonContainer.widthAnchor.constraint(equalToConstant: 35).isActive = true
-                buttonContainer.heightAnchor.constraint(equalToConstant: 35).isActive = true
-                buttonContainer.layer.cornerRadius = 8
-                buttonContainer.tag = BUTTON_IDS.LOCATION.rawValue
-                buttonContainer.backgroundColor = .white
-                if #available(iOS 11.0, *) {
-                    let userTrackingButton = MKUserTrackingButton(mapView: self)
-                    userTrackingButton.translatesAutoresizingMaskIntoConstraints = false
-                    buttonContainer.addSubview(userTrackingButton)
-                    userTrackingButton.centerXAnchor.constraint(equalTo: buttonContainer.centerXAnchor).isActive = true
-                    userTrackingButton.centerYAnchor.constraint(equalTo: buttonContainer.centerYAnchor).isActive = true
-                } else {
-                    let locationButton = UIButton(type: UIButton.ButtonType.custom) as UIButton
-                    let image = UIImage(systemName: "location.fill")?.withRenderingMode(.alwaysTemplate)
-                    locationButton.translatesAutoresizingMaskIntoConstraints = false
-                    locationButton.setImage(image, for: .normal)
-                    locationButton.tintColor = .systemBlue
-                    locationButton.addTarget(self, action: #selector(centerMapOnUserButtonClicked), for:.touchUpInside)
-                    buttonContainer.addSubview(locationButton)
-                    locationButton.centerXAnchor.constraint(equalTo: buttonContainer.centerXAnchor).isActive = true
-                    locationButton.centerYAnchor.constraint(equalTo: buttonContainer.centerYAnchor).isActive = true
-                }
-                self.addSubview(buttonContainer)
-                buttonContainer.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -5 - self.layoutMargins.right).isActive = true
-                buttonContainer.topAnchor.constraint(equalTo: self.topAnchor, constant: self.showsCompass ? 50 : 5 + self.layoutMargins.top).isActive = true
-            }
+            buttonContainer.translatesAutoresizingMaskIntoConstraints = false
+            buttonContainer.widthAnchor.constraint(equalToConstant: 35).isActive = true
+            buttonContainer.heightAnchor.constraint(equalToConstant: 35).isActive = true
+            buttonContainer.layer.cornerRadius = 8
+            buttonContainer.tag = BUTTON_IDS.LOCATION.rawValue
+            buttonContainer.backgroundColor = .white
+            let userTrackingButton = MKUserTrackingButton(mapView: self)
+            userTrackingButton.translatesAutoresizingMaskIntoConstraints = false
+            buttonContainer.addSubview(userTrackingButton)
+            userTrackingButton.centerXAnchor.constraint(equalTo: buttonContainer.centerXAnchor).isActive = true
+            userTrackingButton.centerYAnchor.constraint(equalTo: buttonContainer.centerYAnchor).isActive = true
+            self.addSubview(buttonContainer)
+            buttonContainer.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -5 - self.layoutMargins.right).isActive = true
+            buttonContainer.topAnchor.constraint(equalTo: self.topAnchor, constant: self.showsCompass ? 50 : 5 + self.layoutMargins.top).isActive = true
         }
-    }
-    
-    @objc func centerMapOnUserButtonClicked() {
-       self.setUserTrackingMode(MKUserTrackingMode.follow, animated: true)
     }
     
     func getMapViewAnnotations() -> [FlutterAnnotation?] {
