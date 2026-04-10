@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Flutter
 import MapKit
 
 public class AppleMapController: NSObject, FlutterPlatformView {
@@ -313,7 +314,13 @@ extension AppleMapController {
         snapShotOptions.size = self.mapView.frame.size
         snapShotOptions.scale = UIScreen.main.scale
         snapShotOptions.showsBuildings = options.showBuildings
-        snapShotOptions.showsPointsOfInterest = options.showPointsOfInterest
+        if #available(iOS 13.0, *) {
+            snapShotOptions.pointOfInterestFilter = options.showPointsOfInterest
+                ? .includingAll
+                : .excludingAll
+        } else {
+            snapShotOptions.showsPointsOfInterest = options.showPointsOfInterest
+        }
         
         // Set MKMapSnapShotOptions to MKMapSnapShotter.
         snapShot = MKMapSnapshotter(options: snapShotOptions)

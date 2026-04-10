@@ -45,9 +45,9 @@ class CameraTargetBounds {
   static const CameraTargetBounds unbounded = CameraTargetBounds(null);
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    if (runtimeType != other.runtimeType) return false;
+    if (other is! CameraTargetBounds) return false;
     final CameraTargetBounds typedOther = other;
     return bounds == typedOther.bounds;
   }
@@ -63,7 +63,7 @@ class CameraTargetBounds {
 
 class MinMaxZoomPreference {
   const MinMaxZoomPreference(this.minZoom, this.maxZoom)
-      : assert(minZoom == null || maxZoom == null || minZoom <= maxZoom);
+    : assert(minZoom == null || maxZoom == null || minZoom <= maxZoom);
 
   /// The preferred minimum zoom level or null, if unbounded from below.
   final double? minZoom;
@@ -72,15 +72,17 @@ class MinMaxZoomPreference {
   final double? maxZoom;
 
   /// Unbounded zooming.
-  static const MinMaxZoomPreference unbounded =
-      MinMaxZoomPreference(null, null);
+  static const MinMaxZoomPreference unbounded = MinMaxZoomPreference(
+    null,
+    null,
+  );
 
   dynamic _toJson() => <dynamic>[minZoom, maxZoom];
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    if (runtimeType != other.runtimeType) return false;
+    if (other is! MinMaxZoomPreference) return false;
     final MinMaxZoomPreference typedOther = other;
     return minZoom == typedOther.minZoom && maxZoom == typedOther.maxZoom;
   }

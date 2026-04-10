@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Flutter
 import MapKit
 import CoreLocation
 
@@ -254,10 +255,10 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
                     userTrackingButton.centerYAnchor.constraint(equalTo: buttonContainer.centerYAnchor).isActive = true
                 } else {
                     let locationButton = UIButton(type: UIButton.ButtonType.custom) as UIButton
-                    let image = UIImage(named: "outline_near_me")
+                    let image = UIImage(systemName: "location.fill")?.withRenderingMode(.alwaysTemplate)
                     locationButton.translatesAutoresizingMaskIntoConstraints = false
                     locationButton.setImage(image, for: .normal)
-                    locationButton.imageView?.tintColor = .blue
+                    locationButton.tintColor = .systemBlue
                     locationButton.addTarget(self, action: #selector(centerMapOnUserButtonClicked), for:.touchUpInside)
                     buttonContainer.addSubview(locationButton)
                     locationButton.centerXAnchor.constraint(equalTo: buttonContainer.centerXAnchor).isActive = true

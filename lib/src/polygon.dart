@@ -128,8 +128,8 @@ class Polygon {
 
     addIfPresent('polygonId', polygonId.value);
     addIfPresent('consumeTapEvents', consumeTapEvents);
-    addIfPresent('fillColor', fillColor.value);
-    addIfPresent('strokeColor', strokeColor.value);
+    addIfPresent('fillColor', fillColor.toARGB32());
+    addIfPresent('strokeColor', strokeColor.toARGB32());
     addIfPresent('strokeWidth', strokeWidth);
     addIfPresent('visible', visible);
     addIfPresent('zIndex', zIndex);
@@ -171,8 +171,12 @@ Map<PolygonId, Polygon> _keyByPolygonId(Iterable<Polygon>? polygons) {
   if (polygons == null) {
     return <PolygonId, Polygon>{};
   }
-  return Map<PolygonId, Polygon>.fromEntries(polygons.map((Polygon polygon) =>
-      MapEntry<PolygonId, Polygon>(polygon.polygonId, polygon.clone())));
+  return Map<PolygonId, Polygon>.fromEntries(
+    polygons.map(
+      (Polygon polygon) =>
+          MapEntry<PolygonId, Polygon>(polygon.polygonId, polygon.clone()),
+    ),
+  );
 }
 
 List<Map<String, dynamic>>? _serializePolygonSet(Set<Polygon>? polygons) {

@@ -130,10 +130,10 @@ class Circle {
 
     addIfPresent('circleId', circleId.value);
     addIfPresent('consumeTapEvents', consumeTapEvents);
-    addIfPresent('fillColor', fillColor.value);
+    addIfPresent('fillColor', fillColor.toARGB32());
     addIfPresent('center', center._toJson());
     addIfPresent('radius', radius);
-    addIfPresent('strokeColor', strokeColor.value);
+    addIfPresent('strokeColor', strokeColor.toARGB32());
     addIfPresent('strokeWidth', strokeWidth);
     addIfPresent('visible', visible);
     addIfPresent('zIndex', zIndex);
@@ -166,8 +166,12 @@ Map<CircleId, Circle> _keyByCircleId(Iterable<Circle>? circles) {
   if (circles == null) {
     return <CircleId, Circle>{};
   }
-  return Map<CircleId, Circle>.fromEntries(circles.map((Circle circle) =>
-      MapEntry<CircleId, Circle>(circle.circleId, circle.clone())));
+  return Map<CircleId, Circle>.fromEntries(
+    circles.map(
+      (Circle circle) =>
+          MapEntry<CircleId, Circle>(circle.circleId, circle.clone()),
+    ),
+  );
 }
 
 List<Map<String, dynamic>>? _serializeCircleSet(Set<Circle>? circles) {

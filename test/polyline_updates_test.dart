@@ -40,8 +40,11 @@ void main() {
       FakePlatformViewsController();
 
   setUpAll(() {
-    SystemChannels.platform_views.setMockMethodCallHandler(
-        fakePlatformViewsController.fakePlatformViewsMethodHandler);
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+          SystemChannels.platform_views,
+          fakePlatformViewsController.fakePlatformViewsMethodHandler,
+        );
   });
 
   setUp(() {
@@ -105,8 +108,10 @@ void main() {
   testWidgets("Updating a polyline", (WidgetTester tester) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     final Polyline p1 = Polyline(polylineId: PolylineId("polyline_1"));
-    final Polyline p2 =
-        Polyline(polylineId: PolylineId("polyline_1"), visible: true);
+    final Polyline p2 = Polyline(
+      polylineId: PolylineId("polyline_1"),
+      visible: true,
+    );
 
     await tester.pumpWidget(_mapWithPolylines(_toSet(p1: p1)));
     await tester.pumpWidget(_mapWithPolylines(_toSet(p1: p2)));
@@ -124,8 +129,10 @@ void main() {
   testWidgets("Updating a polyline", (WidgetTester tester) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     final Polyline p1 = Polyline(polylineId: PolylineId("polyline_1"));
-    final Polyline p2 =
-        Polyline(polylineId: PolylineId("polyline_1"), visible: true);
+    final Polyline p2 = Polyline(
+      polylineId: PolylineId("polyline_1"),
+      visible: true,
+    );
 
     await tester.pumpWidget(_mapWithPolylines(_toSet(p1: p1)));
     await tester.pumpWidget(_mapWithPolylines(_toSet(p1: p2)));
@@ -188,27 +195,23 @@ void main() {
     debugDefaultTargetPlatformOverride = null;
   });
 
-  testWidgets(
-    "Partial Update",
-    (WidgetTester tester) async {
-      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-      final Polyline p1 = Polyline(polylineId: PolylineId("polyline_1"));
-      Polyline p2 = Polyline(polylineId: PolylineId("polyline_2"));
-      final Set<Polyline> prev = _toSet(p1: p1, p2: p2);
-      p2 = Polyline(polylineId: PolylineId("polyline_2"), visible: true);
-      final Set<Polyline> cur = _toSet(p1: p1, p2: p2);
+  testWidgets("Partial Update", (WidgetTester tester) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    final Polyline p1 = Polyline(polylineId: PolylineId("polyline_1"));
+    Polyline p2 = Polyline(polylineId: PolylineId("polyline_2"));
+    final Set<Polyline> prev = _toSet(p1: p1, p2: p2);
+    p2 = Polyline(polylineId: PolylineId("polyline_2"), visible: true);
+    final Set<Polyline> cur = _toSet(p1: p1, p2: p2);
 
-      await tester.pumpWidget(_mapWithPolylines(prev));
-      await tester.pumpWidget(_mapWithPolylines(cur));
+    await tester.pumpWidget(_mapWithPolylines(prev));
+    await tester.pumpWidget(_mapWithPolylines(cur));
 
-      final FakePlatformAppleMap platformAppleMap =
-          fakePlatformViewsController.lastCreatedView!;
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
 
-      expect(platformAppleMap.polylinesToChange, _toSet(p2: p2));
-      expect(platformAppleMap.polylineIdsToRemove!.isEmpty, true);
-      expect(platformAppleMap.polylinesToAdd!.isEmpty, true);
-      debugDefaultTargetPlatformOverride = null;
-    },
-    skip: true,
-  );
+    expect(platformAppleMap.polylinesToChange, _toSet(p2: p2));
+    expect(platformAppleMap.polylineIdsToRemove!.isEmpty, true);
+    expect(platformAppleMap.polylinesToAdd!.isEmpty, true);
+    debugDefaultTargetPlatformOverride = null;
+  }, skip: true);
 }

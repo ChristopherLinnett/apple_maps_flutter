@@ -4,7 +4,6 @@
 
 import 'package:apple_maps_flutter/apple_maps_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 import 'page.dart';
 
@@ -58,15 +57,17 @@ class _MapClickBodyState extends State<_MapClickBody> {
     if (mapController != null) {
       final String lastTap = 'Tap:\n${_lastTap ?? ""}\n';
       final String lastLongPress = 'Long press:\n${_lastLongPress ?? ""}';
-      columnChildren.add(Padding(
-        padding: EdgeInsets.all(8),
-        child: Column(
-          children: [
-            Text(lastTap, textAlign: TextAlign.center),
-            Text(lastLongPress, textAlign: TextAlign.center)
-          ],
+      columnChildren.add(
+        Padding(
+          padding: EdgeInsets.all(8),
+          child: Column(
+            children: [
+              Text(lastTap, textAlign: TextAlign.center),
+              Text(lastLongPress, textAlign: TextAlign.center),
+            ],
+          ),
         ),
-      ));
+      );
     }
 
     return Column(children: columnChildren);

@@ -204,7 +204,8 @@ class _AppleMapState extends State<AppleMap> {
       );
     }
     return Text(
-        '$defaultTargetPlatform is not yet supported by the apple maps plugin');
+      '$defaultTargetPlatform is not yet supported by the apple maps plugin',
+    );
   }
 
   @override
@@ -229,8 +230,9 @@ class _AppleMapState extends State<AppleMap> {
 
   void _updateOptions() async {
     final _AppleMapOptions newOptions = _AppleMapOptions.fromWidget(widget);
-    final Map<String, dynamic> updates =
-        _appleMapOptions.updatesMap(newOptions);
+    final Map<String, dynamic> updates = _appleMapOptions.updatesMap(
+      newOptions,
+    );
     if (updates.isEmpty) {
       return;
     }
@@ -241,15 +243,17 @@ class _AppleMapState extends State<AppleMap> {
 
   void _updateAnnotations() async {
     final AppleMapController controller = await _controller.future;
-    controller._updateAnnotations(_AnnotationUpdates.from(
-        _annotations.values.toSet(), widget.annotations));
+    controller._updateAnnotations(
+      _AnnotationUpdates.from(_annotations.values.toSet(), widget.annotations),
+    );
     _annotations = _keyByAnnotationId(widget.annotations);
   }
 
   void _updatePolylines() async {
     final AppleMapController controller = await _controller.future;
     controller._updatePolylines(
-        _PolylineUpdates.from(_polylines.values.toSet(), widget.polylines));
+      _PolylineUpdates.from(_polylines.values.toSet(), widget.polylines),
+    );
     _polylines = _keyByPolylineId(widget.polylines);
   }
 
@@ -257,7 +261,8 @@ class _AppleMapState extends State<AppleMap> {
     final AppleMapController controller = await _controller.future;
     // ignore: unawaited_futures
     controller._updatePolygons(
-        _PolygonUpdates.from(_polygons.values.toSet(), widget.polygons));
+      _PolygonUpdates.from(_polygons.values.toSet(), widget.polygons),
+    );
     _polygons = _keyByPolygonId(widget.polygons);
   }
 
@@ -265,7 +270,8 @@ class _AppleMapState extends State<AppleMap> {
     final AppleMapController controller = await _controller.future;
     // ignore: unawaited_futures
     controller._updateCircles(
-        _CircleUpdates.from(_circles.values.toSet(), widget.circles));
+      _CircleUpdates.from(_circles.values.toSet(), widget.circles),
+    );
     _circles = _keyByCircleId(widget.circles);
   }
 
@@ -311,7 +317,11 @@ class _AppleMapState extends State<AppleMap> {
 
   void onAnnotationZIndexChanged(String annotationIdParam, double zIndex) {
     final AnnotationId annotationId = AnnotationId(annotationIdParam);
-    _annotations[annotationId]?.zIndex = zIndex;
+    final Annotation? annotation = _annotations[annotationId];
+    if (annotation == null) {
+      return;
+    }
+    _annotations[annotationId] = annotation.copyWith(zIndexParam: zIndex);
   }
 
   void onTap(LatLng position) {
@@ -410,7 +420,9 @@ class _AppleMapOptions {
     addIfNonNull('myLocationButtonEnabled', myLocationButtonEnabled);
     addIfNonNull('padding', _serializePadding(padding));
     addIfNonNull(
-        'insetsLayoutMarginsFromSafeArea', insetsLayoutMarginsFromSafeArea);
+      'insetsLayoutMarginsFromSafeArea',
+      insetsLayoutMarginsFromSafeArea,
+    );
     return optionsMap;
   }
 
@@ -423,12 +435,11 @@ class _AppleMapOptions {
     // This caused the diff to always include those keys, triggering a
     // redundant native update on every widget rebuild. Using `listEquals`
     // for `List` values produces a correct element-wise comparison.
-    return newOptions.toMap()
-      ..removeWhere((String key, dynamic value) {
-        final prev = prevOptionsMap[key];
-        if (prev is List && value is List) return listEquals(prev, value);
-        return prev == value;
-      });
+    return newOptions.toMap()..removeWhere((String key, dynamic value) {
+      final prev = prevOptionsMap[key];
+      if (prev is List && value is List) return listEquals(prev, value);
+      return prev == value;
+    });
   }
 
   List<double>? _serializePadding(EdgeInsets? insets) {

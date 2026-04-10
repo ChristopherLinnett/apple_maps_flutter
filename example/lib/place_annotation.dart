@@ -4,8 +4,6 @@
 
 import 'dart:async';
 import 'dart:math';
-import 'dart:typed_data';
-import 'dart:ui';
 import 'dart:ui' as ui;
 
 import 'package:apple_maps_flutter/apple_maps_flutter.dart';
@@ -59,8 +57,8 @@ class PlaceAnnotationBodyState extends State<PlaceAnnotationBody> {
     if (tappedAnnotation != null) {
       setState(() {
         if (annotations.containsKey(tappedAnnotation)) {
-          final Annotation resetOld =
-              annotations[selectedAnnotationId]!.copyWith();
+          final Annotation resetOld = annotations[selectedAnnotationId]!
+              .copyWith();
           annotations[selectedAnnotationId] = resetOld;
         }
         selectedAnnotationId = annotationId;
@@ -93,11 +91,13 @@ class PlaceAnnotationBodyState extends State<PlaceAnnotationBody> {
         break;
       case 'markerAnnotationWithHue':
         bitMapDescriptor = BitmapDescriptor.markerAnnotationWithHue(
-            new Random().nextDouble() * 360);
+          new Random().nextDouble() * 360,
+        );
         break;
       case 'defaultAnnotationWithColor':
         bitMapDescriptor = BitmapDescriptor.defaultAnnotationWithHue(
-            new Random().nextDouble() * 360);
+          new Random().nextDouble() * 360,
+        );
         break;
     }
 
@@ -110,10 +110,11 @@ class PlaceAnnotationBodyState extends State<PlaceAnnotationBody> {
       ),
       zIndex: annotationCount.toDouble(),
       infoWindow: InfoWindow(
-          title: annotationIdVal,
-          anchor: Offset(0.5, 0.0),
-          snippet: '*',
-          onTap: () => print('InfoWindow with id: $annotationId tapped.')),
+        title: annotationIdVal,
+        anchor: Offset(0.5, 0.0),
+        snippet: '*',
+        onTap: () => print('InfoWindow with id: $annotationId tapped.'),
+      ),
       onTap: () {
         _onAnnotationTapped(annotationId);
       },
@@ -160,7 +161,8 @@ class PlaceAnnotationBodyState extends State<PlaceAnnotationBody> {
 
   Future<void> _changeInfo() async {
     final Annotation annotation = annotations[selectedAnnotationId]!;
-    final String newSnippet = annotation.infoWindow.snippet! +
+    final String newSnippet =
+        annotation.infoWindow.snippet! +
         (annotation.infoWindow.snippet!.length % 10 == 0 ? '\n' : '*');
     setState(() {
       annotations[selectedAnnotationId] = annotation.copyWith(
@@ -191,13 +193,17 @@ class PlaceAnnotationBodyState extends State<PlaceAnnotationBody> {
   }
 
   Future<void> _createAnnotationImageFromAsset(
-      BuildContext context, double devicelPixelRatio) async {
+    BuildContext context,
+    double devicelPixelRatio,
+  ) async {
     if (_annotationIcon == null) {
-      final ImageConfiguration imageConfiguration =
-          ImageConfiguration(devicePixelRatio: devicelPixelRatio);
+      final ImageConfiguration imageConfiguration = ImageConfiguration(
+        devicePixelRatio: devicelPixelRatio,
+      );
       BitmapDescriptor.fromAssetImage(
-              imageConfiguration, 'assets/red_square.png')
-          .then(_updateBitmap);
+        imageConfiguration,
+        'assets/red_square.png',
+      ).then(_updateBitmap);
     }
   }
 
@@ -220,21 +226,25 @@ class PlaceAnnotationBodyState extends State<PlaceAnnotationBody> {
   Future<bool> _isInfoWindowShown() async {
     final Annotation annotation = annotations[selectedAnnotationId]!;
     print(
-        'Is InfowWindow visible: ${await this.controller.isMarkerInfoWindowShown(annotation.annotationId)}');
-    return (await this
-        .controller
-        .isMarkerInfoWindowShown(annotation.annotationId))!;
+      'Is InfowWindow visible: ${await this.controller.isMarkerInfoWindowShown(annotation.annotationId)}',
+    );
+    return (await this.controller.isMarkerInfoWindowShown(
+      annotation.annotationId,
+    ))!;
   }
 
   Future<void> _getBytesFromAsset(String path, int width) async {
     ByteData data = await rootBundle.load(path);
-    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
-        targetWidth: width);
+    ui.Codec codec = await ui.instantiateImageCodec(
+      data.buffer.asUint8List(),
+      targetWidth: width,
+    );
     ui.FrameInfo fi = await codec.getNextFrame();
     _iconFromBytes = BitmapDescriptor.fromBytes(
-        (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
-            .buffer
-            .asUint8List());
+      (await fi.image.toByteData(
+        format: ui.ImageByteFormat.png,
+      ))!.buffer.asUint8List(),
+    );
   }
 
   Future<void> _changeZIndex(AnnotationId annotationId) async {
@@ -293,10 +303,7 @@ class PlaceAnnotationBodyState extends State<PlaceAnnotationBody> {
                   child: const Text('customAnnotation from bytes'),
                   onPressed: () => _add('customAnnotationFromBytes'),
                 ),
-                TextButton(
-                  child: const Text('remove'),
-                  onPressed: _remove,
-                ),
+                TextButton(child: const Text('remove'), onPressed: _remove),
                 TextButton(
                   child: const Text('change info'),
                   onPressed: _changeInfo,
@@ -345,12 +352,13 @@ class PlaceAnnotationBodyState extends State<PlaceAnnotationBody> {
                 Container(
                   decoration: BoxDecoration(color: Colors.blueGrey[50]),
                   height: 180,
-                  child:
-                      _imageBytes != null ? Image.memory(_imageBytes!) : null,
+                  child: _imageBytes != null
+                      ? Image.memory(_imageBytes!)
+                      : null,
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

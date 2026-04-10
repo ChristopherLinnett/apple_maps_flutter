@@ -1,8 +1,22 @@
-# Example usage:
+# Example app
+
+The example app demonstrates the currently supported Apple Maps surface on iOS.
+
+Compatibility:
+
+- Flutter `>=3.41.0`
+- Dart `^3.11.0`
+- iOS `13.0+`
+
+If you want to exercise the Swift Package Manager path locally, run `flutter config --enable-swift-package-manager` before building the example on iOS.
+
+# Sample usage
 
 ```dart
 class AppleMapsExample extends StatelessWidget {
-  AppleMapController mapController;
+  AppleMapsExample({super.key});
+
+  late AppleMapController mapController;
 
   void _onMapCreated(AppleMapController controller) {
     mapController = controller;
@@ -29,7 +43,7 @@ class AppleMapsExample extends StatelessWidget {
           children: <Widget>[
             Column(
               children: <Widget>[
-                FlatButton(
+                TextButton(
                   onPressed: () {
                     mapController.moveCamera(
                       CameraUpdate.newCameraPosition(
@@ -44,7 +58,7 @@ class AppleMapsExample extends StatelessWidget {
                   },
                   child: const Text('newCameraPosition'),
                 ),
-                FlatButton(
+                TextButton(
                   onPressed: () {
                     mapController.moveCamera(
                       CameraUpdate.newLatLngZoom(
@@ -59,7 +73,7 @@ class AppleMapsExample extends StatelessWidget {
             ),
             Column(
               children: <Widget>[
-                FlatButton(
+                TextButton(
                   onPressed: () {
                     mapController.moveCamera(
                       CameraUpdate.zoomIn(),
@@ -67,7 +81,7 @@ class AppleMapsExample extends StatelessWidget {
                   },
                   child: const Text('zoomIn'),
                 ),
-                FlatButton(
+                TextButton(
                   onPressed: () {
                     mapController.moveCamera(
                       CameraUpdate.zoomOut(),
@@ -75,7 +89,7 @@ class AppleMapsExample extends StatelessWidget {
                   },
                   child: const Text('zoomOut'),
                 ),
-                FlatButton(
+                TextButton(
                   onPressed: () {
                     mapController.moveCamera(
                       CameraUpdate.zoomTo(16.0),
@@ -92,4 +106,6 @@ class AppleMapsExample extends StatelessWidget {
   }
 }
 ```
+
+See `example/lib/main.dart` for the runnable demo menu.
 
