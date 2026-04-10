@@ -107,7 +107,7 @@ void main() {
     debugDefaultTargetPlatformOverride = null;
   });
 
-  testWidgets("Updating a polygon", (WidgetTester tester) async {
+  testWidgets("Updating a polygon — visibility", (WidgetTester tester) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     final Polygon p1 = Polygon(polygonId: PolygonId("polygon_1"));
     final Polygon p2 = Polygon(
@@ -128,12 +128,14 @@ void main() {
     debugDefaultTargetPlatformOverride = null;
   });
 
-  testWidgets("Updating a polygon", (WidgetTester tester) async {
+  testWidgets("Updating a polygon — strokeColor", (
+    WidgetTester tester,
+  ) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     final Polygon p1 = Polygon(polygonId: PolygonId("polygon_1"));
     final Polygon p2 = Polygon(
       polygonId: PolygonId("polygon_1"),
-      visible: false,
+      strokeColor: const Color(0xFFFF0000),
     );
 
     await tester.pumpWidget(_mapWithPolygons(_toSet(p1: p1)));
@@ -145,7 +147,7 @@ void main() {
 
     final Polygon update = platformAppleMap.polygonsToChange!.first;
     expect(update, equals(p2));
-    expect(update.visible, false);
+    expect(update.strokeColor, const Color(0xFFFF0000));
     debugDefaultTargetPlatformOverride = null;
   });
 
@@ -170,7 +172,9 @@ void main() {
     debugDefaultTargetPlatformOverride = null;
   });
 
-  testWidgets("Multi Update", (WidgetTester tester) async {
+  testWidgets("Multi Update — all polygons changed", (
+    WidgetTester tester,
+  ) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     Polygon p1 = Polygon(polygonId: PolygonId("polygon_1"));
     Polygon p2 = Polygon(polygonId: PolygonId("polygon_2"));
@@ -191,7 +195,9 @@ void main() {
     debugDefaultTargetPlatformOverride = null;
   });
 
-  testWidgets("Multi Update", (WidgetTester tester) async {
+  testWidgets("Multi Update — add, update, and remove combined", (
+    WidgetTester tester,
+  ) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     Polygon p2 = Polygon(polygonId: PolygonId("polygon_2"));
     final Polygon p3 = Polygon(polygonId: PolygonId("polygon_3"));
@@ -274,6 +280,30 @@ void main() {
     expect(payload.points.first.longitude, 2.0);
     expect(payload.points.last.latitude, 3.0);
     expect(payload.points.last.longitude, 4.0);
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets('Polygon with onTap is not resent when callback changes', (
+    WidgetTester tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    // Different lambda instances should not trigger a diff when all value
+    // fields are identical (onTap is excluded from ==).
+    final Polygon p1 = Polygon(polygonId: PolygonId('polygon_1'), onTap: () {});
+    final Set<Polygon> prev = _toSet(p1: p1);
+    final Polygon p1Rebuilt = Polygon(
+      polygonId: PolygonId('polygon_1'),
+      onTap: () {}, // different lambda instance
+    );
+    final Set<Polygon> cur = _toSet(p1: p1Rebuilt);
+
+    await tester.pumpWidget(_mapWithPolygons(prev));
+    await tester.pumpWidget(_mapWithPolygons(cur));
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+
+    expect(platformAppleMap.polygonsToChange!.isEmpty, true);
     debugDefaultTargetPlatformOverride = null;
   });
 }

@@ -18,12 +18,12 @@ extension AppleMapController: PolylineDelegate {
         let polylineRenderer = MKPolylineRenderer(overlay: polyline)
 
         if let flutterPolyline: FlutterPolyline = overlay as? FlutterPolyline {
-            if flutterPolyline.isVisible! {
+            if flutterPolyline.isVisible ?? true {
                 polylineRenderer.strokeColor = flutterPolyline.color
                 polylineRenderer.lineWidth = flutterPolyline.width ?? 1.0
                 polylineRenderer.lineDashPattern = flutterPolyline.pattern
-                polylineRenderer.lineJoin = flutterPolyline.lineJoin!
-                polylineRenderer.lineCap = flutterPolyline.capType!
+                polylineRenderer.lineJoin = flutterPolyline.lineJoin ?? .round
+                polylineRenderer.lineCap = flutterPolyline.capType ?? .butt
             } else {
                 polylineRenderer.strokeColor = UIColor.clear
                 polylineRenderer.lineWidth = 0.0
@@ -87,53 +87,5 @@ extension AppleMapController: PolylineDelegate {
         } else {
             self.mapView.insertOverlay(polyline, at: polyline.zIndex ?? 0)
         }
-    }
-    
-    private func linePatternToArray(patternData: NSArray?, lineWidth: CGFloat?) -> [NSNumber] {
-        var finalPattern: [NSNumber] = []
-        var isDot: Bool = false
-        if patternData == nil {
-            return finalPattern
-        }
-        for pattern in patternData! {
-            if let _pattern: NSArray = pattern as? NSArray {
-                if _pattern.count > 0 {
-                    if let identifier: String = _pattern[0] as? String {
-                        if identifier == "dot" {
-                            isDot = true
-                            finalPattern.append(0)
-                        } else if identifier == "dash" {
-                            isDot = false
-                            finalPattern.append(NSNumber(value: lround((_pattern[1] as! Double) * 1/3.5)))
-                        } else if identifier == "gap" {
-                            if let length = _pattern[1] as? Double {
-                                if isDot {
-                                    finalPattern.append(NSNumber(value: lround(Double((lineWidth ?? 0) * 1.5))))
-                                } else {
-                                    finalPattern.append(NSNumber(value: lround(length * 1/3.5)))
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return finalPattern
-    }
-    
-    private func getLineCapForLinePattern(linePatternData: NSArray?) -> CGLineCap {
-        if linePatternData == nil {
-            return CGLineCap.butt
-        }
-        for pattern in linePatternData! {
-            if let _pattern = pattern as? NSArray {
-                if _pattern.contains("dot") {
-                    return CGLineCap.round
-                } else if _pattern.contains("dash") {
-                    return CGLineCap.butt
-                }
-            }
-        }
-        return CGLineCap.butt
     }
 }

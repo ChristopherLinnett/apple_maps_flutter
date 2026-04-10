@@ -28,11 +28,9 @@ class _PolygonUpdates {
       return currentPolygons[id]!;
     }
 
-    final Set<PolygonId> _polygonIdsToRemove = prevPolygonIds.difference(
-      currentPolygonIds,
-    );
+    polygonIdsToRemove = prevPolygonIds.difference(currentPolygonIds);
 
-    final Set<Polygon> _polygonsToAdd = currentPolygonIds
+    polygonsToAdd = currentPolygonIds
         .difference(prevPolygonIds)
         .map(idToCurrentPolygon)
         .toSet();
@@ -44,15 +42,11 @@ class _PolygonUpdates {
       return current != previous;
     }
 
-    final Set<Polygon> _polygonsToChange = currentPolygonIds
+    polygonsToChange = currentPolygonIds
         .intersection(prevPolygonIds)
         .map(idToCurrentPolygon)
         .where(hasChanged)
         .toSet();
-
-    this.polygonsToAdd = _polygonsToAdd;
-    this.polygonIdsToRemove = _polygonIdsToRemove;
-    this.polygonsToChange = _polygonsToChange;
   }
 
   late Set<Polygon> polygonsToAdd;
@@ -70,8 +64,11 @@ class _PolygonUpdates {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(polygonsToAdd, polygonIdsToRemove, polygonsToChange);
+  int get hashCode => Object.hash(
+        Object.hashAllUnordered(polygonsToAdd),
+        Object.hashAllUnordered(polygonIdsToRemove),
+        Object.hashAllUnordered(polygonsToChange),
+      );
 
   @override
   String toString() {

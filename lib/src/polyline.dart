@@ -173,11 +173,32 @@ class Polyline {
     if (identical(this, other)) return true;
     if (other is! Polyline) return false;
     final Polyline typedOther = other;
-    return polylineId == typedOther.polylineId;
+    // onTap intentionally excluded: callback equality is not reliable
+    return polylineId == typedOther.polylineId &&
+        consumeTapEvents == typedOther.consumeTapEvents &&
+        color == typedOther.color &&
+        polylineCap == typedOther.polylineCap &&
+        jointType == typedOther.jointType &&
+        listEquals(patterns, typedOther.patterns) &&
+        listEquals(points, typedOther.points) &&
+        visible == typedOther.visible &&
+        width == typedOther.width &&
+        zIndex == typedOther.zIndex;
   }
 
   @override
-  int get hashCode => polylineId.hashCode;
+  int get hashCode => Object.hash(
+    polylineId,
+    consumeTapEvents,
+    color,
+    polylineCap,
+    jointType,
+    Object.hashAll(patterns),
+    Object.hashAll(points),
+    visible,
+    width,
+    zIndex,
+  );
 
   dynamic _pointsToJson() {
     final List<dynamic> result = <dynamic>[];

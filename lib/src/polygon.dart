@@ -144,6 +144,7 @@ class Polygon {
     if (identical(this, other)) return true;
     if (other is! Polygon) return false;
     final Polygon typedOther = other;
+    // onTap intentionally excluded: callback equality is not reliable
     return polygonId == typedOther.polygonId &&
         consumeTapEvents == typedOther.consumeTapEvents &&
         fillColor == typedOther.fillColor &&
@@ -151,12 +152,20 @@ class Polygon {
         visible == typedOther.visible &&
         strokeColor == typedOther.strokeColor &&
         strokeWidth == typedOther.strokeWidth &&
-        zIndex == typedOther.zIndex &&
-        onTap == typedOther.onTap;
+        zIndex == typedOther.zIndex;
   }
 
   @override
-  int get hashCode => polygonId.hashCode;
+  int get hashCode => Object.hash(
+    polygonId,
+    consumeTapEvents,
+    fillColor,
+    Object.hashAll(points),
+    strokeColor,
+    strokeWidth,
+    visible,
+    zIndex,
+  );
 
   dynamic _pointsToJson() {
     final List<dynamic> result = <dynamic>[];

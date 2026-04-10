@@ -28,7 +28,7 @@ class FlutterPolyline: MKPolyline {
             case .square:
                 return CAShapeLayerLineCap.square
             case .round:
-                return CAShapeLayerLineCap.square
+                return CAShapeLayerLineCap.round
             default:
                 return CAShapeLayerLineCap.butt
             }
@@ -137,8 +137,22 @@ class FlutterPolyline: MKPolyline {
     }
     
     static func == (lhs: FlutterPolyline, rhs: FlutterPolyline) -> Bool {
-        return lhs.color == rhs.color && lhs.isConsumingTapEvents == rhs.isConsumingTapEvents && lhs.width ==  rhs.width
-            && lhs.isVisible == rhs.isVisible && lhs.capType == rhs.capType && lhs.pattern == rhs.pattern && lhs.lineJoin == rhs.lineJoin && rhs.zIndex == lhs.zIndex && lhs.coordinate.latitude == rhs.coordinate.latitude && lhs.coordinate.longitude == rhs.coordinate.longitude
+        guard lhs.color == rhs.color,
+              lhs.isConsumingTapEvents == rhs.isConsumingTapEvents,
+              lhs.width == rhs.width,
+              lhs.isVisible == rhs.isVisible,
+              lhs.capType == rhs.capType,
+              lhs.pattern == rhs.pattern,
+              lhs.lineJoin == rhs.lineJoin,
+              lhs.zIndex == rhs.zIndex else { return false }
+        // Compare coordinate arrays element-by-element so that path changes
+        // are detected, not just movement of the first point.
+        let lc = lhs.coordinates ?? []
+        let rc = rhs.coordinates ?? []
+        guard lc.count == rc.count else { return false }
+        return zip(lc, rc).allSatisfy {
+            $0.latitude == $1.latitude && $0.longitude == $1.longitude
+        }
     }
     
     static func != (lhs: FlutterPolyline, rhs: FlutterPolyline) -> Bool {
@@ -150,17 +164,15 @@ extension FlutterPolyline: FlutterOverlay {
     func getCAShapeLayer(snapshot: MKMapSnapshotter.Snapshot) -> CAShapeLayer {
         let path = UIBezierPath()
         let shapeLayer = CAShapeLayer()
-        
-        if !(self.isVisible ?? true) {
+
+        guard isVisible ?? true, let coords = self.coordinates, !coords.isEmpty else {
             return shapeLayer
         }
-            
 
         // Thus we use snapshot.point() to save the pain.
-        path.move(to: snapshot.point(for: self.coordinates![0]))
-        for coordinate in self.coordinates! {
+        path.move(to: snapshot.point(for: coords[0]))
+        for coordinate in coords.dropFirst() {
             path.addLine(to: snapshot.point(for: coordinate))
-            path.move(to: snapshot.point(for: coordinate))
         }
         
         shapeLayer.path = path.cgPath
