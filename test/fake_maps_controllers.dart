@@ -80,6 +80,8 @@ class FakePlatformAppleMap {
 
   bool? scaleEnabled;
 
+  TrackingMode? trackingMode;
+
   CameraTargetBounds? cameraTargetBounds;
 
   Set<AnnotationId>? annotationIdsToRemove;
@@ -362,6 +364,9 @@ class FakePlatformAppleMap {
     if (options.containsKey('scaleEnabled')) {
       scaleEnabled = options['scaleEnabled'];
     }
+    if (options.containsKey('trackingMode')) {
+      trackingMode = TrackingMode.values[options['trackingMode'] as int];
+    }
     if (options.containsKey('cameraTargetBounds')) {
       final dynamic boundsData = options['cameraTargetBounds'];
       if (boundsData == null) {
@@ -425,6 +430,9 @@ class FakePlatformAppleMap {
     }
     if (options.scaleEnabled != null) {
       scaleEnabled = options.scaleEnabled;
+    }
+    if (options.trackingMode != null) {
+      trackingMode = TrackingMode.values[options.trackingMode!];
     }
     if (options.cameraTargetBounds != null) {
       final PlatformLatLngBounds? bounds = options.cameraTargetBounds!.bounds;
