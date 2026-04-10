@@ -1804,7 +1804,7 @@ void main() {
     debugDefaultTargetPlatformOverride = null;
   });
 
-  testWidgets('Default trackingMode is null when not set', (
+  testWidgets('Default trackingMode is TrackingMode.none', (
     WidgetTester tester,
   ) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;

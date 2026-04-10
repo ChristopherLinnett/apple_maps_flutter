@@ -45,6 +45,7 @@ class AppleMap extends StatefulWidget {
     this.onCameraIdle,
     this.onTap,
     this.onLongPress,
+    this.onPermissionDenied,
     this.snapshotOptions,
     this.insetsLayoutMarginsFromSafeArea = true,
   }) : super(key: key);
@@ -127,6 +128,13 @@ class AppleMap extends StatefulWidget {
 
   /// Called every time a [AppleMap] is long pressed.
   final ArgumentCallback<LatLng>? onLongPress;
+
+  /// Called when the user denies or revokes location permission.
+  ///
+  /// Fires when the platform reports [CLAuthorizationStatus.denied] or
+  /// [CLAuthorizationStatus.restricted] after a permission request triggered
+  /// by enabling [myLocationEnabled].
+  final VoidCallback? onPermissionDenied;
 
   /// True if a "My Location" layer should be shown on the map.
   ///
@@ -396,6 +404,10 @@ class _AppleMapState extends State<AppleMap> {
 
   void onLongPress(LatLng position) {
     widget.onLongPress?.call(position);
+  }
+
+  void onPermissionDenied() {
+    widget.onPermissionDenied?.call();
   }
 }
 

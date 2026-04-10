@@ -101,6 +101,9 @@ class AppleMapController {
           LatLng._fromJson(call.arguments['position'])!,
         );
         break;
+      case 'map#onPermissionDenied':
+        _appleMapState.onPermissionDenied();
+        break;
       default:
         throw MissingPluginException();
     }
