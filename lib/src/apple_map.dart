@@ -346,7 +346,7 @@ class _AppleMapState extends State<AppleMap> {
   }
 
   Future<void> onPlatformViewCreated(int id) async {
-    final AppleMapController controller = await AppleMapController.init(
+    final AppleMapController controller = AppleMapController.init(
       id,
       widget.initialCameraPosition,
       this,

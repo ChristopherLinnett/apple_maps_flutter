@@ -11,20 +11,20 @@ class AppleMapController implements AppleMapFlutterApi {
     this._hostApi,
     CameraPosition initialCameraPosition,
     this._appleMapState,
-    BinaryMessenger? binaryMessenger,
+    this._binaryMessenger,
   ) {
     AppleMapFlutterApi.setUp(
       this,
-      binaryMessenger: binaryMessenger,
+      binaryMessenger: _binaryMessenger,
       messageChannelSuffix: '$mapId',
     );
   }
 
-  static Future<AppleMapController> init(
+  static AppleMapController init(
     int id,
     CameraPosition initialCameraPosition,
     _AppleMapState appleMapState,
-  ) async {
+  ) {
     return AppleMapController._(
       id,
       AppleMapHostApi(messageChannelSuffix: '$id'),
@@ -40,6 +40,8 @@ class AppleMapController implements AppleMapFlutterApi {
   final AppleMapHostApi _hostApi;
 
   final _AppleMapState _appleMapState;
+
+  final BinaryMessenger? _binaryMessenger;
 
   bool _disposed = false;
 
@@ -304,7 +306,11 @@ class AppleMapController implements AppleMapFlutterApi {
       return;
     }
     _disposed = true;
-    AppleMapFlutterApi.setUp(null, messageChannelSuffix: '$mapId');
+    AppleMapFlutterApi.setUp(
+      null,
+      binaryMessenger: _binaryMessenger,
+      messageChannelSuffix: '$mapId',
+    );
     try {
       await _hostApi.dispose();
     } on PlatformException {

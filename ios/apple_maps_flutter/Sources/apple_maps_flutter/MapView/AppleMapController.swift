@@ -12,7 +12,7 @@ import MapKit
 public class AppleMapController: NSObject, FlutterPlatformView, AppleMapHostApi {
     var contentView: UIView
     var mapView: FlutterMapView
-    var registrar: FlutterPluginRegistrar
+    let registrar: FlutterPluginRegistrar
     var flutterApi: AppleMapFlutterApi
     let mapId: Int64
     let hostApiSuffix: String
@@ -21,7 +21,7 @@ public class AppleMapController: NSObject, FlutterPlatformView, AppleMapHostApi 
     var currentlySelectedAnnotation: String?
     var snapShotOptions: MKMapSnapshotter.Options = MKMapSnapshotter.Options()
     var snapShot: MKMapSnapshotter?
-    var isDisposed: Bool = false
+    private var isDisposed: Bool = false
     
     public init(withFrame frame: CGRect, withRegistrar registrar: FlutterPluginRegistrar, withargs args: Dictionary<String, Any> ,withId id: Int64) {
         self.mapId = id
@@ -187,11 +187,10 @@ public class AppleMapController: NSObject, FlutterPlatformView, AppleMapHostApi 
     }
 
     private func tearDownHostApi() {
-        if isDisposed {
-            return
-        }
+        guard !isDisposed else { return }
         isDisposed = true
         AppleMapHostApiSetup.setUp(binaryMessenger: registrar.messenger(), api: nil, messageChannelSuffix: hostApiSuffix)
+        mapView.flutterApi = nil
         mapView.delegate = nil
         snapShot?.cancel()
         snapShot = nil
@@ -318,20 +317,24 @@ extension AppleMapController: MKMapViewDelegate {
         if ((self.mapView.mapContainerView) != nil) {
             let locationOnMap = self.mapView.region.center
             flutterApi.onCameraMove(
-            position: PlatformCameraPosition(
-                target: PlatformLatLng(latitude: locationOnMap.latitude, longitude: locationOnMap.longitude),
-                heading: self.mapView.actualHeading,
-                pitch: Double(self.mapView.camera.pitch),
-                zoom: self.mapView.calculatedZoomLevel
+                position: PlatformCameraPosition(
+                    target: PlatformLatLng(
+                        latitude: locationOnMap.latitude,
+                        longitude: locationOnMap.longitude
+                    ),
+                    heading: self.mapView.actualHeading,
+                    pitch: Double(self.mapView.camera.pitch),
+                    zoom: self.mapView.calculatedZoomLevel
+                ),
+                completion: pigeonLogOnError
             )
-        ) { _ in }
         }
-        flutterApi.onCameraIdle { _ in }
+        flutterApi.onCameraIdle(completion: pigeonLogOnError)
     }
     
     // onMoveStarted
     public func mapView(_ mapView: MKMapView, regionWillChangeAnimated animated: Bool) {
-        flutterApi.onCameraMoveStarted { _ in }
+        flutterApi.onCameraMoveStarted(completion: pigeonLogOnError)
     }
 
     public func mapView(
@@ -351,8 +354,9 @@ extension AppleMapController: MKMapViewDelegate {
         let coordinate = annotation.coordinate
         flutterApi.onAnnotationDragEnd(
             annotationId: annotation.id,
-            position: PlatformLatLng(latitude: coordinate.latitude, longitude: coordinate.longitude)
-        ) { _ in }
+            position: PlatformLatLng(latitude: coordinate.latitude, longitude: coordinate.longitude),
+            completion: pigeonLogOnError
+        )
     }
     
     public func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {

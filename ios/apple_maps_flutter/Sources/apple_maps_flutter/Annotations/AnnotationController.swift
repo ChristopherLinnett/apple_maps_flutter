@@ -122,7 +122,7 @@ extension AppleMapController: AnnotationDelegate {
     func onAnnotationClick(annotation: MKAnnotation) {
         if let flutterAnnotation: FlutterAnnotation = annotation as? FlutterAnnotation {
             flutterAnnotation.wasDragged = true
-            flutterApi.onAnnotationTap(annotationId: flutterAnnotation.id) { _ in }
+            flutterApi.onAnnotationTap(annotationId: flutterAnnotation.id, completion: pigeonLogOnError)
         }
     }
 
@@ -171,7 +171,7 @@ extension AppleMapController: AnnotationDelegate {
 
     @objc func onCalloutTapped(infoWindowTap: InfoWindowTapGestureRecognizer) {
         if infoWindowTap.annotationId != nil && self.currentlySelectedAnnotation == infoWindowTap.annotationId! {
-            flutterApi.onInfoWindowTap(annotationId: infoWindowTap.annotationId!) { _ in }
+            flutterApi.onInfoWindowTap(annotationId: infoWindowTap.annotationId!, completion: pigeonLogOnError)
         }
         if infoWindowTap.annotationView != nil && self.currentlySelectedAnnotation != infoWindowTap.annotationId! {
             infoWindowTap.annotationView?.removeGestureRecognizer(infoWindowTap)
@@ -201,7 +201,7 @@ extension AppleMapController: AnnotationDelegate {
         }
         if annotation.zIndex == -1 {
             annotation.zIndex = self.getNextAnnotationZIndex()
-            flutterApi.onAnnotationZIndexChanged(annotationId: annotation.id!, zIndex: annotation.zIndex) { _ in }
+            flutterApi.onAnnotationZIndexChanged(annotationId: annotation.id!, zIndex: annotation.zIndex, completion: pigeonLogOnError)
         }
         self.mapView.addAnnotation(annotation)
     }
@@ -288,7 +288,7 @@ extension AppleMapController: AnnotationDelegate {
     private func moveToFront(annotation: FlutterAnnotation) {
         let id: String = annotation.id
         annotation.zIndex = self.getNextAnnotationZIndex()
-        flutterApi.onAnnotationZIndexChanged(annotationId: id, zIndex: annotation.zIndex) { _ in }
+        flutterApi.onAnnotationZIndexChanged(annotationId: id, zIndex: annotation.zIndex, completion: pigeonLogOnError)
         self.addAnnotation(annotation: annotation)
         self.selectAnnotation(with: id)
     }

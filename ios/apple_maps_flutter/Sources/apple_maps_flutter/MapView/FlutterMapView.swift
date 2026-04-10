@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Flutter
 import MapKit
 import CoreLocation
 
@@ -81,8 +80,8 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
     override func layoutSubviews() {
         // Only update the map in layoutSubviews if the bounds changed
         if self.bounds != oldBounds {
-            if self.options != nil {
-                self.interpretOptions(options: self.options!)
+            if let options = self.options {
+                self.interpretOptions(options: options)
             }
             setCenterCoordinateWithAltitude(centerCoordinate: centerCoordinate, zoomLevel: zoomLevel, animated: false)
             mapContainerView = self.findViewOfType("MKScrollContainerView", inView: self)
@@ -204,12 +203,7 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
         }
         
         if let myLocationEnabled: Bool = options["myLocationEnabled"] as? Bool {
-            if (myLocationEnabled) {
-                self.setUserLocation()
-            } else {
-                self.removeUserLocation()
-            }
-            
+            myLocationEnabled ? self.setUserLocation() : self.removeUserLocation()
         }
         
         if let myLocationButtonEnabled: Bool = options["myLocationButtonEnabled"] as? Bool {
@@ -371,8 +365,9 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
            let locationOnMap = self.convert(locationInView, toCoordinateFrom: self)
            
            flutterApi?.onMapLongPress(
-               position: PlatformLatLng(latitude: locationOnMap.latitude, longitude: locationOnMap.longitude)
-           ) { _ in }
+               position: PlatformLatLng(latitude: locationOnMap.latitude, longitude: locationOnMap.longitude),
+               completion: pigeonLogOnError
+           )
         }
     }
 
@@ -425,7 +420,7 @@ extension FlutterMapView: CLLocationManagerDelegate {
         case .denied, .restricted:
             // Clear the flag so a later setUserLocation() call re-evaluates correctly.
             pendingUserLocationEnabled = false
-            flutterApi?.onPermissionDenied { _ in }
+            flutterApi?.onPermissionDenied(completion: pigeonLogOnError)
         default:
             break
         }

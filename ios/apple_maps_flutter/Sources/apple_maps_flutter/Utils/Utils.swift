@@ -57,3 +57,17 @@ class  Utils {
         return Double(doubleStr)!
     }
 }
+
+/// Logs Pigeon callback errors in debug builds.
+///
+/// Pigeon FlutterApi completions must not propagate errors to the native caller,
+/// but silently dropping them obscures Dart-side bugs during development. Use
+/// this handler as the trailing closure on every `flutterApi.on*` call so that
+/// failures surface in the debug console without crashing in production.
+func pigeonLogOnError(_ result: Result<Void, PigeonError>) {
+    #if DEBUG
+    if case .failure(let error) = result {
+        print("[AppleMaps] FlutterApi callback error: \(error)")
+    }
+    #endif
+}

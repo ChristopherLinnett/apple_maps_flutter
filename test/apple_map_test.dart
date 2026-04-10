@@ -1850,4 +1850,28 @@ void main() {
     expect(platformAppleMap.mapUpdateCallCount, 0);
     debugDefaultTargetPlatformOverride = null;
   });
+
+  testWidgets('onPermissionDenied fires widget callback when permission is denied', (
+    WidgetTester tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    bool wasCalled = false;
+
+    await tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: const CameraPosition(target: LatLng(0, 0)),
+          onPermissionDenied: () => wasCalled = true,
+        ),
+      ),
+    );
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+    await platformAppleMap.sendFlutterApiEvent('onPermissionDenied', <Object?>[]);
+
+    expect(wasCalled, isTrue);
+    debugDefaultTargetPlatformOverride = null;
+  });
 }
