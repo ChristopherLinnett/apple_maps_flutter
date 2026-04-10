@@ -37,6 +37,8 @@ Widget _mapWithAnnotations(Set<Annotation>? annotations) {
 }
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   final FakePlatformViewsController fakePlatformViewsController =
       FakePlatformViewsController();
 

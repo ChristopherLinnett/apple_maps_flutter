@@ -13,10 +13,15 @@ If you want to exercise the Swift Package Manager path locally, run `flutter con
 # Sample usage
 
 ```dart
-class AppleMapsExample extends StatelessWidget {
-  AppleMapsExample({super.key});
+class AppleMapsExample extends StatefulWidget {
+  const AppleMapsExample({super.key});
 
-  late AppleMapController mapController;
+  @override
+  State<AppleMapsExample> createState() => _AppleMapsExampleState();
+}
+
+class _AppleMapsExampleState extends State<AppleMapsExample> {
+  AppleMapController? mapController;
 
   void _onMapCreated(AppleMapController controller) {
     mapController = controller;
@@ -45,7 +50,7 @@ class AppleMapsExample extends StatelessWidget {
               children: <Widget>[
                 TextButton(
                   onPressed: () {
-                    mapController.moveCamera(
+                    mapController?.moveCamera(
                       CameraUpdate.newCameraPosition(
                         const CameraPosition(
                           heading: 270.0,
@@ -60,7 +65,7 @@ class AppleMapsExample extends StatelessWidget {
                 ),
                 TextButton(
                   onPressed: () {
-                    mapController.moveCamera(
+                    mapController?.moveCamera(
                       CameraUpdate.newLatLngZoom(
                         const LatLng(37.4231613, -122.087159),
                         11.0,
@@ -75,7 +80,7 @@ class AppleMapsExample extends StatelessWidget {
               children: <Widget>[
                 TextButton(
                   onPressed: () {
-                    mapController.moveCamera(
+                    mapController?.moveCamera(
                       CameraUpdate.zoomIn(),
                     );
                   },
@@ -83,7 +88,7 @@ class AppleMapsExample extends StatelessWidget {
                 ),
                 TextButton(
                   onPressed: () {
-                    mapController.moveCamera(
+                    mapController?.moveCamera(
                       CameraUpdate.zoomOut(),
                     );
                   },
@@ -91,7 +96,7 @@ class AppleMapsExample extends StatelessWidget {
                 ),
                 TextButton(
                   onPressed: () {
-                    mapController.moveCamera(
+                    mapController?.moveCamera(
                       CameraUpdate.zoomTo(16.0),
                     );
                   },

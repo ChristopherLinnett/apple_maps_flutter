@@ -12,6 +12,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'fake_maps_controllers.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   final FakePlatformViewsController fakePlatformViewsController =
       FakePlatformViewsController();
 
