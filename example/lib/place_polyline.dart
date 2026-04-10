@@ -14,9 +14,7 @@ class PlacePolylinePage extends ExamplePage {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: const PlacePolylineBody(),
-    );
+    return SafeArea(child: const PlacePolylineBody());
   }
 }
 
@@ -53,7 +51,7 @@ class PlacePolylineBodyState extends State<PlacePolylineBody> {
   List<JointType> jointTypes = <JointType>[
     JointType.mitered,
     JointType.bevel,
-    JointType.round
+    JointType.round,
   ];
 
   // Values when toggling polyline start cap type
@@ -204,37 +202,43 @@ class PlacePolylineBodyState extends State<PlacePolylineBody> {
             children: [
               TextButton(child: const Text('add'), onPressed: _add),
               TextButton(
-                  child: const Text('remove'),
-                  onPressed: (selectedPolyline == null) ? null : _remove),
+                child: const Text('remove'),
+                onPressed: (selectedPolyline == null) ? null : _remove,
+              ),
               TextButton(
-                  child: const Text('toggle visible'),
-                  onPressed:
-                      (selectedPolyline == null) ? null : _toggleVisible),
+                child: const Text('toggle visible'),
+                onPressed: (selectedPolyline == null) ? null : _toggleVisible,
+              ),
               TextButton(
-                  child: const Text('change zIndex'), onPressed: _changeZIndex),
+                child: const Text('change zIndex'),
+                onPressed: _changeZIndex,
+              ),
               TextButton(
-                  child: const Text('change width'),
-                  onPressed: (selectedPolyline == null) ? null : _changeWidth),
+                child: const Text('change width'),
+                onPressed: (selectedPolyline == null) ? null : _changeWidth,
+              ),
               TextButton(
-                  child: const Text('change color'),
-                  onPressed: (selectedPolyline == null) ? null : _changeColor),
+                child: const Text('change color'),
+                onPressed: (selectedPolyline == null) ? null : _changeColor,
+              ),
               TextButton(
-                  child: const Text('change polyline caps'),
-                  onPressed: (selectedPolyline == null) ? null : _changeCaps),
+                child: const Text('change polyline caps'),
+                onPressed: (selectedPolyline == null) ? null : _changeCaps,
+              ),
               TextButton(
-                  child: const Text('change joint type'),
-                  onPressed:
-                      (selectedPolyline == null) ? null : _changeJointType),
+                child: const Text('change joint type'),
+                onPressed: (selectedPolyline == null) ? null : _changeJointType,
+              ),
               TextButton(
-                  child: const Text('change pattern'),
-                  onPressed:
-                      (selectedPolyline == null) ? null : _changePattern),
+                child: const Text('change pattern'),
+                onPressed: (selectedPolyline == null) ? null : _changePattern,
+              ),
               TextButton(
                 child: Text('Take a snapshot'),
                 onPressed: () async {
-                  final imageBytes = await this
-                      .controller
-                      .takeSnapshot(SnapshotOptions(showOverlays: true));
+                  final imageBytes = await this.controller.takeSnapshot(
+                    SnapshotOptions(showOverlays: true),
+                  );
                   setState(() {
                     _imageBytes = imageBytes;
                   });

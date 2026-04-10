@@ -10,12 +10,14 @@ import 'package:apple_maps_flutter_example/page.dart';
 import 'package:flutter/material.dart';
 import 'package:apple_maps_flutter/apple_maps_flutter.dart';
 
-const CameraPosition _kInitialPosition =
-    CameraPosition(target: LatLng(-33.852, 151.211), zoom: 11.0);
+const CameraPosition _kInitialPosition = CameraPosition(
+  target: LatLng(-33.852, 151.211),
+  zoom: 11.0,
+);
 
 class SnapshotPage extends ExamplePage {
   SnapshotPage()
-      : super(const Icon(Icons.camera_alt), 'Take a snapshot of the map');
+    : super(const Icon(Icons.camera_alt), 'Take a snapshot of the map');
 
   @override
   Widget build(BuildContext context) {

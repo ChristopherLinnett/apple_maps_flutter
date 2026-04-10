@@ -12,7 +12,7 @@ import 'package:apple_maps_flutter/src/messages.g.dart';
 /// on the platform side.
 class AppleMapInspector {
   AppleMapInspector(int mapId)
-      : _hostApi = AppleMapHostApi(messageChannelSuffix: '$mapId');
+    : _hostApi = AppleMapHostApi(messageChannelSuffix: '$mapId');
 
   final AppleMapHostApi _hostApi;
 
@@ -21,8 +21,8 @@ class AppleMapInspector {
   }
 
   Future<MinMaxZoomPreference> getMinMaxZoomLevels() async {
-    final PlatformMinMaxZoomPreference result =
-        await _hostApi.getMinMaxZoomLevels();
+    final PlatformMinMaxZoomPreference result = await _hostApi
+        .getMinMaxZoomLevels();
     return MinMaxZoomPreference(result.minZoom, result.maxZoom);
   }
 

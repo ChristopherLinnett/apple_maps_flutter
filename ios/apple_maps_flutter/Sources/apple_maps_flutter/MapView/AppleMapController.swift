@@ -326,6 +326,27 @@ extension AppleMapController: MKMapViewDelegate {
     public func mapView(_ mapView: MKMapView, regionWillChangeAnimated animated: Bool) {
         self.channel.invokeMethod("camera#onMoveStarted", arguments: "")
     }
+
+    public func mapView(
+        _ mapView: MKMapView,
+        annotationView view: MKAnnotationView,
+        didChange newState: MKAnnotationView.DragState,
+        fromOldState oldState: MKAnnotationView.DragState
+    ) {
+        // Only fire onDragEnd when the drag is committed (.ending).
+        // .canceling means MapKit rolled back the drag — the annotation
+        // returns to its original position and no position update should
+        // be committed to the Flutter data model.
+        guard newState == .ending,
+              let annotation = view.annotation as? FlutterAnnotation else {
+            return
+        }
+        let coordinate = annotation.coordinate
+        channel.invokeMethod("annotation#onDragEnd", arguments: [
+            "annotationId": annotation.id as Any,
+            "position": [coordinate.latitude, coordinate.longitude],
+        ])
+    }
     
     public func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
         if overlay is FlutterPolyline {

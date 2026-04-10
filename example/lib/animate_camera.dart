@@ -9,7 +9,7 @@ import 'page.dart';
 
 class AnimateCameraPage extends ExamplePage {
   AnimateCameraPage()
-      : super(const Icon(Icons.map), 'Camera control, animated');
+    : super(const Icon(Icons.map), 'Camera control, animated');
 
   @override
   Widget build(BuildContext context) {
@@ -89,8 +89,9 @@ class AnimateCameraState extends State<AnimateCamera> {
                     mapController.animateCamera(
                       CameraUpdate.newLatLngBounds(
                         LatLngBounds(
-                            southwest: LatLng(37.749146, -122.71829295684518),
-                            northeast: LatLng(37.94134713198227, -122.498971)),
+                          southwest: LatLng(37.749146, -122.71829295684518),
+                          northeast: LatLng(37.94134713198227, -122.498971),
+                        ),
                         11.0,
                       ),
                     );
@@ -100,43 +101,32 @@ class AnimateCameraState extends State<AnimateCamera> {
                 TextButton(
                   onPressed: () {
                     mapController.animateCamera(
-                      CameraUpdate.zoomBy(
-                        -0.5,
-                        const Offset(30.0, 20.0),
-                      ),
+                      CameraUpdate.zoomBy(-0.5, const Offset(30.0, 20.0)),
                     );
                   },
                   child: const Text('zoomBy with focus'),
                 ),
                 TextButton(
                   onPressed: () {
-                    mapController.animateCamera(
-                      CameraUpdate.zoomBy(-0.5),
-                    );
+                    mapController.animateCamera(CameraUpdate.zoomBy(-0.5));
                   },
                   child: const Text('zoomBy'),
                 ),
                 TextButton(
                   onPressed: () {
-                    mapController.animateCamera(
-                      CameraUpdate.zoomIn(),
-                    );
+                    mapController.animateCamera(CameraUpdate.zoomIn());
                   },
                   child: const Text('zoomIn'),
                 ),
                 TextButton(
                   onPressed: () {
-                    mapController.animateCamera(
-                      CameraUpdate.zoomOut(),
-                    );
+                    mapController.animateCamera(CameraUpdate.zoomOut());
                   },
                   child: const Text('zoomOut'),
                 ),
                 TextButton(
                   onPressed: () {
-                    mapController.animateCamera(
-                      CameraUpdate.zoomTo(16.0),
-                    );
+                    mapController.animateCamera(CameraUpdate.zoomTo(16.0));
                   },
                   child: const Text('zoomTo'),
                 ),

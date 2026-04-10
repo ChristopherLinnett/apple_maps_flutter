@@ -229,7 +229,7 @@ extension PlatformBitmapDescriptor {
 
 extension PlatformAnnotation {
     var asDictionary: [String: Any] {
-        [
+        var dict: [String: Any] = [
             "annotationId": annotationId,
             "alpha": alpha,
             "anchor": anchor.asList,
@@ -240,6 +240,10 @@ extension PlatformAnnotation {
             "position": position.asList,
             "zIndex": zIndex,
         ]
+        if let id = clusteringIdentifier {
+            dict["clusteringIdentifier"] = id
+        }
+        return dict
     }
 }
 

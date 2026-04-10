@@ -38,11 +38,14 @@ final List<ExamplePage> _allPages = <ExamplePage>[
 
 class MapsDemo extends StatelessWidget {
   void _pushPage(BuildContext context, ExamplePage page) {
-    Navigator.of(context).push(MaterialPageRoute<void>(
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
         builder: (_) => Scaffold(
-              appBar: AppBar(title: Text(page.title)),
-              body: page,
-            )));
+          appBar: AppBar(title: Text(page.title)),
+          body: page,
+        ),
+      ),
+    );
   }
 
   @override

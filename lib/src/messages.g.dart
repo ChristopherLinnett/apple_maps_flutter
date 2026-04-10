@@ -691,6 +691,7 @@ class PlatformAnnotation {
     required this.visible,
     required this.position,
     required this.zIndex,
+    this.clusteringIdentifier,
   });
 
   String annotationId;
@@ -711,6 +712,10 @@ class PlatformAnnotation {
 
   double zIndex;
 
+  /// When set, annotations with the same identifier are eligible for clustering.
+  /// Maps to MKAnnotationView.clusteringIdentifier on iOS 11+.
+  String? clusteringIdentifier;
+
   List<Object?> _toList() {
     return <Object?>[
       annotationId,
@@ -722,6 +727,7 @@ class PlatformAnnotation {
       visible,
       position,
       zIndex,
+      clusteringIdentifier,
     ];
   }
 
@@ -740,6 +746,7 @@ class PlatformAnnotation {
       visible: result[6]! as bool,
       position: result[7]! as PlatformLatLng,
       zIndex: result[8]! as double,
+      clusteringIdentifier: result[9] as String?,
     );
   }
 

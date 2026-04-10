@@ -72,9 +72,9 @@ class MapUiBodyState extends State<MapUiBody> {
 
   Widget _zoomBoundsToggler() {
     return TextButton(
-      child: Text(_minMaxZoomPreference.minZoom == null
-          ? 'bound zoom'
-          : 'release zoom'),
+      child: Text(
+        _minMaxZoomPreference.minZoom == null ? 'bound zoom' : 'release zoom',
+      ),
       onPressed: () {
         setState(() {
           _minMaxZoomPreference = _minMaxZoomPreference.minZoom == null
@@ -145,7 +145,8 @@ class MapUiBodyState extends State<MapUiBody> {
   Widget _myLocationToggler() {
     return TextButton(
       child: Text(
-          '${_myLocationEnabled ? 'disable' : 'enable'} my location annotation'),
+        '${_myLocationEnabled ? 'disable' : 'enable'} my location annotation',
+      ),
       onPressed: () {
         setState(() {
           _myLocationEnabled = !_myLocationEnabled;
@@ -157,7 +158,8 @@ class MapUiBodyState extends State<MapUiBody> {
   Widget _myLocationButtonToggler() {
     return TextButton(
       child: Text(
-          '${_myLocationButtonEnabled ? 'disable' : 'enable'} my location button'),
+        '${_myLocationButtonEnabled ? 'disable' : 'enable'} my location button',
+      ),
       onPressed: () {
         setState(() {
           _myLocationButtonEnabled = !_myLocationButtonEnabled;
@@ -185,9 +187,7 @@ class MapUiBodyState extends State<MapUiBody> {
       onCameraMove: _updateCameraPosition,
     );
 
-    final List<Widget> columnChildren = <Widget>[
-      Expanded(child: appleMap),
-    ];
+    final List<Widget> columnChildren = <Widget>[Expanded(child: appleMap)];
 
     if (_isMapCreated) {
       columnChildren.addAll([
@@ -197,8 +197,9 @@ class MapUiBodyState extends State<MapUiBody> {
             children: [
               Text('camera bearing: ${_position.heading}'),
               Text(
-                  'camera target: ${_position.target.latitude.toStringAsFixed(4)},'
-                  '${_position.target.longitude.toStringAsFixed(4)}'),
+                'camera target: ${_position.target.latitude.toStringAsFixed(4)},'
+                '${_position.target.longitude.toStringAsFixed(4)}',
+              ),
               Text('camera zoom: ${_position.zoom}'),
               Text('camera tilt: ${_position.pitch}'),
               Text(_isMoving ? '(Camera moving)' : '(Camera idle)'),

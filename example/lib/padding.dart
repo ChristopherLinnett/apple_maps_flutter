@@ -55,7 +55,7 @@ class MarkerIconsBodyState extends State<MarkerIconsBody> {
         ),
       ),
       _paddingInput(),
-      _buttons()
+      _buttons(),
     ];
 
     return Column(children: columnChildren);
@@ -83,9 +83,7 @@ class MarkerIconsBodyState extends State<MarkerIconsBody> {
               controller: _topController,
               keyboardType: TextInputType.number,
               textAlign: TextAlign.center,
-              decoration: InputDecoration(
-                hintText: "Top",
-              ),
+              decoration: InputDecoration(hintText: "Top"),
             ),
           ),
           Spacer(),
@@ -95,9 +93,7 @@ class MarkerIconsBodyState extends State<MarkerIconsBody> {
               controller: _bottomController,
               keyboardType: TextInputType.number,
               textAlign: TextAlign.center,
-              decoration: InputDecoration(
-                hintText: "Bottom",
-              ),
+              decoration: InputDecoration(hintText: "Bottom"),
             ),
           ),
           Spacer(),
@@ -107,9 +103,7 @@ class MarkerIconsBodyState extends State<MarkerIconsBody> {
               controller: _leftController,
               keyboardType: TextInputType.number,
               textAlign: TextAlign.center,
-              decoration: InputDecoration(
-                hintText: "Left",
-              ),
+              decoration: InputDecoration(hintText: "Left"),
             ),
           ),
           Spacer(),
@@ -119,9 +113,7 @@ class MarkerIconsBodyState extends State<MarkerIconsBody> {
               controller: _rightController,
               keyboardType: TextInputType.number,
               textAlign: TextAlign.center,
-              decoration: InputDecoration(
-                hintText: "Right",
-              ),
+              decoration: InputDecoration(hintText: "Right"),
             ),
           ),
         ],
@@ -159,7 +151,7 @@ class MarkerIconsBodyState extends State<MarkerIconsBody> {
                 _padding = const EdgeInsets.all(0);
               });
             },
-          )
+          ),
         ],
       ),
     );

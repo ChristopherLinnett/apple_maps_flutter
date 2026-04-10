@@ -532,8 +532,9 @@ void main() {
     );
     expect(screenPoint, isNotNull);
 
-    final LatLng roundTrip =
-        (await controller.getLatLng(screenPoint ?? Offset.zero))!;
+    final LatLng roundTrip = (await controller.getLatLng(
+      screenPoint ?? Offset.zero,
+    ))!;
     // In the fake, getScreenCoordinate echoes lat/lng as x/y, and
     // getLatLng echoes x/y as lat/lng, so the round-trip returns
     // the original values.
@@ -566,7 +567,9 @@ void main() {
         fakePlatformViewsController.lastCreatedView!;
 
     platformAppleMap.getLatLngReturnsNull = true;
-    final LatLng? result = await controller.getLatLng(const Offset(999.0, 999.0));
+    final LatLng? result = await controller.getLatLng(
+      const Offset(999.0, 999.0),
+    );
     expect(result, isNull);
     debugDefaultTargetPlatformOverride = null;
   });
@@ -875,8 +878,7 @@ void main() {
     // Verify initial annotations came through creation params.
     expect(platformAppleMap.annotationsToAdd, isNotNull);
     expect(platformAppleMap.annotationsToAdd!.length, 1);
-    final Annotation addedAnnotation =
-        platformAppleMap.annotationsToAdd!.first;
+    final Annotation addedAnnotation = platformAppleMap.annotationsToAdd!.first;
     expect(addedAnnotation.annotationId, AnnotationId('a1'));
     expect(addedAnnotation.alpha, 0.5);
     expect(addedAnnotation.draggable, true);
@@ -907,7 +909,9 @@ void main() {
     // The typed API should have received a change update.
     expect(platformAppleMap.lastPlatformAnnotationUpdates, isNotNull);
     expect(
-      platformAppleMap.lastPlatformAnnotationUpdates!.annotationsToChange
+      platformAppleMap
+          .lastPlatformAnnotationUpdates!
+          .annotationsToChange
           ?.length,
       1,
     );
@@ -924,12 +928,16 @@ void main() {
     );
 
     expect(
-      platformAppleMap.lastPlatformAnnotationUpdates!.annotationIdsToRemove
+      platformAppleMap
+          .lastPlatformAnnotationUpdates!
+          .annotationIdsToRemove
           ?.length,
       1,
     );
     expect(
-      platformAppleMap.lastPlatformAnnotationUpdates!.annotationIdsToRemove!
+      platformAppleMap
+          .lastPlatformAnnotationUpdates!
+          .annotationIdsToRemove!
           .first,
       'a1',
     );
@@ -969,10 +977,7 @@ void main() {
         fakePlatformViewsController.lastCreatedView!;
     expect(platformAppleMap.polylinesToAdd, isNotNull);
     expect(platformAppleMap.polylinesToAdd!.length, 1);
-    expect(
-      platformAppleMap.polylinesToAdd!.first.polylineId,
-      PolylineId('p1'),
-    );
+    expect(platformAppleMap.polylinesToAdd!.first.polylineId, PolylineId('p1'));
 
     // Change the polyline.
     final Polyline polyline1Updated = Polyline(
@@ -1009,8 +1014,7 @@ void main() {
     );
 
     expect(
-      platformAppleMap.lastPlatformPolylineUpdates!.polylineIdsToRemove
-          ?.length,
+      platformAppleMap.lastPlatformPolylineUpdates!.polylineIdsToRemove?.length,
       1,
     );
     debugDefaultTargetPlatformOverride = null;
@@ -1642,10 +1646,7 @@ void main() {
   ) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     final CameraTargetBounds bounds = CameraTargetBounds(
-      LatLngBounds(
-        southwest: LatLng(1.0, 2.0),
-        northeast: LatLng(3.0, 4.0),
-      ),
+      LatLngBounds(southwest: LatLng(1.0, 2.0), northeast: LatLng(3.0, 4.0)),
     );
 
     await tester.pumpWidget(
@@ -1711,6 +1712,52 @@ void main() {
     );
 
     expect(platformAppleMap.mapUpdateCallCount, 0);
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets('onAnnotationDragEnd callback fires when drag completes', (
+    WidgetTester tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    LatLng? dragEndPosition;
+    final Annotation annotation = Annotation(
+      annotationId: AnnotationId('ann_1'),
+      draggable: true,
+      position: const LatLng(10.0, 15.0),
+      onDragEnd: (LatLng pos) => dragEndPosition = pos,
+    );
+
+    await tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: const CameraPosition(
+            target: LatLng(10.0, 15.0),
+          ),
+          annotations: {annotation},
+        ),
+      ),
+    );
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+
+    const LatLng droppedAt = LatLng(11.0, 16.0);
+    await TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .handlePlatformMessage(
+          platformAppleMap.channel.name,
+          platformAppleMap.channel.codec.encodeMethodCall(
+            MethodCall('annotation#onDragEnd', <String, dynamic>{
+              'annotationId': 'ann_1',
+              'position': <double>[droppedAt.latitude, droppedAt.longitude],
+            }),
+          ),
+          (_) {},
+        );
+
+    expect(dragEndPosition, isNotNull);
+    expect(dragEndPosition!.latitude, closeTo(11.0, 0.001));
+    expect(dragEndPosition!.longitude, closeTo(16.0, 0.001));
     debugDefaultTargetPlatformOverride = null;
   });
 }

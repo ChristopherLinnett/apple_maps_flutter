@@ -38,8 +38,16 @@ class _AnnotationUpdates {
         .map(idToCurrentAnnotation)
         .toSet();
     annotationIdsToRemove = prevAnnotationIds.difference(currentAnnotationIds);
+    // Only include annotations whose model state has actually changed.
+    // Callbacks (onTap, onDragEnd) are excluded from Annotation.== so they
+    // cannot be compared; this reduces unnecessary channel traffic when the
+    // widget rebuilds with the same annotation set.
     annotationsToChange = currentAnnotationIds
         .intersection(prevAnnotationIds)
+        .where(
+          (AnnotationId id) =>
+              previousAnnotations[id] != currentAnnotations[id],
+        )
         .map(idToCurrentAnnotation)
         .toSet();
   }

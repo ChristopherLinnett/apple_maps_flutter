@@ -433,8 +433,14 @@ class FakePlatformAppleMap {
       } else {
         cameraTargetBounds = CameraTargetBounds(
           LatLngBounds(
-            southwest: LatLng(bounds.southwest.latitude, bounds.southwest.longitude),
-            northeast: LatLng(bounds.northeast.latitude, bounds.northeast.longitude),
+            southwest: LatLng(
+              bounds.southwest.latitude,
+              bounds.southwest.longitude,
+            ),
+            northeast: LatLng(
+              bounds.northeast.latitude,
+              bounds.northeast.longitude,
+            ),
           ),
         );
       }
@@ -465,6 +471,7 @@ class FakePlatformAppleMap {
           (PlatformAnnotation annotation) => Annotation(
             annotationId: AnnotationId(annotation.annotationId),
             anchor: Offset(annotation.anchor.x, annotation.anchor.y),
+            clusteringIdentifier: annotation.clusteringIdentifier,
             draggable: annotation.draggable,
             visible: annotation.visible,
             icon: _bitmapDescriptorFromPlatform(annotation.icon),
@@ -734,9 +741,7 @@ class FakePlatformAppleMap {
       if (getLatLngReturnsNull) {
         return <Object?>[null];
       }
-      return <Object?>[
-        PlatformLatLng(latitude: sc.x, longitude: sc.y),
-      ];
+      return <Object?>[PlatformLatLng(latitude: sc.x, longitude: sc.y)];
     });
     _registerTypedHandler('isMarkerInfoWindowShown', (Object? message) async {
       return <Object?>[infoWindowShown];

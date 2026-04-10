@@ -16,9 +16,7 @@ class PlacePolygonPage extends ExamplePage {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: const PlacePolygonBody(),
-    );
+    return SafeArea(child: const PlacePolygonBody());
   }
 }
 
@@ -169,10 +167,7 @@ class PlacePolygonBodyState extends State<PlacePolygonBody> {
           child: Wrap(
             alignment: WrapAlignment.spaceEvenly,
             children: [
-              TextButton(
-                child: const Text('add'),
-                onPressed: _add,
-              ),
+              TextButton(child: const Text('add'), onPressed: _add),
               TextButton(
                 child: const Text('remove'),
                 onPressed: (selectedPolygon == null) ? null : _remove,
@@ -191,8 +186,9 @@ class PlacePolygonBodyState extends State<PlacePolygonBody> {
               ),
               TextButton(
                 child: const Text('change stroke color'),
-                onPressed:
-                    (selectedPolygon == null) ? null : _changeStrokeColor,
+                onPressed: (selectedPolygon == null)
+                    ? null
+                    : _changeStrokeColor,
               ),
               TextButton(
                 child: const Text('change fill color'),
@@ -201,9 +197,9 @@ class PlacePolygonBodyState extends State<PlacePolygonBody> {
               TextButton(
                 child: Text('Take a snapshot'),
                 onPressed: () async {
-                  final imageBytes = await this
-                      .controller
-                      .takeSnapshot(SnapshotOptions(showOverlays: true));
+                  final imageBytes = await this.controller.takeSnapshot(
+                    SnapshotOptions(showOverlays: true),
+                  );
                   setState(() {
                     _imageBytes = imageBytes;
                   });
