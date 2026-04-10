@@ -496,6 +496,78 @@ void main() {
     final FakePlatformAppleMap platformAppleMap =
         fakePlatformViewsController.lastCreatedView!;
     expect(platformAppleMap.lastScreenCoordinateTarget, const Offset(1.0, 2.0));
+
+    final LatLng? latLng = await controller.getLatLng(const Offset(3.0, 4.0));
+    expect(latLng, const LatLng(3.0, 4.0));
+    expect(
+      platformAppleMap.lastGetLatLngScreenCoordinate,
+      const Offset(3.0, 4.0),
+    );
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets('getLatLng round-trip with getScreenCoordinate', (
+    WidgetTester tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    final Completer<AppleMapController> controllerCompleter =
+        Completer<AppleMapController>();
+
+    await tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: const CameraPosition(
+            target: LatLng(10.0, 15.0),
+          ),
+          onMapCreated: controllerCompleter.complete,
+        ),
+      ),
+    );
+
+    final AppleMapController controller = await controllerCompleter.future;
+
+    final Offset? screenPoint = await controller.getScreenCoordinate(
+      const LatLng(37.0, -122.0),
+    );
+    expect(screenPoint, isNotNull);
+
+    final LatLng roundTrip =
+        (await controller.getLatLng(screenPoint ?? Offset.zero))!;
+    // In the fake, getScreenCoordinate echoes lat/lng as x/y, and
+    // getLatLng echoes x/y as lat/lng, so the round-trip returns
+    // the original values.
+    expect(roundTrip.latitude, 37.0);
+    expect(roundTrip.longitude, closeTo(-122.0, 1e-10));
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets('getLatLng returns null for invalid screen coordinate', (
+    WidgetTester tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    final Completer<AppleMapController> controllerCompleter =
+        Completer<AppleMapController>();
+
+    await tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: const CameraPosition(
+            target: LatLng(10.0, 15.0),
+          ),
+          onMapCreated: controllerCompleter.complete,
+        ),
+      ),
+    );
+
+    final AppleMapController controller = await controllerCompleter.future;
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+
+    platformAppleMap.getLatLngReturnsNull = true;
+    final LatLng? result = await controller.getLatLng(const Offset(999.0, 999.0));
+    expect(result, isNull);
     debugDefaultTargetPlatformOverride = null;
   });
 

@@ -177,38 +177,6 @@ public extension MKMapView {
         )
     }
     
-    func getVisibleRegion() -> Dictionary<String, Array<Double>> {
-        if self.bounds.size != CGSize.zero {
-            // convert center coordiate to pixel space
-            let centerPixelX = Utils.longitudeToPixelSpaceX(longitude: self.centerCoordinate.longitude)
-            let centerPixelY = Utils.latitudeToPixelSpaceY(latitude: self.centerCoordinate.latitude)
-
-            // determine the scale value from the zoom level
-            let zoomExponent = Double(21 - mapCameraState.zoomLevel)
-            let zoomScale = pow(2.0, zoomExponent)
-
-            // scale the map’s size in pixel space
-            let mapSizeInPixels = self.bounds.size
-            let scaledMapWidth = Double(mapSizeInPixels.width) * zoomScale
-            let scaledMapHeight = Double(mapSizeInPixels.height) * zoomScale;
-
-            // figure out the position of the top-left pixel
-            let topLeftPixelX = centerPixelX - (scaledMapWidth / 2);
-            let topLeftPixelY = centerPixelY - (scaledMapHeight / 2);
-
-            // find the southwest coordinate
-            let minLng = Utils.pixelSpaceXToLongitude(pixelX: topLeftPixelX)
-            let minLat = Utils.pixelSpaceYToLatitude(pixelY: topLeftPixelY)
-
-            // find the northeast coordinate
-            let maxLng = Utils.pixelSpaceXToLongitude(pixelX: topLeftPixelX + scaledMapWidth)
-            let maxLat = Utils.pixelSpaceYToLatitude(pixelY: topLeftPixelY + scaledMapHeight)
-
-            return ["northeast": [minLat, maxLng], "southwest": [maxLat, minLng]]
-        }
-        return ["northeast": [0.0, 0.0], "southwest": [0.0, 0.0]]
-    }
-    
     func zoomIn(animated: Bool) {
         if mapCameraState.zoomLevel - 1 <= mapCameraState.maxZoomLevel {
             if mapCameraState.zoomLevel < 2 {

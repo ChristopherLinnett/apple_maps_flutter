@@ -374,6 +374,8 @@ abstract class AppleMapHostApi {
 
   PlatformScreenCoordinate? getScreenCoordinate(PlatformLatLng latLng);
 
+  PlatformLatLng? getLatLng(PlatformScreenCoordinate screenCoordinate);
+
   @async
   Uint8List? takeSnapshot(PlatformSnapshotOptions options);
 

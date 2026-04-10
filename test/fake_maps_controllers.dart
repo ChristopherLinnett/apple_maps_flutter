@@ -46,6 +46,8 @@ class FakePlatformAppleMap {
   Uint8List? snapshotBytes;
   int disposeCallCount = 0;
   Offset? lastScreenCoordinateTarget;
+  Offset? lastGetLatLngScreenCoordinate;
+  bool getLatLngReturnsNull = false;
   List<int> takenSnapshotFlags = <int>[];
 
   CameraPosition? cameraPosition;
@@ -723,6 +725,17 @@ class FakePlatformAppleMap {
       lastScreenCoordinateTarget = Offset(latLng.latitude, latLng.longitude);
       return <Object?>[
         PlatformScreenCoordinate(x: latLng.latitude, y: latLng.longitude),
+      ];
+    });
+    _registerTypedHandler('getLatLng', (Object? message) async {
+      final PlatformScreenCoordinate sc =
+          (message as List<Object?>)[0]! as PlatformScreenCoordinate;
+      lastGetLatLngScreenCoordinate = Offset(sc.x, sc.y);
+      if (getLatLngReturnsNull) {
+        return <Object?>[null];
+      }
+      return <Object?>[
+        PlatformLatLng(latitude: sc.x, longitude: sc.y),
       ];
     });
     _registerTypedHandler('isMarkerInfoWindowShown', (Object? message) async {

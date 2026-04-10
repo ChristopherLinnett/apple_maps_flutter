@@ -45,6 +45,14 @@ class AppleMapController {
 
   bool _disposed = false;
 
+  void _throwIfDisposed() {
+    if (_disposed) {
+      throw StateError(
+        'AppleMapController methods must not be called after dispose.',
+      );
+    }
+  }
+
   Future<dynamic> _handleMethodCall(MethodCall call) async {
     switch (call.method) {
       case 'camera#onMoveStarted':
@@ -161,6 +169,7 @@ class AppleMapController {
   /// The returned [Future] completes after the change has been started on the
   /// platform side.
   Future<void> animateCamera(CameraUpdate cameraUpdate) async {
+    _throwIfDisposed();
     await _hostApi.animateCamera(
       _platformCameraUpdateFromCameraUpdate(cameraUpdate),
     );
@@ -175,6 +184,7 @@ class AppleMapController {
   ///   * [hideMarkerInfoWindow] to hide the Info Window.
   ///   * [isMarkerInfoWindowShown] to check if the Info Window is showing.
   Future<void> showMarkerInfoWindow(AnnotationId annotationId) {
+    _throwIfDisposed();
     return _hostApi.showMarkerInfoWindow(annotationId.value);
   }
 
@@ -187,6 +197,7 @@ class AppleMapController {
   ///   * [showMarkerInfoWindow] to show the Info Window.
   ///   * [isMarkerInfoWindowShown] to check if the Info Window is showing.
   Future<void> hideMarkerInfoWindow(AnnotationId annotationId) {
+    _throwIfDisposed();
     return _hostApi.hideMarkerInfoWindow(annotationId.value);
   }
 
@@ -199,6 +210,7 @@ class AppleMapController {
   ///   * [showMarkerInfoWindow] to show the Info Window.
   ///   * [hideMarkerInfoWindow] to hide the Info Window.
   Future<bool?> isMarkerInfoWindowShown(AnnotationId annotationId) {
+    _throwIfDisposed();
     return _hostApi.isMarkerInfoWindowShown(annotationId.value);
   }
 
@@ -207,6 +219,7 @@ class AppleMapController {
   /// The returned [Future] completes after the change has been made on the
   /// platform side.
   Future<void> moveCamera(CameraUpdate cameraUpdate) async {
+    _throwIfDisposed();
     await _hostApi.moveCamera(
       _platformCameraUpdateFromCameraUpdate(cameraUpdate),
     );
@@ -214,11 +227,13 @@ class AppleMapController {
 
   /// Returns the current zoomLevel.
   Future<double?> getZoomLevel() async {
+    _throwIfDisposed();
     return _hostApi.getZoomLevel();
   }
 
   /// Return [LatLngBounds] defining the region that is visible in a map.
   Future<LatLngBounds> getVisibleRegion() async {
+    _throwIfDisposed();
     return _latLngBoundsFromPlatform(await _hostApi.getVisibleRegion());
   }
 
@@ -226,6 +241,7 @@ class AppleMapController {
   /// Screen location is in screen pixels (not display pixels) with respect to the top left corner
   /// of the map, not necessarily of the whole screen.
   Future<Offset?> getScreenCoordinate(LatLng latLng) async {
+    _throwIfDisposed();
     final PlatformScreenCoordinate? point = await _hostApi.getScreenCoordinate(
       _platformLatLngFromLatLng(latLng),
     );
@@ -235,10 +251,27 @@ class AppleMapController {
     return Offset(point.x, point.y);
   }
 
+  /// Converts a screen coordinate to a geographical [LatLng].
+  ///
+  /// The screen coordinate is in logical pixels relative to the top-left corner
+  /// of the map view. Returns `null` if the coordinate does not correspond to a
+  /// valid geographical location.
+  Future<LatLng?> getLatLng(Offset screenCoordinate) async {
+    _throwIfDisposed();
+    final PlatformLatLng? latLng = await _hostApi.getLatLng(
+      PlatformScreenCoordinate(x: screenCoordinate.dx, y: screenCoordinate.dy),
+    );
+    if (latLng == null) {
+      return null;
+    }
+    return LatLng(latLng.latitude, latLng.longitude);
+  }
+
   /// Returns the image bytes of the map
   Future<Uint8List?> takeSnapshot([
     SnapshotOptions snapshotOptions = const SnapshotOptions(),
   ]) {
+    _throwIfDisposed();
     return _hostApi.takeSnapshot(
       _platformSnapshotOptionsFromSnapshotOptions(snapshotOptions),
     );
