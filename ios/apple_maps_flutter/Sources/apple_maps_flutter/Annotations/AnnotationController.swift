@@ -75,6 +75,7 @@ extension AppleMapController: AnnotationDelegate {
         annotationView!.canShowCallout = true
         annotationView!.alpha = CGFloat(annotation.alpha ?? 1.00)
         annotationView!.isDraggable = annotation.isDraggable ?? false
+        annotationView!.clusteringIdentifier = annotation.clusteringIdentifier
 
         return annotationView!
     }
@@ -90,14 +91,17 @@ extension AppleMapController: AnnotationDelegate {
         let oldAnnotations: [MKAnnotation] = self.mapView.annotations
         for annotation in annotations {
             let annotationData: Dictionary<String, Any> = annotation as! Dictionary<String, Any>
-            if let annotationToChange = oldAnnotations.filter({($0 as? FlutterAnnotation)?.id == annotationData["annotationId"] as? String})[0] as? FlutterAnnotation {
-                let newAnnotation = FlutterAnnotation.init(fromDictionary: annotationData, registrar: registrar)
-                if annotationToChange != newAnnotation {
-                    if !annotationToChange.wasDragged {
-                        updateAnnotation(annotation: newAnnotation)
-                    } else {
-                        annotationToChange.wasDragged = false
-                    }
+            guard let annotationToChange = oldAnnotations
+                    .compactMap({ $0 as? FlutterAnnotation })
+                    .first(where: { $0.id == annotationData["annotationId"] as? String }) else {
+                continue
+            }
+            let newAnnotation = FlutterAnnotation.init(fromDictionary: annotationData, registrar: registrar)
+            if annotationToChange != newAnnotation {
+                if !annotationToChange.wasDragged {
+                    updateAnnotation(annotation: newAnnotation)
+                } else {
+                    annotationToChange.wasDragged = false
                 }
             }
         }

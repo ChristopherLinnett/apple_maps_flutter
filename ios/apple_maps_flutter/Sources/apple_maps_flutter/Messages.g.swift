@@ -580,6 +580,9 @@ struct PlatformAnnotation: Hashable {
   var visible: Bool
   var position: PlatformLatLng
   var zIndex: Double
+  /// When set, annotations with the same identifier are eligible for clustering.
+  /// Maps to MKAnnotationView.clusteringIdentifier on iOS 11+.
+  var clusteringIdentifier: String? = nil
 
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
@@ -593,6 +596,7 @@ struct PlatformAnnotation: Hashable {
     let visible = pigeonVar_list[6] as! Bool
     let position = pigeonVar_list[7] as! PlatformLatLng
     let zIndex = pigeonVar_list[8] as! Double
+    let clusteringIdentifier: String? = nilOrValue(pigeonVar_list[9])
 
     return PlatformAnnotation(
       annotationId: annotationId,
@@ -603,7 +607,8 @@ struct PlatformAnnotation: Hashable {
       infoWindow: infoWindow,
       visible: visible,
       position: position,
-      zIndex: zIndex
+      zIndex: zIndex,
+      clusteringIdentifier: clusteringIdentifier
     )
   }
   func toList() -> [Any?] {
@@ -617,6 +622,7 @@ struct PlatformAnnotation: Hashable {
       visible,
       position,
       zIndex,
+      clusteringIdentifier,
     ]
   }
   static func == (lhs: PlatformAnnotation, rhs: PlatformAnnotation) -> Bool {

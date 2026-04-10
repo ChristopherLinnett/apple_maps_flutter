@@ -1713,4 +1713,48 @@ void main() {
     expect(platformAppleMap.mapUpdateCallCount, 0);
     debugDefaultTargetPlatformOverride = null;
   });
+
+  testWidgets('onAnnotationDragEnd callback fires when drag completes',
+      (WidgetTester tester) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    LatLng? dragEndPosition;
+    final Annotation annotation = Annotation(
+      annotationId: AnnotationId('ann_1'),
+      draggable: true,
+      position: const LatLng(10.0, 15.0),
+      onDragEnd: (LatLng pos) => dragEndPosition = pos,
+    );
+
+    await tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition:
+              const CameraPosition(target: LatLng(10.0, 15.0)),
+          annotations: {annotation},
+        ),
+      ),
+    );
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+
+    const LatLng droppedAt = LatLng(11.0, 16.0);
+    await TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .handlePlatformMessage(
+      platformAppleMap.channel.name,
+      platformAppleMap.channel.codec.encodeMethodCall(
+        MethodCall('annotation#onDragEnd', <String, dynamic>{
+          'annotationId': 'ann_1',
+          'position': <double>[droppedAt.latitude, droppedAt.longitude],
+        }),
+      ),
+      (_) {},
+    );
+
+    expect(dragEndPosition, isNotNull);
+    expect(dragEndPosition!.latitude, closeTo(11.0, 0.001));
+    expect(dragEndPosition!.longitude, closeTo(16.0, 0.001));
+    debugDefaultTargetPlatformOverride = null;
+  });
 }

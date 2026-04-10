@@ -465,6 +465,7 @@ class FakePlatformAppleMap {
           (PlatformAnnotation annotation) => Annotation(
             annotationId: AnnotationId(annotation.annotationId),
             anchor: Offset(annotation.anchor.x, annotation.anchor.y),
+            clusteringIdentifier: annotation.clusteringIdentifier,
             draggable: annotation.draggable,
             visible: annotation.visible,
             icon: _bitmapDescriptorFromPlatform(annotation.icon),

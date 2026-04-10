@@ -249,6 +249,7 @@ PlatformAnnotation _platformAnnotationFromAnnotation(Annotation annotation) {
     annotationId: annotation.annotationId.value,
     alpha: annotation.alpha,
     anchor: _platformOffsetFromOffset(annotation.anchor),
+    clusteringIdentifier: annotation.clusteringIdentifier,
     draggable: annotation.draggable,
     icon: _platformBitmapDescriptorFromBitmapDescriptor(annotation.icon),
     infoWindow: _platformInfoWindowFromInfoWindow(annotation.infoWindow),

@@ -94,8 +94,8 @@ void main() {
     expect(addedAnnotation, equals(m2));
     expect(platformAppleMap.annotationIdsToRemove!.isEmpty, true);
 
-    expect(platformAppleMap.annotationsToChange!.length, 1);
-    expect(platformAppleMap.annotationsToChange!.first, equals(m1));
+    // m1 has not changed, so it must not appear in annotationsToChange.
+    expect(platformAppleMap.annotationsToChange!.isEmpty, true);
     debugDefaultTargetPlatformOverride = null;
   });
 
@@ -121,7 +121,7 @@ void main() {
     debugDefaultTargetPlatformOverride = null;
   });
 
-  testWidgets("Updating an annotation", (WidgetTester tester) async {
+  testWidgets("Updating an annotation — alpha", (WidgetTester tester) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     final Annotation m1 = Annotation(
       annotationId: AnnotationId("annotation_1"),
@@ -144,7 +144,8 @@ void main() {
     debugDefaultTargetPlatformOverride = null;
   });
 
-  testWidgets("Updating an annotation", (WidgetTester tester) async {
+  testWidgets("Updating an annotation — infoWindow snippet",
+      (WidgetTester tester) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     final Annotation m1 = Annotation(
       annotationId: AnnotationId("annotation_1"),
@@ -167,7 +168,7 @@ void main() {
     debugDefaultTargetPlatformOverride = null;
   });
 
-  testWidgets("Multi Update", (WidgetTester tester) async {
+  testWidgets("Multi Update — all annotations changed", (WidgetTester tester) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     Annotation m1 = Annotation(annotationId: AnnotationId("annotation_1"));
     Annotation m2 = Annotation(annotationId: AnnotationId("annotation_2"));
@@ -191,7 +192,8 @@ void main() {
     debugDefaultTargetPlatformOverride = null;
   });
 
-  testWidgets("Multi Update", (WidgetTester tester) async {
+  testWidgets("Multi Update — add, update, and remove combined",
+      (WidgetTester tester) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     Annotation m2 = Annotation(annotationId: AnnotationId("annotation_2"));
     final Annotation m3 = Annotation(
@@ -251,7 +253,7 @@ void main() {
     expect(platformAppleMap.annotationIdsToRemove!.isEmpty, true);
     expect(platformAppleMap.annotationsToAdd!.isEmpty, true);
     debugDefaultTargetPlatformOverride = null;
-  }, skip: true);
+  });
 
   testWidgets('Typed annotation payload preserves fields', (
     WidgetTester tester,
@@ -300,6 +302,137 @@ void main() {
     expect(payload.position.latitude, 1.0);
     expect(payload.position.longitude, 2.0);
     expect(payload.zIndex, 4.0);
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets('Unchanged annotation is not resent as a change',
+      (WidgetTester tester) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    final Annotation m1 = Annotation(
+      annotationId: AnnotationId('annotation_1'),
+      alpha: 0.5,
+    );
+
+    await tester.pumpWidget(_mapWithAnnotations(_toSet(m1: m1)));
+    // Pump the exact same annotation again — no field changed.
+    await tester.pumpWidget(_mapWithAnnotations(_toSet(m1: m1)));
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+
+    expect(
+      platformAppleMap.annotationsToChange!.isEmpty,
+      true,
+      reason: 'Unchanged annotations must not be sent as changes',
+    );
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets('clusteringIdentifier is forwarded through Pigeon payload',
+      (WidgetTester tester) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    final Annotation m1 = Annotation(
+      annotationId: AnnotationId('annotation_1'),
+      clusteringIdentifier: 'group_a',
+    );
+
+    await tester.pumpWidget(_mapWithAnnotations(null));
+    await tester.pumpWidget(_mapWithAnnotations(_toSet(m1: m1)));
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+    final PlatformAnnotation payload =
+        platformAppleMap.lastPlatformAnnotationUpdates!.annotationsToAdd!.single;
+
+    expect(payload.clusteringIdentifier, 'group_a');
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets('Null clusteringIdentifier is forwarded as null',
+      (WidgetTester tester) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    final Annotation m1 = Annotation(
+      annotationId: AnnotationId('annotation_1'),
+    );
+
+    await tester.pumpWidget(_mapWithAnnotations(null));
+    await tester.pumpWidget(_mapWithAnnotations(_toSet(m1: m1)));
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+    final PlatformAnnotation payload =
+        platformAppleMap.lastPlatformAnnotationUpdates!.annotationsToAdd!.single;
+
+    expect(payload.clusteringIdentifier, isNull);
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets(
+      'Changing clusteringIdentifier triggers an annotation change',
+      (WidgetTester tester) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    final Annotation m1 = Annotation(
+      annotationId: AnnotationId('annotation_1'),
+    );
+    final Annotation m1Clustered = Annotation(
+      annotationId: AnnotationId('annotation_1'),
+      clusteringIdentifier: 'group_b',
+    );
+
+    await tester.pumpWidget(_mapWithAnnotations(_toSet(m1: m1)));
+    await tester.pumpWidget(_mapWithAnnotations(_toSet(m1: m1Clustered)));
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+
+    expect(platformAppleMap.annotationsToChange!.length, 1);
+    expect(
+      platformAppleMap.annotationsToChange!.first.clusteringIdentifier,
+      'group_b',
+    );
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets('copyWith can clear clusteringIdentifier to null',
+      (WidgetTester tester) async {
+    final Annotation original = Annotation(
+      annotationId: AnnotationId('ann1'),
+      clusteringIdentifier: 'group_a',
+    );
+    final Annotation cleared =
+        original.copyWith(clusteringIdentifierParam: null);
+    expect(cleared.clusteringIdentifier, isNull);
+  });
+
+  testWidgets(
+      'Annotation with InfoWindow(onTap:) is not resent when unchanged',
+      (WidgetTester tester) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    // InfoWindow carries a tap callback; rebuild with equal model state must
+    // not be misidentified as a change (InfoWindow.== must not compare onTap).
+    final Annotation m1 = Annotation(
+      annotationId: AnnotationId('annotation_1'),
+      infoWindow: InfoWindow(title: 'Hello', onTap: () {}),
+    );
+
+    await tester.pumpWidget(_mapWithAnnotations(_toSet(m1: m1)));
+    // Rebuild with an annotation whose model fields are identical. The lambda
+    // is a different object but should not trigger a diff.
+    final Annotation m1Same = Annotation(
+      annotationId: AnnotationId('annotation_1'),
+      infoWindow: InfoWindow(title: 'Hello', onTap: () {}),
+    );
+    await tester.pumpWidget(_mapWithAnnotations(_toSet(m1: m1Same)));
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+
+    expect(
+      platformAppleMap.annotationsToChange!.isEmpty,
+      true,
+      reason:
+          'Callback-field differences must not produce annotation change events',
+    );
     debugDefaultTargetPlatformOverride = null;
   });
 }

@@ -84,12 +84,14 @@ class InfoWindow {
     final InfoWindow typedOther = other;
     return title == typedOther.title &&
         snippet == typedOther.snippet &&
-        anchor == typedOther.anchor &&
-        onTap == typedOther.onTap;
+        anchor == typedOther.anchor;
+    // onTap is a callback and cannot be compared by value. It is serialized
+    // as consumesTapEvents (bool), which IS included in the Pigeon payload,
+    // so the intent reaches the platform without needing equality here.
   }
 
   @override
-  int get hashCode => Object.hash(title.hashCode, snippet, anchor);
+  int get hashCode => Object.hash(title, snippet, anchor);
 
   @override
   String toString() {
@@ -147,6 +149,7 @@ class Annotation {
     required this.annotationId,
     this.alpha = 1.0,
     this.anchor = const Offset(0.5, 1.0),
+    this.clusteringIdentifier,
     this.draggable = false,
     this.icon = BitmapDescriptor.defaultAnnotation,
     this.infoWindow = InfoWindow.noText,
@@ -159,6 +162,11 @@ class Annotation {
 
   /// Uniquely identifies a [Annotation].
   final AnnotationId annotationId;
+
+  /// When non-null, annotations with the same [clusteringIdentifier] are
+  /// eligible for clustering. Maps to `MKAnnotationView.clusteringIdentifier`
+  /// on iOS 11+.
+  final String? clusteringIdentifier;
 
   /// The opacity of the annotation, between 0.0 and 1.0 inclusive.
   ///
@@ -201,11 +209,19 @@ class Annotation {
   /// earlier, and thus appearing to be closer to the surface of the Earth.
   final double zIndex;
 
+  /// Sentinel used by [copyWith] to distinguish an explicit `null` from an
+  /// omitted argument for [clusteringIdentifier].
+  static const Object _absent = Object();
+
   /// Creates a new [Annotation] object whose values are the same as this instance,
   /// unless overwritten by the specified parameters.
+  ///
+  /// Pass `clusteringIdentifier: null` to explicitly clear a previously set
+  /// clustering identifier.
   Annotation copyWith({
     double? alphaParam,
     Offset? anchorParam,
+    Object? clusteringIdentifierParam = _absent,
     bool? consumeTapEventsParam,
     bool? draggableParam,
     BitmapDescriptor? iconParam,
@@ -220,6 +236,9 @@ class Annotation {
       annotationId: annotationId,
       anchor: anchorParam ?? anchor,
       alpha: alphaParam ?? alpha,
+      clusteringIdentifier: identical(clusteringIdentifierParam, _absent)
+          ? clusteringIdentifier
+          : clusteringIdentifierParam as String?,
       draggable: draggableParam ?? draggable,
       icon: iconParam ?? icon,
       infoWindow: infoWindowParam ?? infoWindow,
@@ -243,6 +262,7 @@ class Annotation {
     addIfPresent('annotationId', annotationId.value);
     addIfPresent('alpha', alpha);
     addIfPresent('anchor', _offsetToJson(anchor));
+    addIfPresent('clusteringIdentifier', clusteringIdentifier);
     addIfPresent('draggable', draggable);
     addIfPresent('icon', icon._toJson());
     addIfPresent('infoWindow', infoWindow._toJson());
@@ -260,6 +280,7 @@ class Annotation {
     return annotationId == typedOther.annotationId &&
         alpha == typedOther.alpha &&
         anchor == typedOther.anchor &&
+        clusteringIdentifier == typedOther.clusteringIdentifier &&
         draggable == typedOther.draggable &&
         icon == typedOther.icon &&
         infoWindow == typedOther.infoWindow &&
@@ -269,13 +290,25 @@ class Annotation {
   }
 
   @override
-  int get hashCode => annotationId.hashCode;
+  int get hashCode => Object.hash(
+        annotationId,
+        alpha,
+        anchor,
+        clusteringIdentifier,
+        draggable,
+        icon,
+        infoWindow,
+        position,
+        visible,
+        zIndex,
+      );
 
   @override
   String toString() {
-    return 'Annotation{annotationId: $annotationId, alpha: $alpha, draggable: $draggable, '
-        'icon: $icon, infoWindow: $infoWindow, position: $position ,visible: $visible, '
-        'onTap: $onTap}, zIndex: $zIndex, onTap: $onTap}';
+    return 'Annotation{annotationId: $annotationId, alpha: $alpha, '
+        'clusteringIdentifier: $clusteringIdentifier, draggable: $draggable, '
+        'icon: $icon, infoWindow: $infoWindow, position: $position, visible: $visible, '
+        'zIndex: $zIndex, onTap: $onTap}';
   }
 }
 
