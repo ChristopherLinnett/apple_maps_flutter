@@ -216,12 +216,14 @@ extension AppleMapController: AnnotationDelegate {
                 oldAnnotation.isVisible = annotation.isVisible
                 oldAnnotation.title = annotation.title
                 oldAnnotation.subtitle = annotation.subtitle
+                oldAnnotation.clusteringIdentifier = annotation.clusteringIdentifier
             })
             
-            // Update the annotation view with the new image
+            // Update the annotation view with the new image and clustering identifier.
             if let view = self.mapView.view(for: oldAnnotation) {
                 let newAnnotationView = getAnnotationView(annotation: annotation)
                 view.image = newAnnotationView.image
+                view.clusteringIdentifier = annotation.clusteringIdentifier
             }
         }
     }

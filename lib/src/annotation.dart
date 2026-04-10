@@ -216,8 +216,8 @@ class Annotation {
   /// Creates a new [Annotation] object whose values are the same as this instance,
   /// unless overwritten by the specified parameters.
   ///
-  /// Pass `clusteringIdentifier: null` to explicitly clear a previously set
-  /// clustering identifier.
+  /// Pass `clusteringIdentifierParam: null` to explicitly clear a previously
+  /// set clustering identifier.
   Annotation copyWith({
     double? alphaParam,
     Offset? anchorParam,
