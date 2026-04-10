@@ -68,6 +68,18 @@ jobs:
     - name: Build example with Swift Package Manager
       working-directory: ./example
       run: flutter build ios --debug --no-codesign
+    - name: Boot iOS simulator
+      run: |
+        set -eo pipefail
+        SIMULATOR_ID="$(xcrun simctl list devices available -j | jq -r '.devices | to_entries[] | select(.key | startswith("com.apple.CoreSimulator.SimRuntime.iOS-")) | .value[] | select(.isAvailable == true and (.name | startswith("iPhone"))) | .udid' | head -n 1)"
+        if [[ -z "$SIMULATOR_ID" ]]; then
+          echo "No available iPhone simulator found"
+          exit 1
+        fi
+        echo "IOS_SIMULATOR_UDID=$SIMULATOR_ID" >> "$GITHUB_ENV"
+        open -a Simulator --args -CurrentDeviceUDID "$SIMULATOR_ID"
+        xcrun simctl boot "$SIMULATOR_ID" || true
+        xcrun simctl bootstatus "$SIMULATOR_ID" -b
     - name: Run example integration tests
       working-directory: ./example
-      run: flutter test integration_test
+      run: flutter test integration_test -d "$IOS_SIMULATOR_UDID"
