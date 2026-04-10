@@ -37,11 +37,12 @@ jobs:
       run: pod lib lint ios/apple_maps_flutter.podspec --configuration=Debug --skip-tests --use-modular-headers
     - name: Publish dry run
       run: flutter pub publish --dry-run
-    - name: Upload coverage report
-      uses: codecov/codecov-action@v5
-      with:
-        token: ${{secrets.CODECOV}}
-        file: ./coverage/lcov.info
+    # TODO: Re-enable coverage publishing once a reporting backend is configured.
+    # - name: Upload coverage report
+    #   uses: codecov/codecov-action@v5
+    #   with:
+    #     token: ${{secrets.CODECOV}}
+    #     file: ./coverage/lcov.info
 
   swiftpm:
     runs-on: macos-latest
