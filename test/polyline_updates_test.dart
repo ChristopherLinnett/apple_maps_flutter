@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:apple_maps_flutter/apple_maps_flutter.dart';
+import 'package:apple_maps_flutter/src/messages.g.dart';
 import 'package:flutter/foundation.dart'
     show debugDefaultTargetPlatformOverride;
 import 'package:flutter/services.dart';
@@ -216,4 +217,50 @@ void main() {
     expect(platformAppleMap.polylinesToAdd!.isEmpty, true);
     debugDefaultTargetPlatformOverride = null;
   }, skip: true);
+
+  testWidgets('Typed polyline payload preserves fields', (
+    WidgetTester tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    final Polyline polyline = Polyline(
+      polylineId: PolylineId('polyline_1'),
+      consumeTapEvents: true,
+      color: const Color(0xFF123456),
+      polylineCap: Cap.roundCap,
+      jointType: JointType.bevel,
+      visible: false,
+      width: 7,
+      zIndex: 9,
+      points: const <LatLng>[LatLng(1.0, 2.0), LatLng(3.0, 4.0)],
+      patterns: <PatternItem>[PatternItem.dash(5), PatternItem.gap(2)],
+    );
+
+    await tester.pumpWidget(_mapWithPolylines(null));
+    await tester.pumpWidget(_mapWithPolylines(_toSet(p1: polyline)));
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+    final PlatformPolyline payload =
+        platformAppleMap.lastPlatformPolylineUpdates!.polylinesToAdd!.single;
+
+    expect(payload.polylineId, 'polyline_1');
+    expect(payload.consumeTapEvents, true);
+    expect(payload.color, const Color(0xFF123456).toARGB32());
+    expect(payload.polylineCap, CapType.roundCap);
+    expect(payload.jointType, JointType.bevel.value);
+    expect(payload.visible, false);
+    expect(payload.width, 7);
+    expect(payload.zIndex, 9);
+    expect(payload.points.length, 2);
+    expect(payload.points.first.latitude, 1.0);
+    expect(payload.points.first.longitude, 2.0);
+    expect(payload.points.last.latitude, 3.0);
+    expect(payload.points.last.longitude, 4.0);
+    expect(payload.patterns.length, 2);
+    expect(payload.patterns.first.type, PatternItemType.dash);
+    expect(payload.patterns.first.length, 5.0);
+    expect(payload.patterns.last.type, PatternItemType.gap);
+    expect(payload.patterns.last.length, 2.0);
+    debugDefaultTargetPlatformOverride = null;
+  });
 }

@@ -18,10 +18,12 @@ class _PolylineUpdates {
       current = Set<Polyline>.identity();
     }
 
-    final Map<PolylineId, Polyline> previousPolylines =
-        _keyByPolylineId(previous);
-    final Map<PolylineId, Polyline> currentPolylines =
-        _keyByPolylineId(current);
+    final Map<PolylineId, Polyline> previousPolylines = _keyByPolylineId(
+      previous,
+    );
+    final Map<PolylineId, Polyline> currentPolylines = _keyByPolylineId(
+      current,
+    );
 
     final Set<PolylineId> prevPolylineIds = previousPolylines.keys.toSet();
     final Set<PolylineId> currentPolylineIds = currentPolylines.keys.toSet();
@@ -30,44 +32,20 @@ class _PolylineUpdates {
       return currentPolylines[id]!;
     }
 
-    final Set<PolylineId> _polylineIdsToRemove =
-        prevPolylineIds.difference(currentPolylineIds);
-
-    final Set<Polyline> _polylinesToAdd = currentPolylineIds
+    polylinesToAdd = currentPolylineIds
         .difference(prevPolylineIds)
         .map(idToCurrentPolyline)
         .toSet();
-
-    final Set<Polyline> _polylinesToChange = currentPolylineIds
+    polylineIdsToRemove = prevPolylineIds.difference(currentPolylineIds);
+    polylinesToChange = currentPolylineIds
         .intersection(prevPolylineIds)
         .map(idToCurrentPolyline)
         .toSet();
-
-    polylinesToAdd = _polylinesToAdd;
-    polylineIdsToRemove = _polylineIdsToRemove;
-    polylinesToChange = _polylinesToChange;
   }
 
   late Set<Polyline> polylinesToAdd;
   late Set<PolylineId> polylineIdsToRemove;
   late Set<Polyline> polylinesToChange;
-
-  Map<String, dynamic> _toMap() {
-    final Map<String, dynamic> updateMap = <String, dynamic>{};
-
-    void addIfNonNull(String fieldName, dynamic value) {
-      if (value != null) {
-        updateMap[fieldName] = value;
-      }
-    }
-
-    addIfNonNull('polylinesToAdd', _serializePolylineSet(polylinesToAdd));
-    addIfNonNull('polylinesToChange', _serializePolylineSet(polylinesToChange));
-    addIfNonNull('polylineIdsToRemove',
-        polylineIdsToRemove.map<dynamic>((PolylineId m) => m.value).toList());
-
-    return updateMap;
-  }
 
   @override
   bool operator ==(Object other) {

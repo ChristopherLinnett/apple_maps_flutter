@@ -28,8 +28,9 @@ class _CircleUpdates {
       return currentCircles[id]!;
     }
 
-    final Set<CircleId> _circleIdsToRemove =
-        prevCircleIds.difference(currentCircleIds);
+    final Set<CircleId> _circleIdsToRemove = prevCircleIds.difference(
+      currentCircleIds,
+    );
 
     final Set<Circle> _circlesToAdd = currentCircleIds
         .difference(prevCircleIds)
@@ -49,31 +50,14 @@ class _CircleUpdates {
         .where(hasChanged)
         .toSet();
 
-    circlesToAdd = _circlesToAdd;
-    circleIdsToRemove = _circleIdsToRemove;
-    circlesToChange = _circlesToChange;
+    this.circlesToAdd = _circlesToAdd;
+    this.circleIdsToRemove = _circleIdsToRemove;
+    this.circlesToChange = _circlesToChange;
   }
 
   late Set<Circle> circlesToAdd;
   late Set<CircleId> circleIdsToRemove;
   late Set<Circle> circlesToChange;
-
-  Map<String, dynamic> _toMap() {
-    final Map<String, dynamic> updateMap = <String, dynamic>{};
-
-    void addIfNonNull(String fieldName, dynamic value) {
-      if (value != null) {
-        updateMap[fieldName] = value;
-      }
-    }
-
-    addIfNonNull('circlesToAdd', _serializeCircleSet(circlesToAdd));
-    addIfNonNull('circlesToChange', _serializeCircleSet(circlesToChange));
-    addIfNonNull('circleIdsToRemove',
-        circleIdsToRemove.map<dynamic>((CircleId m) => m.value).toList());
-
-    return updateMap;
-  }
 
   @override
   bool operator ==(Object other) {

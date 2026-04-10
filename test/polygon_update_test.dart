@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:apple_maps_flutter/apple_maps_flutter.dart';
+import 'package:apple_maps_flutter/src/messages.g.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -235,6 +236,44 @@ void main() {
     expect(platformAppleMap.polygonsToChange, _toSet(p3: p3));
     expect(platformAppleMap.polygonIdsToRemove!.isEmpty, true);
     expect(platformAppleMap.polygonsToAdd!.isEmpty, true);
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets('Typed polygon payload preserves fields', (
+    WidgetTester tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    final Polygon polygon = Polygon(
+      polygonId: PolygonId('polygon_1'),
+      consumeTapEvents: true,
+      fillColor: const Color(0xFF112233),
+      points: const <LatLng>[LatLng(1.0, 2.0), LatLng(3.0, 4.0)],
+      strokeColor: const Color(0xFF445566),
+      strokeWidth: 6,
+      visible: false,
+      zIndex: 8,
+    );
+
+    await tester.pumpWidget(_mapWithPolygons(null));
+    await tester.pumpWidget(_mapWithPolygons(_toSet(p1: polygon)));
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+    final PlatformPolygon payload =
+        platformAppleMap.lastPlatformPolygonUpdates!.polygonsToAdd!.single;
+
+    expect(payload.polygonId, 'polygon_1');
+    expect(payload.consumeTapEvents, true);
+    expect(payload.fillColor, const Color(0xFF112233).toARGB32());
+    expect(payload.strokeColor, const Color(0xFF445566).toARGB32());
+    expect(payload.strokeWidth, 6);
+    expect(payload.visible, false);
+    expect(payload.zIndex, 8);
+    expect(payload.points.length, 2);
+    expect(payload.points.first.latitude, 1.0);
+    expect(payload.points.first.longitude, 2.0);
+    expect(payload.points.last.latitude, 3.0);
+    expect(payload.points.last.longitude, 4.0);
     debugDefaultTargetPlatformOverride = null;
   });
 }

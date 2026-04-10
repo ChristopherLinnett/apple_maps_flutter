@@ -20,60 +20,33 @@ class _AnnotationUpdates {
 
     final Map<AnnotationId, Annotation> previousAnnotations =
         _keyByAnnotationId(previous);
-    final Map<AnnotationId, Annotation> currentAnnotations =
-        _keyByAnnotationId(current);
+    final Map<AnnotationId, Annotation> currentAnnotations = _keyByAnnotationId(
+      current,
+    );
 
-    final Set<AnnotationId> prevAnnotationIds =
-        previousAnnotations.keys.toSet();
-    final Set<AnnotationId> currentAnnotationIds =
-        currentAnnotations.keys.toSet();
+    final Set<AnnotationId> prevAnnotationIds = previousAnnotations.keys
+        .toSet();
+    final Set<AnnotationId> currentAnnotationIds = currentAnnotations.keys
+        .toSet();
 
     Annotation idToCurrentAnnotation(AnnotationId id) {
       return currentAnnotations[id]!;
     }
 
-    final Set<AnnotationId> _annotationIdsToRemove =
-        prevAnnotationIds.difference(currentAnnotationIds);
-
-    final Set<Annotation> _annotationsToAdd = currentAnnotationIds
+    annotationsToAdd = currentAnnotationIds
         .difference(prevAnnotationIds)
         .map(idToCurrentAnnotation)
         .toSet();
-
-    final Set<Annotation> _annotationsToChange = currentAnnotationIds
+    annotationIdsToRemove = prevAnnotationIds.difference(currentAnnotationIds);
+    annotationsToChange = currentAnnotationIds
         .intersection(prevAnnotationIds)
         .map(idToCurrentAnnotation)
         .toSet();
-
-    annotationsToAdd = _annotationsToAdd;
-    annotationIdsToRemove = _annotationIdsToRemove;
-    annotationsToChange = _annotationsToChange;
   }
 
   late Set<Annotation> annotationsToAdd;
   late Set<AnnotationId> annotationIdsToRemove;
   late Set<Annotation> annotationsToChange;
-
-  Map<String, dynamic> _toMap() {
-    final Map<String, dynamic> updateMap = <String, dynamic>{};
-
-    void addIfNonNull(String fieldName, dynamic value) {
-      if (value != null) {
-        updateMap[fieldName] = value;
-      }
-    }
-
-    addIfNonNull('annotationsToAdd', _serializeAnnotationSet(annotationsToAdd));
-    addIfNonNull(
-        'annotationsToChange', _serializeAnnotationSet(annotationsToChange));
-    addIfNonNull(
-        'annotationIdsToRemove',
-        annotationIdsToRemove
-            .map<dynamic>((AnnotationId m) => m.value)
-            .toList());
-
-    return updateMap;
-  }
 
   @override
   bool operator ==(Object other) {
