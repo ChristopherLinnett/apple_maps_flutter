@@ -58,9 +58,8 @@ void main() {
           initialCameraPosition: _kInitialCameraPosition,
           compassEnabled: false,
           onMapCreated: (AppleMapController controller) {
-            final AppleMapInspector inspector =
-                // ignore: invalid_use_of_visible_for_testing_member
-                AppleMapInspector(controller.channel);
+            // ignore: invalid_use_of_visible_for_testing_member
+            final AppleMapInspector inspector = AppleMapInspector(controller.mapId);
             inspectorCompleter.complete(inspector);
           },
         ),
@@ -69,7 +68,7 @@ void main() {
 
     final AppleMapInspector inspector = await inspectorCompleter.future;
     bool compassEnabled = await _waitForValue<bool>(
-      read: () async => (await inspector.isCompassEnabled())!,
+      read: () async => await inspector.isCompassEnabled(),
       matches: (bool value) => value == false,
     );
     expect(compassEnabled, false);
@@ -90,7 +89,7 @@ void main() {
     );
 
     compassEnabled = await _waitForValue<bool>(
-      read: () async => (await inspector.isCompassEnabled())!,
+      read: () async => await inspector.isCompassEnabled(),
       matches: (bool value) => value,
     );
     expect(compassEnabled, true);
@@ -113,9 +112,8 @@ void main() {
           initialCameraPosition: _kInitialCameraPosition,
           minMaxZoomPreference: initialZoomLevel,
           onMapCreated: (AppleMapController controller) {
-            final AppleMapInspector inspector =
-                // ignore: invalid_use_of_visible_for_testing_member
-                AppleMapInspector(controller.channel);
+            // ignore: invalid_use_of_visible_for_testing_member
+            final AppleMapInspector inspector = AppleMapInspector(controller.mapId);
             inspectorCompleter.complete(inspector);
           },
         ),
@@ -165,9 +163,8 @@ void main() {
           initialCameraPosition: _kInitialCameraPosition,
           zoomGesturesEnabled: false,
           onMapCreated: (AppleMapController controller) {
-            final AppleMapInspector inspector =
-                // ignore: invalid_use_of_visible_for_testing_member
-                AppleMapInspector(controller.channel);
+            // ignore: invalid_use_of_visible_for_testing_member
+            final AppleMapInspector inspector = AppleMapInspector(controller.mapId);
             inspectorCompleter.complete(inspector);
           },
         ),
@@ -176,7 +173,7 @@ void main() {
 
     final AppleMapInspector inspector = await inspectorCompleter.future;
     bool zoomGesturesEnabled = await _waitForValue<bool>(
-      read: () async => (await inspector.isZoomGesturesEnabled())!,
+      read: () async => await inspector.isZoomGesturesEnabled(),
       matches: (bool value) => value == false,
     );
     expect(zoomGesturesEnabled, false);
@@ -197,7 +194,7 @@ void main() {
     );
 
     zoomGesturesEnabled = await _waitForValue<bool>(
-      read: () async => (await inspector.isZoomGesturesEnabled())!,
+      read: () async => await inspector.isZoomGesturesEnabled(),
       matches: (bool value) => value,
     );
     expect(zoomGesturesEnabled, true);
@@ -217,9 +214,8 @@ void main() {
           initialCameraPosition: _kInitialCameraPosition,
           rotateGesturesEnabled: false,
           onMapCreated: (AppleMapController controller) {
-            final AppleMapInspector inspector =
-                // ignore: invalid_use_of_visible_for_testing_member
-                AppleMapInspector(controller.channel);
+            // ignore: invalid_use_of_visible_for_testing_member
+            final AppleMapInspector inspector = AppleMapInspector(controller.mapId);
             inspectorCompleter.complete(inspector);
           },
         ),
@@ -228,7 +224,7 @@ void main() {
 
     final AppleMapInspector inspector = await inspectorCompleter.future;
     bool rotateGesturesEnabled = await _waitForValue<bool>(
-      read: () async => (await inspector.isRotateGesturesEnabled())!,
+      read: () async => await inspector.isRotateGesturesEnabled(),
       matches: (bool value) => value == false,
     );
     expect(rotateGesturesEnabled, false);
@@ -249,7 +245,7 @@ void main() {
     );
 
     rotateGesturesEnabled = await _waitForValue<bool>(
-      read: () async => (await inspector.isRotateGesturesEnabled())!,
+      read: () async => await inspector.isRotateGesturesEnabled(),
       matches: (bool value) => value,
     );
     expect(rotateGesturesEnabled, true);
@@ -269,9 +265,8 @@ void main() {
           initialCameraPosition: _kInitialCameraPosition,
           pitchGesturesEnabled: false,
           onMapCreated: (AppleMapController controller) {
-            final AppleMapInspector inspector =
-                // ignore: invalid_use_of_visible_for_testing_member
-                AppleMapInspector(controller.channel);
+            // ignore: invalid_use_of_visible_for_testing_member
+            final AppleMapInspector inspector = AppleMapInspector(controller.mapId);
             inspectorCompleter.complete(inspector);
           },
         ),
@@ -280,7 +275,7 @@ void main() {
 
     final AppleMapInspector inspector = await inspectorCompleter.future;
     bool pitchGesturesEnabled = await _waitForValue<bool>(
-      read: () async => (await inspector.isPitchGesturesEnabled())!,
+      read: () async => await inspector.isPitchGesturesEnabled(),
       matches: (bool value) => value == false,
     );
     expect(pitchGesturesEnabled, false);
@@ -301,7 +296,7 @@ void main() {
     );
 
     pitchGesturesEnabled = await _waitForValue<bool>(
-      read: () async => (await inspector.isPitchGesturesEnabled())!,
+      read: () async => await inspector.isPitchGesturesEnabled(),
       matches: (bool value) => value,
     );
     expect(pitchGesturesEnabled, true);
@@ -321,9 +316,8 @@ void main() {
           initialCameraPosition: _kInitialCameraPosition,
           scrollGesturesEnabled: false,
           onMapCreated: (AppleMapController controller) {
-            final AppleMapInspector inspector =
-                // ignore: invalid_use_of_visible_for_testing_member
-                AppleMapInspector(controller.channel);
+            // ignore: invalid_use_of_visible_for_testing_member
+            final AppleMapInspector inspector = AppleMapInspector(controller.mapId);
             inspectorCompleter.complete(inspector);
           },
         ),
@@ -332,7 +326,7 @@ void main() {
 
     final AppleMapInspector inspector = await inspectorCompleter.future;
     bool scrollGesturesEnabled = await _waitForValue<bool>(
-      read: () async => (await inspector.isScrollGesturesEnabled())!,
+      read: () async => await inspector.isScrollGesturesEnabled(),
       matches: (bool value) => value == false,
     );
     expect(scrollGesturesEnabled, false);
@@ -353,7 +347,7 @@ void main() {
     );
 
     scrollGesturesEnabled = await _waitForValue<bool>(
-      read: () async => (await inspector.isScrollGesturesEnabled())!,
+      read: () async => await inspector.isScrollGesturesEnabled(),
       matches: (bool value) => value,
     );
     expect(scrollGesturesEnabled, true);
@@ -437,9 +431,8 @@ void main() {
           myLocationButtonEnabled: true,
           myLocationEnabled: false,
           onMapCreated: (AppleMapController controller) {
-            final AppleMapInspector inspector =
-                // ignore: invalid_use_of_visible_for_testing_member
-                AppleMapInspector(controller.channel);
+            // ignore: invalid_use_of_visible_for_testing_member
+            final AppleMapInspector inspector = AppleMapInspector(controller.mapId);
             inspectorCompleter.complete(inspector);
           },
         ),
@@ -448,7 +441,7 @@ void main() {
 
     final AppleMapInspector inspector = await inspectorCompleter.future;
     bool myLocationButtonEnabled = await _waitForValue<bool>(
-      read: () async => (await inspector.isMyLocationButtonEnabled())!,
+      read: () async => await inspector.isMyLocationButtonEnabled(),
       matches: (bool value) => value,
     );
     expect(myLocationButtonEnabled, true);
@@ -470,7 +463,7 @@ void main() {
     );
 
     myLocationButtonEnabled = await _waitForValue<bool>(
-      read: () async => (await inspector.isMyLocationButtonEnabled())!,
+      read: () async => await inspector.isMyLocationButtonEnabled(),
       matches: (bool value) => value == false,
     );
     expect(myLocationButtonEnabled, false);
@@ -493,9 +486,8 @@ void main() {
           myLocationButtonEnabled: false,
           myLocationEnabled: false,
           onMapCreated: (AppleMapController controller) {
-            final AppleMapInspector inspector =
-                // ignore: invalid_use_of_visible_for_testing_member
-                AppleMapInspector(controller.channel);
+            // ignore: invalid_use_of_visible_for_testing_member
+            final AppleMapInspector inspector = AppleMapInspector(controller.mapId);
             inspectorCompleter.complete(inspector);
           },
         ),
@@ -504,7 +496,7 @@ void main() {
 
     final AppleMapInspector inspector = await inspectorCompleter.future;
     final bool myLocationButtonEnabled = await _waitForValue<bool>(
-      read: () async => (await inspector.isMyLocationButtonEnabled())!,
+      read: () async => await inspector.isMyLocationButtonEnabled(),
       matches: (bool value) => value == false,
     );
     expect(myLocationButtonEnabled, false);
@@ -527,9 +519,8 @@ void main() {
           myLocationButtonEnabled: true,
           myLocationEnabled: false,
           onMapCreated: (AppleMapController controller) {
-            final AppleMapInspector inspector =
-                // ignore: invalid_use_of_visible_for_testing_member
-                AppleMapInspector(controller.channel);
+            // ignore: invalid_use_of_visible_for_testing_member
+            final AppleMapInspector inspector = AppleMapInspector(controller.mapId);
             inspectorCompleter.complete(inspector);
           },
         ),
@@ -538,7 +529,7 @@ void main() {
 
     final AppleMapInspector inspector = await inspectorCompleter.future;
     final bool myLocationButtonEnabled = await _waitForValue<bool>(
-      read: () async => (await inspector.isMyLocationButtonEnabled())!,
+      read: () async => await inspector.isMyLocationButtonEnabled(),
       matches: (bool value) => value == false,
     );
     expect(myLocationButtonEnabled, false);

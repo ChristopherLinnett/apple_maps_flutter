@@ -9,18 +9,23 @@ import Foundation
 import Flutter
 import MapKit
 
-public class AppleMapController: NSObject, FlutterPlatformView {
+public class AppleMapController: NSObject, FlutterPlatformView, AppleMapHostApi {
     var contentView: UIView
     var mapView: FlutterMapView
     var registrar: FlutterPluginRegistrar
     var channel: FlutterMethodChannel
+    let mapId: Int64
+    let hostApiSuffix: String
     var initialCameraPosition: [String: Any]
     var options: [String: Any]
     var currentlySelectedAnnotation: String?
     var snapShotOptions: MKMapSnapshotter.Options = MKMapSnapshotter.Options()
     var snapShot: MKMapSnapshotter?
+    var isDisposed: Bool = false
     
     public init(withFrame frame: CGRect, withRegistrar registrar: FlutterPluginRegistrar, withargs args: Dictionary<String, Any> ,withId id: Int64) {
+        self.mapId = id
+        self.hostApiSuffix = String(id)
         self.options = args["options"] as! [String: Any]
         self.channel = FlutterMethodChannel(name: "apple_maps_plugin.luisthein.de/apple_maps_\(id)", binaryMessenger: registrar.messenger())
         
@@ -37,9 +42,9 @@ public class AppleMapController: NSObject, FlutterPlatformView {
         super.init()
         
         self.mapView.delegate = self
-        
+        AppleMapHostApiSetup.setUp(binaryMessenger: registrar.messenger(), api: self, messageChannelSuffix: hostApiSuffix)
+
         self.mapView.setCenterCoordinate(initialCameraPosition, animated: false)
-        self.setMethodCallHandlers()
         
         if let annotationsToAdd: NSArray = args["annotationsToAdd"] as? NSArray {
             self.annotationsToAdd(annotations: annotationsToAdd)
@@ -54,226 +59,211 @@ public class AppleMapController: NSObject, FlutterPlatformView {
             self.addCircles(circleData: circlesToAdd)
         }
     }
+
+    deinit {
+        tearDownHostApi()
+    }
     
     public func view() -> UIView {
         return contentView
     }
-    
-    private func setMethodCallHandlers() {
-        channel.setMethodCallHandler({ [unowned self] (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
-            if let args: Dictionary<String, Any> = call.arguments as? Dictionary<String,Any> {
-                switch(call.method) {
-                case "annotations#update":
-                    self.annotationUpdate(args: args)
-                    result(nil)
-                    break
-                case "annotations#showInfoWindow":
-                    self.selectAnnotation(with: args["annotationId"] as! String)
-                    break
-                case "annotations#hideInfoWindow":
-                    self.hideAnnotation(with: args["annotationId"] as! String)
-                    break
-                case "annotations#isInfoWindowShown":
-                    result(self.isAnnotationSelected(with: args["annotationId"] as! String))
-                    break
-                case "polylines#update":
-                    self.polylineUpdate(args: args)
-                    result(nil)
-                    break
-                case "polygons#update":
-                    self.polygonUpdate(args: args)
-                    result(nil)
-                    break
-                case "circles#update":
-                    self.circleUpdate(args: args)
-                    result(nil)
-                    break
-                case "map#update":
-                    self.mapView.interpretOptions(options: args["options"] as! Dictionary<String, Any>)
-                    break
-                case "camera#animate":
-                    self.animateCamera(args: args)
-                    result(nil)
-                    break
-                case "camera#move":
-                    self.moveCamera(args: args)
-                    result(nil)
-                    break
-                case "camera#convert":
-                    self.cameraConvert(args: args, result: result)
-                    break
-                case "map#takeSnapshot":
-                    self.takeSnapshot(options: SnapshotOptions.init(options: args), onCompletion: { (snapshot: FlutterStandardTypedData?, error: Error?) -> Void in
-                        result(snapshot ?? error)
-                    })
-                default:
-                    result(FlutterMethodNotImplemented)
-                    break
-                }
-            } else {
-                switch call.method {
-                case "map#getVisibleRegion":
-                    result(self.mapView.getVisibleRegion())
-                    break
-                case "map#isCompassEnabled":
-                    if #available(iOS 9.0, *) {
-                        result(self.mapView.showsCompass)
-                    } else {
-                        result(false)
-                    }
-                    break
-                case "map#isPitchGesturesEnabled":
-                    result(self.mapView.isPitchEnabled)
-                    break
-                case "map#isScrollGesturesEnabled":
-                    result(self.mapView.isScrollEnabled)
-                    break
-                case "map#isZoomGesturesEnabled":
-                    result(self.mapView.isZoomEnabled)
-                    break
-                case "map#isRotateGesturesEnabled":
-                    result(self.mapView.isRotateEnabled)
-                    break
-                case "map#isMyLocationButtonEnabled":
-                    result(self.mapView.isMyLocationButtonShowing ?? false)
-                    break
-                case "map#getMinMaxZoomLevels":
-                    result([self.mapView.minZoomLevel, self.mapView.maxZoomLevel])
-                    break
-                case "camera#getZoomLevel":
-                    result(self.mapView.calculatedZoomLevel)
-                    break
-                default:
-                    result(FlutterMethodNotImplemented)
-                    break
-                }
-            }
-        })
+
+    func updateMapOptions(options: PlatformMapOptions) throws {
+        self.mapView.interpretOptions(options: options.asDictionary)
     }
-    
-    private func annotationUpdate(args: Dictionary<String, Any>) -> Void {
-        if let annotationsToAdd = args["annotationsToAdd"] as? NSArray {
-            if annotationsToAdd.count > 0 {
-                self.annotationsToAdd(annotations: annotationsToAdd)
-            }
+
+    func updateAnnotations(updates: PlatformAnnotationUpdates) throws {
+        let legacyUpdates = updates.asLegacyUpdates
+        if let annotationsToAdd = legacyUpdates.annotationsToAdd {
+            self.annotationsToAdd(annotations: annotationsToAdd)
         }
-        if let annotationsToChange = args["annotationsToChange"] as? NSArray {
-            if annotationsToChange.count > 0 {
-                self.annotationsToChange(annotations: annotationsToChange)
-            }
+        if let annotationsToChange = legacyUpdates.annotationsToChange {
+            self.annotationsToChange(annotations: annotationsToChange)
         }
-        if let annotationsToDelete = args["annotationIdsToRemove"] as? NSArray {
-            if annotationsToDelete.count > 0 {
-                self.annotationsIdsToRemove(annotationIds: annotationsToDelete)
-            }
+        if let annotationIdsToRemove = legacyUpdates.annotationIdsToRemove {
+            self.annotationsIdsToRemove(annotationIds: annotationIdsToRemove as NSArray)
         }
     }
-    
-    private func polygonUpdate(args: Dictionary<String, Any>) -> Void {
-        if let polyligonsToAdd: NSArray = args["polygonsToAdd"] as? NSArray {
-            self.addPolygons(polygonData: polyligonsToAdd)
-        }
-        if let polygonsToChange: NSArray = args["polygonsToChange"] as? NSArray {
-            self.changePolygons(polygonData: polygonsToChange)
-        }
-        if let polygonsToRemove: NSArray = args["polygonIdsToRemove"] as? NSArray {
-            self.removePolygons(polygonIds: polygonsToRemove)
-        }
-    }
-    
-    private func polylineUpdate(args: Dictionary<String, Any>) -> Void {
-        if let polylinesToAdd: NSArray = args["polylinesToAdd"] as? NSArray {
+
+    func updatePolylines(updates: PlatformPolylineUpdates) throws {
+        let legacyUpdates = updates.asLegacyUpdates
+        if let polylinesToAdd = legacyUpdates.polylinesToAdd {
             self.addPolylines(polylineData: polylinesToAdd)
         }
-        if let polylinesToChange: NSArray = args["polylinesToChange"] as? NSArray {
+        if let polylinesToChange = legacyUpdates.polylinesToChange {
             self.changePolylines(polylineData: polylinesToChange)
         }
-        if let polylinesToRemove: NSArray = args["polylineIdsToRemove"] as? NSArray {
-            self.removePolylines(polylineIds: polylinesToRemove)
+        if let polylineIdsToRemove = legacyUpdates.polylineIdsToRemove {
+            self.removePolylines(polylineIds: polylineIdsToRemove as NSArray)
         }
     }
-    
-    private func circleUpdate(args: Dictionary<String, Any>) -> Void {
-        if let circlesToAdd: NSArray = args["circlesToAdd"] as? NSArray {
+
+    func updatePolygons(updates: PlatformPolygonUpdates) throws {
+        let legacyUpdates = updates.asLegacyUpdates
+        if let polygonsToAdd = legacyUpdates.polygonsToAdd {
+            self.addPolygons(polygonData: polygonsToAdd)
+        }
+        if let polygonsToChange = legacyUpdates.polygonsToChange {
+            self.changePolygons(polygonData: polygonsToChange)
+        }
+        if let polygonIdsToRemove = legacyUpdates.polygonIdsToRemove {
+            self.removePolygons(polygonIds: polygonIdsToRemove as NSArray)
+        }
+    }
+
+    func updateCircles(updates: PlatformCircleUpdates) throws {
+        let legacyUpdates = updates.asLegacyUpdates
+        if let circlesToAdd = legacyUpdates.circlesToAdd {
             self.addCircles(circleData: circlesToAdd)
         }
-        if let circlesToChange: NSArray = args["circlesToChange"] as? NSArray {
+        if let circlesToChange = legacyUpdates.circlesToChange {
             self.changeCircles(circleData: circlesToChange)
         }
-        if let circlesToRemove: NSArray = args["circleIdsToRemove"] as? NSArray {
-            self.removeCircles(circleIds: circlesToRemove)
+        if let circleIdsToRemove = legacyUpdates.circleIdsToRemove {
+            self.removeCircles(circleIds: circleIdsToRemove as NSArray)
         }
     }
-    
-    private func moveCamera(args: Dictionary<String, Any>) -> Void {
-        let positionData: Dictionary<String, Any> = self.toPositionData(data: args["cameraUpdate"] as! Array<Any>, animated: true)
-        if !positionData.isEmpty {
-            guard let _ = positionData["moveToBounds"] else {
-                self.mapView.setCenterCoordinate(positionData, animated: false)
+
+    func animateCamera(cameraUpdate: PlatformCameraUpdate) throws {
+        updateCamera(cameraUpdate: cameraUpdate, animated: true)
+    }
+
+    func moveCamera(cameraUpdate: PlatformCameraUpdate) throws {
+        updateCamera(cameraUpdate: cameraUpdate, animated: false)
+    }
+
+    func showMarkerInfoWindow(annotationId: String) throws {
+        self.selectAnnotation(with: annotationId)
+    }
+
+    func hideMarkerInfoWindow(annotationId: String) throws {
+        self.hideAnnotation(with: annotationId)
+    }
+
+    func isMarkerInfoWindowShown(annotationId: String) throws -> Bool? {
+        self.isAnnotationSelected(with: annotationId)
+    }
+
+    func getZoomLevel() throws -> Double? {
+        self.mapView.calculatedZoomLevel
+    }
+
+    func getVisibleRegion() throws -> PlatformLatLngBounds {
+        let region = self.mapView.getVisibleRegion()
+        let southwest = region["southwest"] ?? [0, 0]
+        let northeast = region["northeast"] ?? [0, 0]
+        return PlatformLatLngBounds(
+            southwest: PlatformLatLng(latitude: southwest[0], longitude: southwest[1]),
+            northeast: PlatformLatLng(latitude: northeast[0], longitude: northeast[1])
+        )
+    }
+
+    func getScreenCoordinate(latLng: PlatformLatLng) throws -> PlatformScreenCoordinate? {
+        let point = self.mapView.convert(latLng.asCoordinate, toPointTo: self.view())
+        return PlatformScreenCoordinate(x: point.x, y: point.y)
+    }
+
+    func takeSnapshot(options: PlatformSnapshotOptions, completion: @escaping (Result<FlutterStandardTypedData?, Error>) -> Void) {
+        self.takeSnapshot(options: SnapshotOptions(options: options.asDictionary)) { snapshot, error in
+            if let error {
+                completion(.failure(error))
                 return
             }
-            self.mapView.setBounds(positionData, animated: false)
+            completion(.success(snapshot))
         }
     }
-    
-    private func animateCamera(args: Dictionary<String, Any>) -> Void {
-        let positionData: Dictionary<String, Any> = self.toPositionData(data: args["cameraUpdate"] as! Array<Any>, animated: true)
-        if !positionData.isEmpty {
-            guard let _ = positionData["moveToBounds"] else {
-                self.mapView.setCenterCoordinate(positionData, animated: true)
-                return
-            }
-            self.mapView.setBounds(positionData, animated: true)
-        }
+
+    func dispose() throws {
+        tearDownHostApi()
     }
-    
-    private func cameraConvert(args: Dictionary<String, Any>, result: FlutterResult) -> Void {
-        guard let annotation = args["annotation"] as? Array<Double> else {
-            result(nil)
+
+    private func tearDownHostApi() {
+        if isDisposed {
             return
         }
-        let point = self.mapView.convert(CLLocationCoordinate2D(latitude: annotation[0] , longitude: annotation[1]), toPointTo: self.view())
-        result(["point": [point.x, point.y]])
+        isDisposed = true
+        AppleMapHostApiSetup.setUp(binaryMessenger: registrar.messenger(), api: nil, messageChannelSuffix: hostApiSuffix)
+        mapView.delegate = nil
+        snapShot?.cancel()
+        snapShot = nil
+        mapView.resetStoredCameraState()
     }
-    
-    private func toPositionData(data: Array<Any>, animated: Bool) -> Dictionary<String, Any> {
-        var positionData: Dictionary<String, Any> = [:]
-        if let update: String = data[0] as? String {
-            switch(update) {
-            case "newCameraPosition":
-                if let _positionData : Dictionary<String, Any> = data[1] as? Dictionary<String, Any> {
-                    positionData = _positionData
-                }
-            case "newLatLng":
-                if let _positionData : Array<Any> = data[1] as? Array<Any> {
-                    positionData = ["target": _positionData]
-                }
-            case "newLatLngZoom":
-                if let _positionData: Array<Any> = data[1] as? Array<Any> {
-                    let zoom: Double = data[2] as? Double ?? 0
-                    positionData = ["target": _positionData, "zoom": zoom]
-                }
-            case "newLatLngBounds":
-                if let _positionData: Array<Any> = data[1] as? Array<Any> {
-                    let padding: Double = data[2] as? Double ?? 0
-                    positionData = ["target": _positionData, "padding": padding, "moveToBounds": true]
-                }
-            case "zoomBy":
-                if let zoomBy: Double = data[1] as? Double {
-                    mapView.zoomBy(zoomBy: zoomBy, animated: animated)
-                }
-            case "zoomTo":
-                if let zoomTo: Double = data[1] as? Double {
-                    mapView.zoomTo(newZoomLevel: zoomTo, animated: animated)
-                }
-            case "zoomIn":
-                mapView.zoomIn(animated: animated)
-            case "zoomOut":
-                mapView.zoomOut(animated: animated)
-            default:
-                positionData = [:]
+
+    func isCompassEnabled() throws -> Bool {
+        if #available(iOS 9.0, *) {
+            return mapView.showsCompass
+        }
+        return true
+    }
+
+    func getMinMaxZoomLevels() throws -> PlatformMinMaxZoomPreference {
+        PlatformMinMaxZoomPreference(minZoom: mapView.minZoomLevel, maxZoom: mapView.maxZoomLevel)
+    }
+
+    func isZoomGesturesEnabled() throws -> Bool {
+        mapView.isZoomEnabled
+    }
+
+    func isRotateGesturesEnabled() throws -> Bool {
+        mapView.isRotateEnabled
+    }
+
+    func isPitchGesturesEnabled() throws -> Bool {
+        mapView.isPitchEnabled
+    }
+
+    func isScrollGesturesEnabled() throws -> Bool {
+        mapView.isScrollEnabled
+    }
+
+    func isMyLocationButtonEnabled() throws -> Bool {
+        mapView.isMyLocationButtonShowing ?? false
+    }
+
+    private func updateCamera(cameraUpdate: PlatformCameraUpdate, animated: Bool) {
+        let positionData = self.toPositionData(cameraUpdate: cameraUpdate, animated: animated)
+        if !positionData.isEmpty {
+            guard positionData["moveToBounds"] == nil else {
+                self.mapView.setBounds(positionData, animated: animated)
+                return
             }
-            return positionData
+            self.mapView.setCenterCoordinate(positionData, animated: animated)
+        }
+    }
+
+    private func toPositionData(cameraUpdate: PlatformCameraUpdate, animated: Bool) -> Dictionary<String, Any> {
+        switch cameraUpdate.type {
+        case .newCameraPosition:
+            return cameraUpdate.cameraPosition?.asDictionary ?? [:]
+        case .newLatLng:
+            if let latLng = cameraUpdate.latLng {
+                return ["target": latLng.asList]
+            }
+        case .newLatLngZoom:
+            if let latLng = cameraUpdate.latLng {
+                return ["target": latLng.asList, "zoom": cameraUpdate.zoom ?? 0]
+            }
+        case .newLatLngBounds:
+            if let bounds = cameraUpdate.bounds {
+                return [
+                    "target": bounds.asTargetList,
+                    "padding": cameraUpdate.padding ?? 0,
+                    "moveToBounds": true,
+                ]
+            }
+        case .zoomBy:
+            if let zoomBy = cameraUpdate.zoom {
+                let focus: CGPoint? = cameraUpdate.focus.map { CGPoint(x: $0.x, y: $0.y) }
+                mapView.zoomBy(zoomBy: zoomBy, animated: animated, focus: focus)
+            }
+        case .zoomTo:
+            if let zoomTo = cameraUpdate.zoom {
+                mapView.zoomTo(newZoomLevel: zoomTo, animated: animated)
+            }
+        case .zoomIn:
+            mapView.zoomIn(animated: animated)
+        case .zoomOut:
+            mapView.zoomOut(animated: animated)
         }
         return [:]
     }
@@ -322,10 +312,9 @@ extension AppleMapController {
             snapShotOptions.showsPointsOfInterest = options.showPointsOfInterest
         }
         
-        // Set MKMapSnapShotOptions to MKMapSnapShotter.
-        snapShot = MKMapSnapshotter(options: snapShotOptions)
-        
+        // Cancel any in-flight snapshot before creating a new one.
         snapShot?.cancel()
+        snapShot = MKMapSnapshotter(options: snapShotOptions)
         
         if #available(iOS 10.0, *) {
             snapShot?.start { [weak self] snapshot, error in

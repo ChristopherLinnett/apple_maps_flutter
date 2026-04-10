@@ -175,14 +175,16 @@ class AppleMap extends StatefulWidget {
 }
 
 class _AppleMapState extends State<AppleMap> {
-  final Completer<AppleMapController> _controller =
-      Completer<AppleMapController>();
+  final Completer<AppleMapController?> _controller =
+      Completer<AppleMapController?>();
+  Future<void> _platformSyncQueue = Future<void>.value();
 
   Map<AnnotationId, Annotation> _annotations = <AnnotationId, Annotation>{};
   Map<PolylineId, Polyline> _polylines = <PolylineId, Polyline>{};
   Map<PolygonId, Polygon> _polygons = <PolygonId, Polygon>{};
   Map<CircleId, Circle> _circles = <CircleId, Circle>{};
   late _AppleMapOptions _appleMapOptions;
+  bool _isDisposed = false;
 
   @override
   Widget build(BuildContext context) {
@@ -219,16 +221,64 @@ class _AppleMapState extends State<AppleMap> {
   }
 
   @override
-  void didUpdateWidget(AppleMap oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _updateOptions();
-    _updateAnnotations();
-    _updatePolylines();
-    _updatePolygons();
-    _updateCircles();
+  void dispose() {
+    _isDisposed = true;
+    if (_controller.isCompleted) {
+      unawaited(
+        _controller.future.then((AppleMapController? controller) {
+          return controller?.dispose();
+        }),
+      );
+    } else {
+      _controller.complete(null);
+    }
+    super.dispose();
   }
 
-  void _updateOptions() async {
+  @override
+  void didUpdateWidget(AppleMap oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _schedulePlatformSync();
+  }
+
+  void _schedulePlatformSync() {
+    _platformSyncQueue = _platformSyncQueue.then((_) async {
+      if (_isDisposed) {
+        return;
+      }
+      try {
+        await _synchronizePlatformState();
+      } catch (error, stackTrace) {
+        if (_isDisposed) {
+          return;
+        }
+        FlutterError.reportError(
+          FlutterErrorDetails(
+            exception: error,
+            stack: stackTrace,
+            library: 'apple_maps_flutter',
+            context: ErrorDescription(
+              'while synchronizing map state to the platform view',
+            ),
+          ),
+        );
+      }
+    });
+  }
+
+  Future<void> _synchronizePlatformState() async {
+    final AppleMapController? controller = await _controller.future;
+    if (_isDisposed || !mounted || controller == null) {
+      return;
+    }
+    await _updateOptions(controller);
+    await _updateAnnotations(controller);
+    await _updatePolylines(controller);
+    await _updatePolygons(controller);
+    await _updateCircles(controller);
+  }
+
+  Future<void> _updateOptions(AppleMapController controller) async {
     final _AppleMapOptions newOptions = _AppleMapOptions.fromWidget(widget);
     final Map<String, dynamic> updates = _appleMapOptions.updatesMap(
       newOptions,
@@ -236,40 +286,33 @@ class _AppleMapState extends State<AppleMap> {
     if (updates.isEmpty) {
       return;
     }
-    final AppleMapController controller = await _controller.future;
-    controller._updateMapOptions(updates);
+    await controller._updateMapOptions(updates);
     _appleMapOptions = newOptions;
   }
 
-  void _updateAnnotations() async {
-    final AppleMapController controller = await _controller.future;
-    controller._updateAnnotations(
+  Future<void> _updateAnnotations(AppleMapController controller) async {
+    await controller._updateAnnotations(
       _AnnotationUpdates.from(_annotations.values.toSet(), widget.annotations),
     );
     _annotations = _keyByAnnotationId(widget.annotations);
   }
 
-  void _updatePolylines() async {
-    final AppleMapController controller = await _controller.future;
-    controller._updatePolylines(
+  Future<void> _updatePolylines(AppleMapController controller) async {
+    await controller._updatePolylines(
       _PolylineUpdates.from(_polylines.values.toSet(), widget.polylines),
     );
     _polylines = _keyByPolylineId(widget.polylines);
   }
 
-  void _updatePolygons() async {
-    final AppleMapController controller = await _controller.future;
-    // ignore: unawaited_futures
-    controller._updatePolygons(
+  Future<void> _updatePolygons(AppleMapController controller) async {
+    await controller._updatePolygons(
       _PolygonUpdates.from(_polygons.values.toSet(), widget.polygons),
     );
     _polygons = _keyByPolygonId(widget.polygons);
   }
 
-  void _updateCircles() async {
-    final AppleMapController controller = await _controller.future;
-    // ignore: unawaited_futures
-    controller._updateCircles(
+  Future<void> _updateCircles(AppleMapController controller) async {
+    await controller._updateCircles(
       _CircleUpdates.from(_circles.values.toSet(), widget.circles),
     );
     _circles = _keyByCircleId(widget.circles);
@@ -281,6 +324,10 @@ class _AppleMapState extends State<AppleMap> {
       widget.initialCameraPosition,
       this,
     );
+    if (_isDisposed || !mounted || _controller.isCompleted) {
+      await controller.dispose();
+      return;
+    }
     _controller.complete(controller);
     widget.onMapCreated?.call(controller);
   }

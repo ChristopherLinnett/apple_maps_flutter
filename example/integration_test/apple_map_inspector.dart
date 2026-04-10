@@ -3,7 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:apple_maps_flutter/apple_maps_flutter.dart';
-import 'package:flutter/services.dart';
+import 'package:apple_maps_flutter/src/messages.g.dart';
 
 /// Inspect Apple Maps state using the platform SDK.
 ///
@@ -11,38 +11,38 @@ import 'package:flutter/services.dart';
 /// class should call "getters" on the AppleMap object or equivalent
 /// on the platform side.
 class AppleMapInspector {
-  AppleMapInspector(this._channel);
+  AppleMapInspector(int mapId)
+      : _hostApi = AppleMapHostApi(messageChannelSuffix: '$mapId');
 
-  final MethodChannel _channel;
+  final AppleMapHostApi _hostApi;
 
-  Future<bool?> isCompassEnabled() async {
-    return await _channel.invokeMethod<bool>('map#isCompassEnabled');
+  Future<bool> isCompassEnabled() async {
+    return _hostApi.isCompassEnabled();
   }
 
   Future<MinMaxZoomPreference> getMinMaxZoomLevels() async {
-    final List<double> zoomLevels =
-        (await _channel.invokeMethod<List<dynamic>>('map#getMinMaxZoomLevels'))!
-            .cast<double>();
-    return MinMaxZoomPreference(zoomLevels[0], zoomLevels[1]);
+    final PlatformMinMaxZoomPreference result =
+        await _hostApi.getMinMaxZoomLevels();
+    return MinMaxZoomPreference(result.minZoom, result.maxZoom);
   }
 
-  Future<bool?> isZoomGesturesEnabled() async {
-    return await _channel.invokeMethod<bool>('map#isZoomGesturesEnabled');
+  Future<bool> isZoomGesturesEnabled() async {
+    return _hostApi.isZoomGesturesEnabled();
   }
 
-  Future<bool?> isRotateGesturesEnabled() async {
-    return await _channel.invokeMethod<bool>('map#isRotateGesturesEnabled');
+  Future<bool> isRotateGesturesEnabled() async {
+    return _hostApi.isRotateGesturesEnabled();
   }
 
-  Future<bool?> isPitchGesturesEnabled() async {
-    return await _channel.invokeMethod<bool>('map#isPitchGesturesEnabled');
+  Future<bool> isPitchGesturesEnabled() async {
+    return _hostApi.isPitchGesturesEnabled();
   }
 
-  Future<bool?> isScrollGesturesEnabled() async {
-    return await _channel.invokeMethod<bool>('map#isScrollGesturesEnabled');
+  Future<bool> isScrollGesturesEnabled() async {
+    return _hostApi.isScrollGesturesEnabled();
   }
 
-  Future<bool?> isMyLocationButtonEnabled() async {
-    return await _channel.invokeMethod<bool>('map#isMyLocationButtonEnabled');
+  Future<bool> isMyLocationButtonEnabled() async {
+    return _hostApi.isMyLocationButtonEnabled();
   }
 }

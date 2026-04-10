@@ -8,21 +8,41 @@
 import Foundation
 import UIKit
 import MapKit
+import ObjectiveC
 
 public extension MKMapView {
-    // keeps track of the Map values
-    private struct Holder {
-        static var _zoomLevel: Double = Double(0)
-        static var _pitch: CGFloat = CGFloat(0)
-        static var _heading: CLLocationDirection = CLLocationDirection(0)
-        static var _maxZoomLevel: Double = Double(21)
-        static var _minZoomLevel: Double = Double(2)
+    private final class MapCameraState {
+        var zoomLevel: Double = 0
+        var pitch: CGFloat = 0
+        var heading: CLLocationDirection = 0
+        var maxZoomLevel: Double = 21
+        var minZoomLevel: Double = 2
+    }
+
+    private static var mapCameraStateKey: UInt8 = 0
+
+    private var mapCameraState: MapCameraState {
+        get {
+            if let state = objc_getAssociatedObject(self, &Self.mapCameraStateKey) as? MapCameraState {
+                return state
+            }
+            let state = MapCameraState()
+            objc_setAssociatedObject(self, &Self.mapCameraStateKey, state, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            return state
+        }
+        set {
+            objc_setAssociatedObject(self, &Self.mapCameraStateKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        }
+    }
+
+    func resetStoredCameraState() {
+        objc_setAssociatedObject(self, &Self.mapCameraStateKey, nil, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
     
     var maxZoomLevel: Double {
         set(_maxZoomLevel) {
-            Holder._maxZoomLevel = _maxZoomLevel
-            if Holder._zoomLevel > _maxZoomLevel {
+            mapCameraState.maxZoomLevel = _maxZoomLevel
+            if mapCameraState.zoomLevel > _maxZoomLevel {
                 if #available(iOS 9.0, *) {
                     self.setCenterCoordinateWithAltitude(centerCoordinate: centerCoordinate, zoomLevel: _maxZoomLevel, animated: false)
                 } else {
@@ -32,14 +52,14 @@ public extension MKMapView {
             self.applyCameraZoomRange()
         }
         get {
-            return Holder._maxZoomLevel
+            return mapCameraState.maxZoomLevel
         }
     }
     
     var minZoomLevel: Double {
         set(_minZoomLevel) {
-            Holder._minZoomLevel = _minZoomLevel
-            if Holder._zoomLevel < _minZoomLevel {
+            mapCameraState.minZoomLevel = _minZoomLevel
+            if mapCameraState.zoomLevel < _minZoomLevel {
                 if #available(iOS 9.0, *) {
                    self.setCenterCoordinateWithAltitude(centerCoordinate: centerCoordinate, zoomLevel: _minZoomLevel, animated: false)
                 } else {
@@ -49,13 +69,13 @@ public extension MKMapView {
             self.applyCameraZoomRange()
         }
         get {
-           return Holder._minZoomLevel
+              return mapCameraState.minZoomLevel
         }
     }
     
     var zoomLevel: Double {
         get {
-            return Holder._zoomLevel
+            return mapCameraState.zoomLevel
         }
     }
     
@@ -76,25 +96,25 @@ public extension MKMapView {
             
             zoomLevel = Utils.roundToTwoDecimalPlaces(number: zoomLevel)
             
-            Holder._zoomLevel = zoomLevel
+            mapCameraState.zoomLevel = zoomLevel
             
             return zoomLevel
             
         }
         set (newZoomLevel) {
-            Holder._zoomLevel = newZoomLevel
+            mapCameraState.zoomLevel = newZoomLevel
         }
     }
     
     func setCenterCoordinate(_ positionData: Dictionary<String, Any>, animated: Bool) {
         let targetList :Array<CLLocationDegrees> = positionData["target"] as? Array<CLLocationDegrees> ?? [self.camera.centerCoordinate.latitude, self.camera.centerCoordinate.longitude]
-        let zoom :Double = positionData["zoom"] as? Double ?? Holder._zoomLevel
-        Holder._zoomLevel = zoom
+        let zoom :Double = positionData["zoom"] as? Double ?? mapCameraState.zoomLevel
+        mapCameraState.zoomLevel = zoom
         if let pitch :CGFloat = positionData["pitch"] as? CGFloat {
-            Holder._pitch = pitch
+            mapCameraState.pitch = pitch
         }
         if let heading :CLLocationDirection = positionData["heading"] as? CLLocationDirection {
-            Holder._heading = heading
+            mapCameraState.heading = heading
         }
         let centerCoordinate :CLLocationCoordinate2D = CLLocationCoordinate2D(latitude:  targetList[0], longitude: targetList[1])
         if #available(iOS 9.0, *) {
@@ -128,8 +148,8 @@ public extension MKMapView {
         // Setting the pitch/heading doesn't work while animating yet.
         // The animation will stop if the you change camera properties while it's running.
         if (!animated) {
-            self.camera.pitch = Holder._pitch
-            self.camera.heading = Holder._heading
+            self.camera.pitch = mapCameraState.pitch
+            self.camera.heading = mapCameraState.heading
         }
     }
     
@@ -170,7 +190,7 @@ public extension MKMapView {
         // clamp large numbers to 28
         let zoomL = min(zoomLevel, 28);
         let altitude = getCameraAltitude(centerCoordinate: centerCoordinate, zoomLevel: zoomL)
-        self.setCamera(MKMapCamera(lookingAtCenter: centerCoordinate, fromDistance: CLLocationDistance(altitude), pitch: Holder._pitch, heading: Holder._heading), animated: animated)
+        self.setCamera(MKMapCamera(lookingAtCenter: centerCoordinate, fromDistance: CLLocationDistance(altitude), pitch: mapCameraState.pitch, heading: mapCameraState.heading), animated: animated)
     }
     
     private func getCameraAltitude(centerCoordinate: CLLocationCoordinate2D, zoomLevel: Double) -> Double {
@@ -209,13 +229,13 @@ public extension MKMapView {
     /// Applies `MKMapView.cameraZoomRange` (iOS 13+) so the native map view
     /// itself prevents pinch gestures from exceeding the stored min/max zoom
     /// levels. Without this, `MKMapView` allows unrestricted gesture zooming
-    /// and the stored `Holder._minZoomLevel` / `Holder._maxZoomLevel` values
-    /// are only checked during programmatic camera moves.
+    /// and the per-instance stored min/max zoom values are only checked during
+    /// programmatic camera moves.
     private func applyCameraZoomRange() {
         if #available(iOS 13.0, *) {
             // Lower zoom level = further out = larger center-coordinate distance.
-            let maxDistance = zoomLevelToDistance(Holder._minZoomLevel)
-            let minDistance = zoomLevelToDistance(Holder._maxZoomLevel)
+            let maxDistance = zoomLevelToDistance(mapCameraState.minZoomLevel)
+            let minDistance = zoomLevelToDistance(mapCameraState.maxZoomLevel)
             self.cameraZoomRange = MKMapView.CameraZoomRange(
                 minCenterCoordinateDistance: minDistance,
                 maxCenterCoordinateDistance: maxDistance
@@ -230,7 +250,7 @@ public extension MKMapView {
             let centerPixelY = Utils.latitudeToPixelSpaceY(latitude: self.centerCoordinate.latitude)
 
             // determine the scale value from the zoom level
-            let zoomExponent = Double(21 - Holder._zoomLevel)
+            let zoomExponent = Double(21 - mapCameraState.zoomLevel)
             let zoomScale = pow(2.0, zoomExponent)
 
             // scale the map’s size in pixel space
@@ -256,70 +276,89 @@ public extension MKMapView {
     }
     
     func zoomIn(animated: Bool) {
-        if Holder._zoomLevel - 1 <= Holder._maxZoomLevel {
-            if Holder._zoomLevel < 2 {
-                Holder._zoomLevel = 2
+        if mapCameraState.zoomLevel - 1 <= mapCameraState.maxZoomLevel {
+            if mapCameraState.zoomLevel < 2 {
+                mapCameraState.zoomLevel = 2
             }
-            Holder._zoomLevel += 1
+            mapCameraState.zoomLevel += 1
             if #available(iOS 9.0, *) {
-                self.setCenterCoordinateWithAltitude(centerCoordinate: centerCoordinate, zoomLevel: Holder._zoomLevel, animated: animated)
+                self.setCenterCoordinateWithAltitude(centerCoordinate: centerCoordinate, zoomLevel: mapCameraState.zoomLevel, animated: animated)
             } else {
-                self.setCenterCoordinateRegion(centerCoordinate: centerCoordinate, zoomLevel: Holder._zoomLevel, animated: animated)
+                self.setCenterCoordinateRegion(centerCoordinate: centerCoordinate, zoomLevel: mapCameraState.zoomLevel, animated: animated)
             }
         }
     }
     
     func zoomOut(animated: Bool) {
-        if Holder._zoomLevel - 1 >= Holder._minZoomLevel {
-            Holder._zoomLevel -= 1
-            if round(Holder._zoomLevel) <= 2 {
-               Holder._zoomLevel = 0
+        if mapCameraState.zoomLevel - 1 >= mapCameraState.minZoomLevel {
+            mapCameraState.zoomLevel -= 1
+            if round(mapCameraState.zoomLevel) <= 2 {
+               mapCameraState.zoomLevel = 0
             }
 
             if #available(iOS 9.0, *) {
-               self.setCenterCoordinateWithAltitude(centerCoordinate: centerCoordinate, zoomLevel: Holder._zoomLevel, animated: animated)
+               self.setCenterCoordinateWithAltitude(centerCoordinate: centerCoordinate, zoomLevel: mapCameraState.zoomLevel, animated: animated)
             } else {
-               self.setCenterCoordinateRegion(centerCoordinate: centerCoordinate, zoomLevel: Holder._zoomLevel, animated: animated)
+               self.setCenterCoordinateRegion(centerCoordinate: centerCoordinate, zoomLevel: mapCameraState.zoomLevel, animated: animated)
             }
         }
     }
     
     func zoomTo(newZoomLevel: Double, animated: Bool) {
-        if newZoomLevel < Holder._minZoomLevel {
-            Holder._zoomLevel = Holder._minZoomLevel
-        } else if newZoomLevel > Holder._maxZoomLevel {
-            Holder._zoomLevel = Holder._maxZoomLevel
+        if newZoomLevel < mapCameraState.minZoomLevel {
+            mapCameraState.zoomLevel = mapCameraState.minZoomLevel
+        } else if newZoomLevel > mapCameraState.maxZoomLevel {
+            mapCameraState.zoomLevel = mapCameraState.maxZoomLevel
         } else {
-            Holder._zoomLevel = newZoomLevel
+            mapCameraState.zoomLevel = newZoomLevel
         }
 
         if #available(iOS 9.0, *) {
-            self.setCenterCoordinateWithAltitude(centerCoordinate: centerCoordinate, zoomLevel: Holder._zoomLevel, animated: animated)
+            self.setCenterCoordinateWithAltitude(centerCoordinate: centerCoordinate, zoomLevel: mapCameraState.zoomLevel, animated: animated)
         } else {
-            self.setCenterCoordinateRegion(centerCoordinate: centerCoordinate, zoomLevel: Holder._zoomLevel, animated: animated)
+            self.setCenterCoordinateRegion(centerCoordinate: centerCoordinate, zoomLevel: mapCameraState.zoomLevel, animated: animated)
         }
     }
     
-    func zoomBy(zoomBy: Double, animated: Bool) {
-        if Holder._zoomLevel + zoomBy < Holder._minZoomLevel {
-            Holder._zoomLevel = Holder._minZoomLevel
-        } else if Holder._zoomLevel + zoomBy > Holder._maxZoomLevel {
-            Holder._zoomLevel = Holder._maxZoomLevel
+    func zoomBy(zoomBy: Double, animated: Bool, focus: CGPoint? = nil) {
+        let oldZoom = mapCameraState.zoomLevel
+        let newZoom: Double
+        if oldZoom + zoomBy < mapCameraState.minZoomLevel {
+            newZoom = mapCameraState.minZoomLevel
+        } else if oldZoom + zoomBy > mapCameraState.maxZoomLevel {
+            newZoom = mapCameraState.maxZoomLevel
         } else {
-            Holder._zoomLevel = Holder._zoomLevel + zoomBy
+            newZoom = oldZoom + zoomBy
         }
-        
-        if #available(iOS 9.0, *) {
-            self.setCenterCoordinateWithAltitude(centerCoordinate: centerCoordinate, zoomLevel: Holder._zoomLevel, animated: animated)
+        mapCameraState.zoomLevel = newZoom
+
+        let newCenter: CLLocationCoordinate2D
+        if let focus = focus {
+            let focusCoordinate = self.convert(focus, toCoordinateFrom: self)
+            let zoomDelta = newZoom - oldZoom
+            let scale = pow(2.0, zoomDelta)
+            let focusPt = MKMapPoint(focusCoordinate)
+            let centerPt = MKMapPoint(centerCoordinate)
+            let adjustedPt = MKMapPoint(
+                x: focusPt.x + (centerPt.x - focusPt.x) / scale,
+                y: focusPt.y + (centerPt.y - focusPt.y) / scale
+            )
+            newCenter = adjustedPt.coordinate
         } else {
-            self.setCenterCoordinateRegion(centerCoordinate: centerCoordinate, zoomLevel: Holder._zoomLevel, animated: animated)
+            newCenter = centerCoordinate
+        }
+
+        if #available(iOS 9.0, *) {
+            self.setCenterCoordinateWithAltitude(centerCoordinate: newCenter, zoomLevel: newZoom, animated: animated)
+        } else {
+            self.setCenterCoordinateRegion(centerCoordinate: newCenter, zoomLevel: newZoom, animated: animated)
         }
     }
     
     func updateStoredCameraValues(newZoomLevel: Double, newPitch: CGFloat, newHeading: CLLocationDirection) {
-        Holder._zoomLevel = newZoomLevel
-        Holder._pitch = newPitch
-        Holder._heading = newHeading
+        mapCameraState.zoomLevel = newZoomLevel
+        mapCameraState.pitch = newPitch
+        mapCameraState.heading = newHeading
     }
 }
 

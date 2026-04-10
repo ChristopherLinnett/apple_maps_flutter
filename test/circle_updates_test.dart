@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:apple_maps_flutter/apple_maps_flutter.dart';
+import 'package:apple_maps_flutter/src/messages.g.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -208,6 +209,43 @@ void main() {
     expect(platformAppleMap.circlesToChange, _toSet(c3: c3));
     expect(platformAppleMap.circleIdsToRemove!.isEmpty, true);
     expect(platformAppleMap.circlesToAdd!.isEmpty, true);
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets('Typed circle payload preserves fields', (
+    WidgetTester tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    final Circle circle = Circle(
+      circleId: CircleId('circle_1'),
+      consumeTapEvents: true,
+      fillColor: const Color(0xFF112233),
+      center: const LatLng(1.0, 2.0),
+      radius: 42,
+      strokeColor: const Color(0xFF445566),
+      strokeWidth: 6,
+      visible: false,
+      zIndex: 8,
+    );
+
+    await tester.pumpWidget(_mapWithCircles(null));
+    await tester.pumpWidget(_mapWithCircles(_toSet(c1: circle)));
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+    final PlatformCircle payload =
+        platformAppleMap.lastPlatformCircleUpdates!.circlesToAdd!.single;
+
+    expect(payload.circleId, 'circle_1');
+    expect(payload.consumeTapEvents, true);
+    expect(payload.fillColor, const Color(0xFF112233).toARGB32());
+    expect(payload.center.latitude, 1.0);
+    expect(payload.center.longitude, 2.0);
+    expect(payload.radius, 42.0);
+    expect(payload.strokeColor, const Color(0xFF445566).toARGB32());
+    expect(payload.strokeWidth, 6);
+    expect(payload.visible, false);
+    expect(payload.zIndex, 8);
     debugDefaultTargetPlatformOverride = null;
   });
 }

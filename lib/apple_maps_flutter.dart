@@ -11,6 +11,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'src/messages.g.dart';
+
 part 'src/annotation.dart';
 part 'src/annotation_updates.dart';
 part 'src/apple_map.dart';
@@ -23,6 +25,7 @@ part 'src/circle_updates.dart';
 part 'src/controller.dart';
 part 'src/joint_type.dart';
 part 'src/location.dart';
+part 'src/pigeon_conversions.dart';
 part 'src/pattern_item.dart';
 part 'src/polyline.dart';
 part 'src/polyline_updates.dart';

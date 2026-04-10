@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:apple_maps_flutter/apple_maps_flutter.dart';
+import 'package:apple_maps_flutter/src/messages.g.dart';
 import 'package:flutter/foundation.dart'
     show debugDefaultTargetPlatformOverride;
 import 'package:flutter/services.dart';
@@ -251,4 +252,54 @@ void main() {
     expect(platformAppleMap.annotationsToAdd!.isEmpty, true);
     debugDefaultTargetPlatformOverride = null;
   }, skip: true);
+
+  testWidgets('Typed annotation payload preserves fields', (
+    WidgetTester tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    final Annotation annotation = Annotation(
+      annotationId: AnnotationId('annotation_1'),
+      alpha: 0.7,
+      anchor: const Offset(0.25, 0.75),
+      draggable: true,
+      icon: BitmapDescriptor.markerAnnotationWithHue(BitmapDescriptor.hueCyan),
+      infoWindow: InfoWindow(
+        title: 'title',
+        snippet: 'snippet',
+        anchor: const Offset(0.1, 0.2),
+        onTap: () {},
+      ),
+      position: const LatLng(1.0, 2.0),
+      visible: false,
+      zIndex: 4,
+    );
+
+    await tester.pumpWidget(_mapWithAnnotations(null));
+    await tester.pumpWidget(_mapWithAnnotations(_toSet(m1: annotation)));
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+    final PlatformAnnotation payload = platformAppleMap
+        .lastPlatformAnnotationUpdates!
+        .annotationsToAdd!
+        .single;
+
+    expect(payload.annotationId, 'annotation_1');
+    expect(payload.alpha, 0.7);
+    expect(payload.anchor.x, 0.25);
+    expect(payload.anchor.y, 0.75);
+    expect(payload.draggable, true);
+    expect(payload.icon.type, BitmapDescriptorType.markerAnnotation);
+    expect(payload.icon.hue, BitmapDescriptor.hueCyan / 360.0);
+    expect(payload.infoWindow.title, 'title');
+    expect(payload.infoWindow.snippet, 'snippet');
+    expect(payload.infoWindow.anchor!.x, 0.1);
+    expect(payload.infoWindow.anchor!.y, 0.2);
+    expect(payload.infoWindow.consumesTapEvents, true);
+    expect(payload.visible, false);
+    expect(payload.position.latitude, 1.0);
+    expect(payload.position.longitude, 2.0);
+    expect(payload.zIndex, 4.0);
+    debugDefaultTargetPlatformOverride = null;
+  });
 }

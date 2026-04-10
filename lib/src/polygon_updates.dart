@@ -28,8 +28,9 @@ class _PolygonUpdates {
       return currentPolygons[id]!;
     }
 
-    final Set<PolygonId> _polygonIdsToRemove =
-        prevPolygonIds.difference(currentPolygonIds);
+    final Set<PolygonId> _polygonIdsToRemove = prevPolygonIds.difference(
+      currentPolygonIds,
+    );
 
     final Set<Polygon> _polygonsToAdd = currentPolygonIds
         .difference(prevPolygonIds)
@@ -49,31 +50,14 @@ class _PolygonUpdates {
         .where(hasChanged)
         .toSet();
 
-    polygonsToAdd = _polygonsToAdd;
-    polygonIdsToRemove = _polygonIdsToRemove;
-    polygonsToChange = _polygonsToChange;
+    this.polygonsToAdd = _polygonsToAdd;
+    this.polygonIdsToRemove = _polygonIdsToRemove;
+    this.polygonsToChange = _polygonsToChange;
   }
 
   late Set<Polygon> polygonsToAdd;
   late Set<PolygonId> polygonIdsToRemove;
   late Set<Polygon> polygonsToChange;
-
-  Map<String, dynamic> _toMap() {
-    final Map<String, dynamic> updateMap = <String, dynamic>{};
-
-    void addIfNonNull(String fieldName, dynamic value) {
-      if (value != null) {
-        updateMap[fieldName] = value;
-      }
-    }
-
-    addIfNonNull('polygonsToAdd', _serializePolygonSet(polygonsToAdd));
-    addIfNonNull('polygonsToChange', _serializePolygonSet(polygonsToChange));
-    addIfNonNull('polygonIdsToRemove',
-        polygonIdsToRemove.map<dynamic>((PolygonId m) => m.value).toList());
-
-    return updateMap;
-  }
 
   @override
   bool operator ==(Object other) {
