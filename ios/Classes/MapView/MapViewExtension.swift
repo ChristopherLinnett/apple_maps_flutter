@@ -29,6 +29,7 @@ public extension MKMapView {
                     self.setCenterCoordinateRegion(centerCoordinate: centerCoordinate, zoomLevel: _maxZoomLevel, animated: false)
                 }
             }
+            self.applyCameraZoomRange()
         }
         get {
             return Holder._maxZoomLevel
@@ -45,6 +46,7 @@ public extension MKMapView {
                    self.setCenterCoordinateRegion(centerCoordinate: centerCoordinate, zoomLevel: _minZoomLevel, animated: false)
                 }
             }
+            self.applyCameraZoomRange()
         }
         get {
            return Holder._minZoomLevel
@@ -190,6 +192,35 @@ public extension MKMapView {
         let altitude = distance / tan(.pi*(15/180.0))
         
         return altitude
+    }
+
+    /// Converts a zoom level to a camera center-coordinate distance using the
+    /// equator as reference latitude. The result is independent of the current
+    /// map bounds so it can safely be called before layout completes.
+    private func zoomLevelToDistance(_ zoom: Double) -> CLLocationDistance {
+        let z = min(zoom, 28)
+        let metersPerPixelAtEquator = 156543.03392
+        let referenceScreenHeight = 800.0
+        let metersPerPixel = metersPerPixelAtEquator / pow(2.0, z)
+        let visibleMeters = metersPerPixel * referenceScreenHeight
+        return visibleMeters / tan(.pi * (15.0 / 180.0))
+    }
+
+    /// Applies `MKMapView.cameraZoomRange` (iOS 13+) so the native map view
+    /// itself prevents pinch gestures from exceeding the stored min/max zoom
+    /// levels. Without this, `MKMapView` allows unrestricted gesture zooming
+    /// and the stored `Holder._minZoomLevel` / `Holder._maxZoomLevel` values
+    /// are only checked during programmatic camera moves.
+    private func applyCameraZoomRange() {
+        if #available(iOS 13.0, *) {
+            // Lower zoom level = further out = larger center-coordinate distance.
+            let maxDistance = zoomLevelToDistance(Holder._minZoomLevel)
+            let minDistance = zoomLevelToDistance(Holder._maxZoomLevel)
+            self.cameraZoomRange = MKMapView.CameraZoomRange(
+                minCenterCoordinateDistance: minDistance,
+                maxCenterCoordinateDistance: maxDistance
+            )
+        }
     }
     
     func getVisibleRegion() -> Dictionary<String, Array<Double>> {
