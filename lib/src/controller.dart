@@ -7,6 +7,7 @@ part of apple_maps_flutter;
 /// Controller for a single AppleMap instance running on the host platform.
 class AppleMapController {
   AppleMapController._(
+    this.mapId,
     this.channel,
     this._hostApi,
     CameraPosition initialCameraPosition,
@@ -24,12 +25,16 @@ class AppleMapController {
       'apple_maps_plugin.luisthein.de/apple_maps_$id',
     );
     return AppleMapController._(
+      id,
       channel,
       AppleMapHostApi(messageChannelSuffix: '$id'),
       initialCameraPosition,
       appleMapState,
     );
   }
+
+  @visibleForTesting
+  final int mapId;
 
   @visibleForTesting
   final MethodChannel channel;

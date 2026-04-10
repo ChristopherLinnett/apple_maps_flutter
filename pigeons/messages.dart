@@ -364,4 +364,19 @@ abstract class AppleMapHostApi {
   Uint8List? takeSnapshot(PlatformSnapshotOptions options);
 
   void dispose();
+
+  // Inspector methods for integration testing.
+  bool isCompassEnabled();
+
+  PlatformMinMaxZoomPreference getMinMaxZoomLevels();
+
+  bool isZoomGesturesEnabled();
+
+  bool isRotateGesturesEnabled();
+
+  bool isPitchGesturesEnabled();
+
+  bool isScrollGesturesEnabled();
+
+  bool isMyLocationButtonEnabled();
 }

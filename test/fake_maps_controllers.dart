@@ -712,6 +712,32 @@ class FakePlatformAppleMap {
       ];
       return <Object?>[snapshotBytes];
     });
+    _registerTypedHandler('isCompassEnabled', (Object? message) async {
+      return <Object?>[compassEnabled ?? true];
+    });
+    _registerTypedHandler('getMinMaxZoomLevels', (Object? message) async {
+      return <Object?>[
+        PlatformMinMaxZoomPreference(
+          minZoom: minMaxZoomPreference?.minZoom,
+          maxZoom: minMaxZoomPreference?.maxZoom,
+        ),
+      ];
+    });
+    _registerTypedHandler('isZoomGesturesEnabled', (Object? message) async {
+      return <Object?>[zoomGesturesEnabled ?? true];
+    });
+    _registerTypedHandler('isRotateGesturesEnabled', (Object? message) async {
+      return <Object?>[rotateGesturesEnabled ?? true];
+    });
+    _registerTypedHandler('isPitchGesturesEnabled', (Object? message) async {
+      return <Object?>[pitchGesturesEnabled ?? true];
+    });
+    _registerTypedHandler('isScrollGesturesEnabled', (Object? message) async {
+      return <Object?>[scrollGesturesEnabled ?? true];
+    });
+    _registerTypedHandler('isMyLocationButtonEnabled', (Object? message) async {
+      return <Object?>[myLocationButtonEnabled ?? false];
+    });
   }
 
   CameraUpdate _cameraUpdateFromPlatform(PlatformCameraUpdate update) {

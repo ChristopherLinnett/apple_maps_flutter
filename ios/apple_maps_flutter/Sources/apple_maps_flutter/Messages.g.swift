@@ -1193,6 +1193,13 @@ protocol AppleMapHostApi {
   func getScreenCoordinate(latLng: PlatformLatLng) throws -> PlatformScreenCoordinate?
   func takeSnapshot(options: PlatformSnapshotOptions, completion: @escaping (Result<FlutterStandardTypedData?, Error>) -> Void)
   func dispose() throws
+  func isCompassEnabled() throws -> Bool
+  func getMinMaxZoomLevels() throws -> PlatformMinMaxZoomPreference
+  func isZoomGesturesEnabled() throws -> Bool
+  func isRotateGesturesEnabled() throws -> Bool
+  func isPitchGesturesEnabled() throws -> Bool
+  func isScrollGesturesEnabled() throws -> Bool
+  func isMyLocationButtonEnabled() throws -> Bool
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -1421,6 +1428,97 @@ class AppleMapHostApiSetup {
       }
     } else {
       disposeChannel.setMessageHandler(nil)
+    }
+    let isCompassEnabledChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isCompassEnabled\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      isCompassEnabledChannel.setMessageHandler { _, reply in
+        do {
+          let result = try api.isCompassEnabled()
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      isCompassEnabledChannel.setMessageHandler(nil)
+    }
+    let getMinMaxZoomLevelsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.getMinMaxZoomLevels\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      getMinMaxZoomLevelsChannel.setMessageHandler { _, reply in
+        do {
+          let result = try api.getMinMaxZoomLevels()
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      getMinMaxZoomLevelsChannel.setMessageHandler(nil)
+    }
+    let isZoomGesturesEnabledChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isZoomGesturesEnabled\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      isZoomGesturesEnabledChannel.setMessageHandler { _, reply in
+        do {
+          let result = try api.isZoomGesturesEnabled()
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      isZoomGesturesEnabledChannel.setMessageHandler(nil)
+    }
+    let isRotateGesturesEnabledChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isRotateGesturesEnabled\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      isRotateGesturesEnabledChannel.setMessageHandler { _, reply in
+        do {
+          let result = try api.isRotateGesturesEnabled()
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      isRotateGesturesEnabledChannel.setMessageHandler(nil)
+    }
+    let isPitchGesturesEnabledChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isPitchGesturesEnabled\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      isPitchGesturesEnabledChannel.setMessageHandler { _, reply in
+        do {
+          let result = try api.isPitchGesturesEnabled()
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      isPitchGesturesEnabledChannel.setMessageHandler(nil)
+    }
+    let isScrollGesturesEnabledChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isScrollGesturesEnabled\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      isScrollGesturesEnabledChannel.setMessageHandler { _, reply in
+        do {
+          let result = try api.isScrollGesturesEnabled()
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      isScrollGesturesEnabledChannel.setMessageHandler(nil)
+    }
+    let isMyLocationButtonEnabledChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isMyLocationButtonEnabled\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      isMyLocationButtonEnabledChannel.setMessageHandler { _, reply in
+        do {
+          let result = try api.isMyLocationButtonEnabled()
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      isMyLocationButtonEnabledChannel.setMessageHandler(nil)
     }
   }
 }

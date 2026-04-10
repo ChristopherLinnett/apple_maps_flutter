@@ -43,9 +43,6 @@ public class AppleMapController: NSObject, FlutterPlatformView, AppleMapHostApi 
         
         self.mapView.delegate = self
         AppleMapHostApiSetup.setUp(binaryMessenger: registrar.messenger(), api: self, messageChannelSuffix: hostApiSuffix)
-        self.channel.setMethodCallHandler { [weak self] call, result in
-            self?.onMethodCall(call: call, result: result)
-        }
 
         self.mapView.setCenterCoordinate(initialCameraPosition, animated: false)
         
@@ -186,36 +183,41 @@ public class AppleMapController: NSObject, FlutterPlatformView, AppleMapHostApi 
         }
         isDisposed = true
         AppleMapHostApiSetup.setUp(binaryMessenger: registrar.messenger(), api: nil, messageChannelSuffix: hostApiSuffix)
-        channel.setMethodCallHandler(nil)
         mapView.delegate = nil
         snapShot?.cancel()
         snapShot = nil
         mapView.resetStoredCameraState()
     }
 
-    private func onMethodCall(call: FlutterMethodCall, result: @escaping FlutterResult) {
-        switch call.method {
-        case "map#isCompassEnabled":
-            if #available(iOS 9.0, *) {
-                result(mapView.showsCompass)
-            } else {
-                result(true)
-            }
-        case "map#getMinMaxZoomLevels":
-            result([mapView.minZoomLevel, mapView.maxZoomLevel])
-        case "map#isZoomGesturesEnabled":
-            result(mapView.isZoomEnabled)
-        case "map#isRotateGesturesEnabled":
-            result(mapView.isRotateEnabled)
-        case "map#isPitchGesturesEnabled":
-            result(mapView.isPitchEnabled)
-        case "map#isScrollGesturesEnabled":
-            result(mapView.isScrollEnabled)
-        case "map#isMyLocationButtonEnabled":
-            result(mapView.isMyLocationButtonShowing ?? false)
-        default:
-            result(FlutterMethodNotImplemented)
+    func isCompassEnabled() throws -> Bool {
+        if #available(iOS 9.0, *) {
+            return mapView.showsCompass
         }
+        return true
+    }
+
+    func getMinMaxZoomLevels() throws -> PlatformMinMaxZoomPreference {
+        PlatformMinMaxZoomPreference(minZoom: mapView.minZoomLevel, maxZoom: mapView.maxZoomLevel)
+    }
+
+    func isZoomGesturesEnabled() throws -> Bool {
+        mapView.isZoomEnabled
+    }
+
+    func isRotateGesturesEnabled() throws -> Bool {
+        mapView.isRotateEnabled
+    }
+
+    func isPitchGesturesEnabled() throws -> Bool {
+        mapView.isPitchEnabled
+    }
+
+    func isScrollGesturesEnabled() throws -> Bool {
+        mapView.isScrollEnabled
+    }
+
+    func isMyLocationButtonEnabled() throws -> Bool {
+        mapView.isMyLocationButtonShowing ?? false
     }
 
     private func updateCamera(cameraUpdate: PlatformCameraUpdate, animated: Bool) {
