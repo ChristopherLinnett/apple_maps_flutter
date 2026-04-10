@@ -1,12 +1,32 @@
 # apple_maps_flutter
 
-[![codecov](https://codecov.io/gh/LuisThein/apple_maps_flutter/branch/master/graph/badge.svg)](https://codecov.io/gh/LuisThein/apple_maps_flutter)
+[![codecov](https://codecov.io/gh/ChristopherLinnett/apple_maps_flutter/branch/master/graph/badge.svg)](https://codecov.io/gh/ChristopherLinnett/apple_maps_flutter)
 
 A Flutter plugin that provides an Apple Maps widget.
 
-The plugin relies on Flutter's mechanism for embedding Android and iOS views. As that mechanism is currently in a developers preview, this plugin should also be considered a developers preview.
+This fork targets current Flutter and Apple toolchains and supports Apple Maps on iOS through Flutter platform views.
 
-This plugin was based on the `google_maps_flutter` plugin. Instead of reinventing the wheel it also uses the Flutter implementation of the `google_maps_flutter` plugin. This was also done to simplify the process of combining the `google_maps_flutter` plugin with `apple_maps_flutter` to create a cross platform implementation for Android/iOS called `flutter_platform_maps`.
+The package still follows the familiar `google_maps_flutter`-style API shape where practical, while adopting Apple-native behavior deliberately when MapKit semantics differ.
+
+## Compatibility
+
+- Flutter: `>=3.41.0`
+- Dart: `^3.11.0`
+- iOS deployment target: `13.0`
+- Modern MapKit configuration APIs are feature-gated for iOS `16+`
+- iOS dependency managers: CocoaPods and Swift Package Manager
+
+## Current feature surface
+
+| Capability | Status |
+| :--------- | :----- |
+| Embedded Apple map view | Supported |
+| Camera move and animate operations | Supported |
+| Annotations | Supported |
+| Polylines, polygons, and circles | Supported |
+| Visible region and screen coordinate APIs | Supported |
+| Snapshots | Supported |
+| Android implementation | Not included |
 
 # Screenshots
 
@@ -16,7 +36,9 @@ This plugin was based on the `google_maps_flutter` plugin. Instead of reinventin
 
 # iOS
 
-To use this plugin on iOS you need to opt-in for the embedded views preview by adding a boolean property to the app's Info.plist file, with the key `io.flutter.embedded_views_preview` and the value `YES`. You will also have to add the key `Privacy - Location When In Use Usage Description` with the value of your usage description.
+Add `NSLocationWhenInUseUsageDescription` to the host app if you enable user location features.
+
+If you want to validate Swift Package Manager integration locally, enable it with `flutter config --enable-swift-package-manager` before building the example app.
 
 # Android
 
@@ -25,8 +47,15 @@ There is no Android implementation, but there is a package combining apple_maps_
 ## Sample Usage
 
 ```dart
-class AppleMapsExample extends StatelessWidget {
-  AppleMapController mapController;
+class AppleMapsExample extends StatefulWidget {
+  const AppleMapsExample({super.key});
+
+  @override
+  State<AppleMapsExample> createState() => _AppleMapsExampleState();
+}
+
+class _AppleMapsExampleState extends State<AppleMapsExample> {
+  AppleMapController? mapController;
 
   void _onMapCreated(AppleMapController controller) {
     mapController = controller;
@@ -53,9 +82,9 @@ class AppleMapsExample extends StatelessWidget {
           children: <Widget>[
             Column(
               children: <Widget>[
-                FlatButton(
+                TextButton(
                   onPressed: () {
-                    mapController.moveCamera(
+                    mapController?.moveCamera(
                       CameraUpdate.newCameraPosition(
                         const CameraPosition(
                           heading: 270.0,
@@ -68,9 +97,9 @@ class AppleMapsExample extends StatelessWidget {
                   },
                   child: const Text('newCameraPosition'),
                 ),
-                FlatButton(
+                TextButton(
                   onPressed: () {
-                    mapController.moveCamera(
+                    mapController?.moveCamera(
                       CameraUpdate.newLatLngZoom(
                         const LatLng(37.4231613, -122.087159),
                         11.0,
@@ -83,25 +112,25 @@ class AppleMapsExample extends StatelessWidget {
             ),
             Column(
               children: <Widget>[
-                FlatButton(
+                TextButton(
                   onPressed: () {
-                    mapController.moveCamera(
+                    mapController?.moveCamera(
                       CameraUpdate.zoomIn(),
                     );
                   },
                   child: const Text('zoomIn'),
                 ),
-                FlatButton(
+                TextButton(
                   onPressed: () {
-                    mapController.moveCamera(
+                    mapController?.moveCamera(
                       CameraUpdate.zoomOut(),
                     );
                   },
                   child: const Text('zoomOut'),
                 ),
-                FlatButton(
+                TextButton(
                   onPressed: () {
-                    mapController.moveCamera(
+                    mapController?.moveCamera(
                       CameraUpdate.zoomTo(16.0),
                     );
                   },

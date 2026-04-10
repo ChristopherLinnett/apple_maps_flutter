@@ -155,7 +155,7 @@ class Polyline {
 
     addIfPresent('polylineId', polylineId.value);
     addIfPresent('consumeTapEvents', consumeTapEvents);
-    addIfPresent('color', color.value);
+    addIfPresent('color', color.toARGB32());
     addIfPresent('polylineCap', polylineCap._toJson());
     addIfPresent('jointType', jointType.value);
     addIfPresent('visible', visible);
@@ -200,9 +200,12 @@ Map<PolylineId, Polyline> _keyByPolylineId(Iterable<Polyline>? polylines) {
   if (polylines == null) {
     return <PolylineId, Polyline>{};
   }
-  return Map<PolylineId, Polyline>.fromEntries(polylines.map(
+  return Map<PolylineId, Polyline>.fromEntries(
+    polylines.map(
       (Polyline polyline) =>
-          MapEntry<PolylineId, Polyline>(polyline.polylineId, polyline)));
+          MapEntry<PolylineId, Polyline>(polyline.polylineId, polyline),
+    ),
+  );
 }
 
 List<Map<String, dynamic>>? _serializePolylineSet(Set<Polyline>? polylines) {

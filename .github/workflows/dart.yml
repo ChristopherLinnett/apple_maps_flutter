@@ -1,9 +1,4 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-name: Dart
+name: CI
 
 on:
   push:
@@ -12,30 +7,79 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  package:
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-java@v1
+    - uses: actions/checkout@v4
+    - uses: actions/setup-java@v4
       with:
-        java-version: '12.x'
+        distribution: temurin
+        java-version: '17'
     - name: Install Flutter
-      uses: subosito/flutter-action@v1
+      uses: subosito/flutter-action@v2
       with:
-        flutter-version: '3.27.3'
+        flutter-version: '3.41.6'
+        channel: stable
+        cache: true
     - name: Install dependencies
       run: flutter pub get
-    - name: Run dart analyze
-      run: dart analyze
-    - name: run tests
+    - name: Run flutter analyze
+      run: flutter analyze
+    - name: Run tests
       run: flutter test --coverage
-    - name: upload coverage report
-      uses: codecov/codecov-action@v2
-      with:
-        token: ${{secrets.CODECOV}}
-        file: ./coverage/lcov.info
-    - name: build example project
+    - name: Publish dry run
+      run: flutter pub publish --dry-run
+    - name: Install example dependencies
+      working-directory: ./example
+      run: flutter pub get
+    - name: Build example with CocoaPods
       working-directory: ./example
       run: flutter build ios --release --no-codesign
-    - name: publish --dry-run
-      run: flutter pub publish --dry-run
+    - name: CocoaPods lint
+      run: pod lib lint ios/apple_maps_flutter.podspec --configuration=Debug --skip-tests --use-modular-headers
+    # TODO: Re-enable coverage publishing once a reporting backend is configured.
+    # - name: Upload coverage report
+    #   uses: codecov/codecov-action@v5
+    #   with:
+    #     token: ${{secrets.CODECOV}}
+    #     file: ./coverage/lcov.info
+
+  swiftpm:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: '17'
+    - name: Install Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.41.6'
+        channel: stable
+        cache: true
+    - name: Enable Swift Package Manager
+      run: flutter config --enable-swift-package-manager
+    - name: Install dependencies
+      run: flutter pub get
+    - name: Install example dependencies
+      working-directory: ./example
+      run: flutter pub get
+    - name: Build example with Swift Package Manager
+      working-directory: ./example
+      run: flutter build ios --debug --no-codesign
+    - name: Boot iOS simulator
+      run: |
+        set -eo pipefail
+        SIMULATOR_ID="$(xcrun simctl list devices available -j | jq -r '.devices | to_entries[] | select(.key | startswith("com.apple.CoreSimulator.SimRuntime.iOS-")) | .value[] | select(.isAvailable == true and (.name | startswith("iPhone"))) | .udid' | head -n 1)"
+        if [[ -z "$SIMULATOR_ID" ]]; then
+          echo "No available iPhone simulator found"
+          exit 1
+        fi
+        echo "IOS_SIMULATOR_UDID=$SIMULATOR_ID" >> "$GITHUB_ENV"
+        open -a Simulator --args -CurrentDeviceUDID "$SIMULATOR_ID"
+        xcrun simctl boot "$SIMULATOR_ID" || true
+        xcrun simctl bootstatus "$SIMULATOR_ID" -b
+    - name: Run example integration tests
+      working-directory: ./example
+      run: flutter test integration_test -d "$IOS_SIMULATOR_UDID"

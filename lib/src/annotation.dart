@@ -199,7 +199,7 @@ class Annotation {
   ///
   /// Overlays are drawn in order of z-index, so that lower values means drawn
   /// earlier, and thus appearing to be closer to the surface of the Earth.
-  double zIndex;
+  final double zIndex;
 
   /// Creates a new [Annotation] object whose values are the same as this instance,
   /// unless overwritten by the specified parameters.
@@ -280,17 +280,24 @@ class Annotation {
 }
 
 Map<AnnotationId, Annotation> _keyByAnnotationId(
-    Iterable<Annotation>? annotations) {
+  Iterable<Annotation>? annotations,
+) {
   if (annotations == null) {
     return <AnnotationId, Annotation>{};
   }
-  return Map<AnnotationId, Annotation>.fromEntries(annotations.map(
+  return Map<AnnotationId, Annotation>.fromEntries(
+    annotations.map(
       (Annotation annotation) => MapEntry<AnnotationId, Annotation>(
-          annotation.annotationId, annotation)));
+        annotation.annotationId,
+        annotation,
+      ),
+    ),
+  );
 }
 
 List<Map<String, dynamic>>? _serializeAnnotationSet(
-    Set<Annotation>? annotations) {
+  Set<Annotation>? annotations,
+) {
   if (annotations == null) {
     return null;
   }

@@ -14,11 +14,11 @@ class SnapshotOptions {
   final bool showOverlays;
 
   dynamic _toMap() => <String, bool>{
-        'showBuildings': showBuildings,
-        'showPointsOfInterest': showPointsOfInterest,
-        'showAnnotations': showAnnotations,
-        'showOverlays': showOverlays,
-      };
+    'showBuildings': showBuildings,
+    'showPointsOfInterest': showPointsOfInterest,
+    'showAnnotations': showAnnotations,
+    'showOverlays': showOverlays,
+  };
 
   @visibleForTesting
   static SnapshotOptions? fromMap(dynamic json) {
@@ -34,9 +34,9 @@ class SnapshotOptions {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    if (runtimeType != other.runtimeType) return false;
+    if (other is! SnapshotOptions) return false;
     final SnapshotOptions typedOther = other;
     return showBuildings == typedOther.showBuildings &&
         showPointsOfInterest == typedOther.showPointsOfInterest &&

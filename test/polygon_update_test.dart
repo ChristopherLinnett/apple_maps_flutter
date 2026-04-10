@@ -41,8 +41,11 @@ void main() {
       FakePlatformViewsController();
 
   setUpAll(() {
-    SystemChannels.platform_views.setMockMethodCallHandler(
-        fakePlatformViewsController.fakePlatformViewsMethodHandler);
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+          SystemChannels.platform_views,
+          fakePlatformViewsController.fakePlatformViewsMethodHandler,
+        );
   });
 
   setUp(() {
@@ -106,8 +109,10 @@ void main() {
   testWidgets("Updating a polygon", (WidgetTester tester) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     final Polygon p1 = Polygon(polygonId: PolygonId("polygon_1"));
-    final Polygon p2 =
-        Polygon(polygonId: PolygonId("polygon_1"), visible: false);
+    final Polygon p2 = Polygon(
+      polygonId: PolygonId("polygon_1"),
+      visible: false,
+    );
 
     await tester.pumpWidget(_mapWithPolygons(_toSet(p1: p1)));
     await tester.pumpWidget(_mapWithPolygons(_toSet(p1: p2)));
@@ -125,8 +130,10 @@ void main() {
   testWidgets("Updating a polygon", (WidgetTester tester) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     final Polygon p1 = Polygon(polygonId: PolygonId("polygon_1"));
-    final Polygon p2 =
-        Polygon(polygonId: PolygonId("polygon_1"), visible: false);
+    final Polygon p2 = Polygon(
+      polygonId: PolygonId("polygon_1"),
+      visible: false,
+    );
 
     await tester.pumpWidget(_mapWithPolygons(_toSet(p1: p1)));
     await tester.pumpWidget(_mapWithPolygons(_toSet(p1: p2)));

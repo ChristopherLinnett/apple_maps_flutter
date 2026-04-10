@@ -42,11 +42,11 @@ class CameraPosition {
   final double zoom;
 
   dynamic _toMap() => <String, dynamic>{
-        'target': target._toJson(),
-        'heading': heading,
-        'pitch': pitch,
-        'zoom': zoom,
-      };
+    'target': target._toJson(),
+    'heading': heading,
+    'pitch': pitch,
+    'zoom': zoom,
+  };
 
   @visibleForTesting
   static CameraPosition? fromMap(dynamic json) {
@@ -62,9 +62,9 @@ class CameraPosition {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    if (runtimeType != other.runtimeType) return false;
+    if (other is! CameraPosition) return false;
     final CameraPosition typedOther = other;
     return heading == typedOther.heading &&
         target == typedOther.target &&
@@ -87,9 +87,10 @@ class CameraUpdate {
 
   /// Returns a camera update that moves the camera to the specified position.
   static CameraUpdate newCameraPosition(CameraPosition cameraPosition) {
-    return CameraUpdate._(
-      <dynamic>['newCameraPosition', cameraPosition._toMap()],
-    );
+    return CameraUpdate._(<dynamic>[
+      'newCameraPosition',
+      cameraPosition._toMap(),
+    ]);
   }
 
   /// Returns a camera update that moves the camera target to the specified
@@ -101,9 +102,7 @@ class CameraUpdate {
   /// Returns a camera update that moves the camera target to the specified
   /// geographical location and zoom level.
   static CameraUpdate newLatLngZoom(LatLng latLng, double zoom) {
-    return CameraUpdate._(
-      <dynamic>['newLatLngZoom', latLng._toJson(), zoom],
-    );
+    return CameraUpdate._(<dynamic>['newLatLngZoom', latLng._toJson(), zoom]);
   }
 
   /// Returns a camera update that transforms the camera so that the specified

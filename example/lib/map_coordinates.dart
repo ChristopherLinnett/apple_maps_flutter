@@ -4,7 +4,6 @@
 
 import 'package:apple_maps_flutter/apple_maps_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 import 'page.dart';
 
@@ -48,18 +47,21 @@ class _MapCoordinatesBodyState extends State<_MapCoordinatesBody> {
     final List<Widget> columnChildren = <Widget>[Expanded(child: appleMap)];
 
     if (mapController != null) {
-      final String currentVisibleRegion = 'VisibleRegion:'
+      final String currentVisibleRegion =
+          'VisibleRegion:'
           '\nnortheast: ${_visibleRegion.northeast},'
           '\nsouthwest: ${_visibleRegion.southwest}';
-      columnChildren.add(Padding(
-        padding: EdgeInsets.all(8),
-        child: Column(
-          children: [
-            Center(child: Text(currentVisibleRegion)),
-            _getVisibleRegionButton(),
-          ],
+      columnChildren.add(
+        Padding(
+          padding: EdgeInsets.all(8),
+          child: Column(
+            children: [
+              Center(child: Text(currentVisibleRegion)),
+              _getVisibleRegionButton(),
+            ],
+          ),
         ),
-      ));
+      );
     }
 
     return Column(children: columnChildren);
@@ -79,8 +81,8 @@ class _MapCoordinatesBodyState extends State<_MapCoordinatesBody> {
       child: ElevatedButton(
         child: const Text('Get Visible Region Bounds'),
         onPressed: () async {
-          final LatLngBounds visibleRegion =
-              (await mapController?.getVisibleRegion())!;
+          final LatLngBounds visibleRegion = (await mapController
+              ?.getVisibleRegion())!;
           setState(() {
             _visibleRegion = visibleRegion;
           });
