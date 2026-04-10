@@ -21,6 +21,7 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
     var oldBounds: CGRect?
     var options: Dictionary<String, Any>?
     var isMyLocationButtonShowing: Bool? = false
+    var currentMapTypeIndex: Int = 0
     var isPointsOfInterestEnabled: Bool {
         (self.pointOfInterestFilter ?? .includingAll) != .excludingAll
     }
@@ -144,7 +145,7 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
         let newPoi = options["pointsOfInterestEnabled"] as? Bool
         let newBuildings = options["buildingsEnabled"] as? Bool
         if newMapType != nil || newTraffic != nil || newPoi != nil || newBuildings != nil {
-            let mapTypeIndex = newMapType ?? self.mapTypes.firstIndex(of: self.mapType) ?? 0
+            let mapTypeIndex = newMapType ?? self.currentMapTypeIndex
             let traffic = newTraffic ?? self.showsTraffic
             let buildings = newBuildings ?? self.showsBuildings
             let poi: MKPointOfInterestFilter = {
@@ -178,6 +179,7 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
                 self.showsBuildings = buildings
                 self.pointOfInterestFilter = poi
             }
+            self.currentMapTypeIndex = mapTypeIndex
 
         }
         
