@@ -13,6 +13,7 @@ concurrency:
 
 jobs:
   swiftpm:
+    if: ${{ github.event_name != 'pull_request' || (github.actor == github.repository_owner && github.event.pull_request.head.repo.full_name == github.repository) }}
     runs-on: [self-hosted, macOS]
     timeout-minutes: 60
     defaults:

@@ -19,10 +19,13 @@ require_command python3
 require_command xcodebuild
 require_command xcrun
 
-if [[ -d "$required_xcode_developer_dir" ]]; then
-  export DEVELOPER_DIR="$required_xcode_developer_dir"
-  echo "DEVELOPER_DIR=$required_xcode_developer_dir" >> "$GITHUB_ENV"
+if [[ ! -d "$required_xcode_developer_dir" ]]; then
+  echo "Required Xcode developer directory '$required_xcode_developer_dir' does not exist on this runner." >&2
+  exit 1
 fi
+
+export DEVELOPER_DIR="$required_xcode_developer_dir"
+echo "DEVELOPER_DIR=$required_xcode_developer_dir" >> "$GITHUB_ENV"
 
 current_flutter_version="$(flutter --version --machine | python3 -c 'import json, sys
 data = json.load(sys.stdin)
