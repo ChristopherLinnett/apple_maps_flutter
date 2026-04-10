@@ -1760,4 +1760,47 @@ void main() {
     expect(dragEndPosition!.longitude, closeTo(16.0, 0.001));
     debugDefaultTargetPlatformOverride = null;
   });
+
+  testWidgets('Can update trackingMode', (WidgetTester tester) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: CameraPosition(target: LatLng(10.0, 15.0)),
+          trackingMode: TrackingMode.none,
+        ),
+      ),
+    );
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+
+    expect(platformAppleMap.trackingMode, TrackingMode.none);
+
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: CameraPosition(target: LatLng(10.0, 15.0)),
+          trackingMode: TrackingMode.follow,
+        ),
+      ),
+    );
+
+    expect(platformAppleMap.trackingMode, TrackingMode.follow);
+
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: CameraPosition(target: LatLng(10.0, 15.0)),
+          trackingMode: TrackingMode.followWithHeading,
+        ),
+      ),
+    );
+
+    expect(platformAppleMap.trackingMode, TrackingMode.followWithHeading);
+    debugDefaultTargetPlatformOverride = null;
+  });
 }

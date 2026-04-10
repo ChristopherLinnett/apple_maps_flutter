@@ -22,6 +22,9 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
     var options: Dictionary<String, Any>?
     var isMyLocationButtonShowing: Bool? = false
     var currentMapTypeIndex: Int = 0
+    // Tracks whether location services should start once the user grants permission.
+    // Set when requestWhenInUseAuthorization is called; cleared on authorization or removal.
+    private var pendingUserLocationEnabled = false
     var isPointsOfInterestEnabled: Bool {
         (self.pointOfInterestFilter ?? .includingAll) != .excludingAll
     }
@@ -255,29 +258,37 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
     }
     
     func setUserLocation() {
-        let authorizationStatus = CLLocationManager.authorizationStatus()
-        
+        locationManager.delegate = self
+        let authorizationStatus: CLAuthorizationStatus
+        if #available(iOS 14.0, *) {
+            authorizationStatus = locationManager.authorizationStatus
+        } else {
+            authorizationStatus = CLLocationManager.authorizationStatus()
+        }
+
         switch authorizationStatus {
         case .notDetermined:
+            // Store intent so the delegate can start location once the user grants permission.
+            pendingUserLocationEnabled = true
             locationManager.requestWhenInUseAuthorization()
-            break
-            
-        case .authorizedAlways:
-            fallthrough
-        case .authorizedWhenInUse:
-            locationManager.requestWhenInUseAuthorization()
-            locationManager.desiredAccuracy = kCLLocationAccuracyBest
-            locationManager.distanceFilter = kCLDistanceFilterNone
-            locationManager.startUpdatingLocation()
-            self.showsUserLocation = true
-            break
-            
+
+        case .authorizedAlways, .authorizedWhenInUse:
+            startUpdatingUserLocation()
+
         default:
-            print("\(authorizationStatus.rawValue) is not supported.")
+            break
         }
     }
-    
+
+    private func startUpdatingUserLocation() {
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.distanceFilter = kCLDistanceFilterNone
+        locationManager.startUpdatingLocation()
+        self.showsUserLocation = true
+    }
+
     func removeUserLocation() {
+        pendingUserLocationEnabled = false
         locationManager.stopUpdatingLocation()
         self.showsUserLocation = false
     }
@@ -303,7 +314,9 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
             userTrackingButton.centerYAnchor.constraint(equalTo: buttonContainer.centerYAnchor).isActive = true
             self.addSubview(buttonContainer)
             buttonContainer.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -5 - self.layoutMargins.right).isActive = true
-            buttonContainer.topAnchor.constraint(equalTo: self.topAnchor, constant: self.showsCompass ? 50 : 5 + self.layoutMargins.top).isActive = true
+            // layoutMargins.top must be added in both cases so the button respects safe-area
+            // insets consistently regardless of compass visibility.
+            buttonContainer.topAnchor.constraint(equalTo: self.topAnchor, constant: (self.showsCompass ? 50 : 5) + self.layoutMargins.top).isActive = true
         }
     }
     
@@ -323,10 +336,14 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
         pinchGesture.delegate = self
         let rotateGesture = UIRotationGestureRecognizer(target: self, action: #selector(onMapGesture))
         rotateGesture.delegate = self
-        let tiltGesture = UISwipeGestureRecognizer(target: self, action: #selector(onMapGesture))
-        tiltGesture.numberOfTouchesRequired = 2
-        tiltGesture.direction = .up
-        tiltGesture.direction = .down
+        let tiltGestureUp = UISwipeGestureRecognizer(target: self, action: #selector(onMapGesture))
+        tiltGestureUp.numberOfTouchesRequired = 2
+        tiltGestureUp.direction = .up
+        tiltGestureUp.delegate = self
+        let tiltGestureDown = UISwipeGestureRecognizer(target: self, action: #selector(onMapGesture))
+        tiltGestureDown.numberOfTouchesRequired = 2
+        tiltGestureDown.direction = .down
+        tiltGestureDown.delegate = self
         let doubleTapGesture = UITapGestureRecognizer(target: self, action: nil)
         doubleTapGesture.numberOfTapsRequired = 2
         let longTapGesture = UILongPressGestureRecognizer(target: self, action: #selector(longTap))
@@ -335,7 +352,8 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
         self.addGestureRecognizer(panGesture)
         self.addGestureRecognizer(pinchGesture)
         self.addGestureRecognizer(rotateGesture)
-        self.addGestureRecognizer(tiltGesture)
+        self.addGestureRecognizer(tiltGestureUp)
+        self.addGestureRecognizer(tiltGestureDown)
         self.addGestureRecognizer(longTapGesture)
         self.addGestureRecognizer(doubleTapGesture)
         self.addGestureRecognizer(tapGesture)
@@ -376,5 +394,31 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
         let xDist = a.x - b.x
         let yDist = a.y - b.y
         return CGFloat(sqrt(xDist * xDist + yDist * yDist))
+    }
+}
+
+// MARK: - CLLocationManagerDelegate
+
+extension FlutterMapView: CLLocationManagerDelegate {
+    // iOS 14+ unified authorization callback.
+    @available(iOS 14.0, *)
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        handleAuthorizationChange(status: manager.authorizationStatus)
+    }
+
+    // iOS 13 authorization callback.
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        handleAuthorizationChange(status: status)
+    }
+
+    private func handleAuthorizationChange(status: CLAuthorizationStatus) {
+        guard pendingUserLocationEnabled else { return }
+        switch status {
+        case .authorizedWhenInUse, .authorizedAlways:
+            pendingUserLocationEnabled = false
+            startUpdatingUserLocation()
+        default:
+            break
+        }
     }
 }
