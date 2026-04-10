@@ -2,7 +2,6 @@
 
 set -euo pipefail
 
-required_flutter_version="${REQUIRED_FLUTTER_VERSION:-3.41.6}"
 required_xcode_major="${REQUIRED_XCODE_MAJOR:-26}"
 required_xcode_developer_dir="${REQUIRED_XCODE_DEVELOPER_DIR:-/Applications/Xcode.app/Contents/Developer}"
 
@@ -27,20 +26,7 @@ fi
 export DEVELOPER_DIR="$required_xcode_developer_dir"
 echo "DEVELOPER_DIR=$required_xcode_developer_dir" >> "$GITHUB_ENV"
 
-current_flutter_version="$(flutter --version --machine | python3 -c 'import json, sys
-data = json.load(sys.stdin)
-print(data.get("frameworkVersion", ""))')"
-
-if [[ -z "$current_flutter_version" ]]; then
-  echo "Unable to determine the installed Flutter version." >&2
-  exit 1
-fi
-
-if [[ "$current_flutter_version" != "$required_flutter_version" ]]; then
-  echo "Updating Flutter from $current_flutter_version to $required_flutter_version"
-  flutter channel stable
-  flutter version "$required_flutter_version"
-fi
+flutter upgrade
 
 flutter precache --ios
 flutter config --enable-swift-package-manager
