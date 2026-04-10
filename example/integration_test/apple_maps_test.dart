@@ -616,68 +616,32 @@ void main() {
     expect(poiEnabled, true);
   });
 
-  // test('testGetVisibleRegion', () async {
-  //   final Key key = GlobalKey();
-  //   final LatLngBounds zeroLatLngBounds = LatLngBounds(
-  //       southwest: const LatLng(0, 0), northeast: const LatLng(0, 0));
+  testWidgets('testGetVisibleRegion', (WidgetTester tester) async {
+    final Key key = GlobalKey();
+    final Completer<AppleMapController> controllerCompleter =
+        Completer<AppleMapController>();
 
-  //   final Completer<AppleMapController> mapControllerCompleter =
-  //       Completer<AppleMapController>();
+    await _pumpMap(
+      tester,
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          key: key,
+          initialCameraPosition: _kInitialCameraPosition,
+          onMapCreated: controllerCompleter.complete,
+        ),
+      ),
+    );
 
-  //   await pumpWidget(Directionality(
-  //     textDirection: TextDirection.ltr,
-  //     child: AppleMap(
-  //       key: key,
-  //       initialCameraPosition: _kInitialCameraPosition,
-  //       onMapCreated: (AppleMapController controller) {
-  //         mapControllerCompleter.complete(controller);
-  //       },
-  //     ),
-  //   ));
-  //   final AppleMapController mapController =
-  //       await mapControllerCompleter.future;
-
-  //   await Future<dynamic>.delayed(const Duration(seconds: 3));
-
-  //   final LatLngBounds firstVisibleRegion =
-  //       await mapController.getVisibleRegion();
-
-  //   expect(firstVisibleRegion, isNotNull);
-  //   expect(firstVisibleRegion.southwest, isNotNull);
-  //   expect(firstVisibleRegion.northeast, isNotNull);
-  //   expect(firstVisibleRegion, isNot(zeroLatLngBounds));
-  //   expect(firstVisibleRegion.contains(_kInitialMapCenter), isTrue);
-
-  //   const LatLng southWest = LatLng(60, 75);
-  //   const LatLng northEast = LatLng(65, 80);
-  //   final LatLng newCenter = LatLng(
-  //     (northEast.latitude + southWest.latitude) / 2,
-  //     (northEast.longitude + southWest.longitude) / 2,
-  //   );
-
-  //   expect(firstVisibleRegion.contains(northEast), isFalse);
-  //   expect(firstVisibleRegion.contains(southWest), isFalse);
-
-  //   final LatLngBounds latLngBounds =
-  //       LatLngBounds(southwest: southWest, northeast: northEast);
-
-  //   // TODO(iskakaushik): non-zero padding is needed for some device configurations
-  //   // https://github.com/flutter/flutter/issues/30575
-  //   final double padding = 0;
-  //   await mapController
-  //       .moveCamera(CameraUpdate.newLatLngBounds(latLngBounds, padding));
-
-  //   final LatLngBounds secondVisibleRegion =
-  //       await mapController.getVisibleRegion();
-
-  //   expect(secondVisibleRegion, isNotNull);
-  //   expect(secondVisibleRegion.southwest, isNotNull);
-  //   expect(secondVisibleRegion.northeast, isNotNull);
-  //   expect(secondVisibleRegion, isNot(zeroLatLngBounds));
-
-  //   expect(firstVisibleRegion, isNot(secondVisibleRegion));
-  //   expect(secondVisibleRegion.contains(newCenter), isTrue);
-  // });
+    final AppleMapController controller = await controllerCompleter.future;
+    final LatLngBounds region = await _waitForValue<LatLngBounds>(
+      read: () async => controller.getVisibleRegion(),
+      matches: (LatLngBounds value) => value.contains(_kInitialMapCenter),
+    );
+    expect(region.southwest, isNotNull);
+    expect(region.northeast, isNotNull);
+    expect(region.contains(_kInitialMapCenter), isTrue);
+  });
 
   testWidgets('testMyLocationButtonToggle', (WidgetTester tester) async {
     final Key key = GlobalKey();
@@ -796,5 +760,98 @@ void main() {
       matches: (bool value) => value == false,
     );
     expect(myLocationButtonEnabled, false);
+  });
+
+  testWidgets('testGetLatLngRoundTrip', (WidgetTester tester) async {
+    final Key key = GlobalKey();
+    final Completer<AppleMapController> controllerCompleter =
+        Completer<AppleMapController>();
+
+    await _pumpMap(
+      tester,
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          key: key,
+          initialCameraPosition: _kInitialCameraPosition,
+          onMapCreated: controllerCompleter.complete,
+        ),
+      ),
+    );
+
+    final AppleMapController controller = await controllerCompleter.future;
+    // Wait until the camera has settled at the initial position before
+    // projecting. getScreenCoordinate returns non-null as soon as the channel
+    // is live, but the round-trip is only meaningful once the map is actually
+    // showing the initial center.
+    await _waitForValue<LatLngBounds>(
+      read: () => controller.getVisibleRegion(),
+      matches: (LatLngBounds value) => value.contains(_kInitialMapCenter),
+    );
+
+    final Offset? screenPoint =
+        await controller.getScreenCoordinate(_kInitialMapCenter);
+    expect(screenPoint, isNotNull);
+
+    final LatLng? latLng = await controller.getLatLng(screenPoint!);
+    expect(latLng, isNotNull);
+    expect(latLng!.latitude, closeTo(_kInitialMapCenter.latitude, 0.01));
+    expect(latLng.longitude, closeTo(_kInitialMapCenter.longitude, 0.01));
+  });
+
+  testWidgets('testCameraEventSequence', (WidgetTester tester) async {
+    final Key key = GlobalKey();
+    final Completer<AppleMapController> controllerCompleter =
+        Completer<AppleMapController>();
+    final List<String> events = <String>[];
+    final Completer<void> idleCompleter = Completer<void>();
+
+    await _pumpMap(
+      tester,
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          key: key,
+          initialCameraPosition: _kInitialCameraPosition,
+          onMapCreated: controllerCompleter.complete,
+          onCameraMoveStarted: () {
+            events.add('moveStarted');
+          },
+          onCameraMove: (CameraPosition position) {
+            events.add('move');
+          },
+          onCameraIdle: () {
+            events.add('idle');
+            if (!idleCompleter.isCompleted) {
+              idleCompleter.complete();
+            }
+          },
+        ),
+      ),
+    );
+
+    final AppleMapController controller = await controllerCompleter.future;
+    await _waitForValue<LatLngBounds>(
+      read: () => controller.getVisibleRegion(),
+      matches: (LatLngBounds value) => value.contains(_kInitialMapCenter),
+    );
+    events.clear();
+
+    await controller.moveCamera(
+      CameraUpdate.newLatLng(const LatLng(10.0, 20.0)),
+    );
+
+    await idleCompleter.future.timeout(
+      const Duration(seconds: 5),
+      onTimeout: () => throw TimeoutException(
+        'Timed out waiting for onCameraIdle after moveCamera.',
+      ),
+    );
+
+    expect(events, contains('moveStarted'));
+    expect(events, contains('idle'));
+    final int moveStartedIndex = events.indexOf('moveStarted');
+    final int idleIndex = events.indexOf('idle');
+    expect(moveStartedIndex, lessThan(idleIndex));
   });
 }

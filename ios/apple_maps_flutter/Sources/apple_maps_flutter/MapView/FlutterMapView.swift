@@ -342,12 +342,7 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
     }
        
     @objc func onMapGesture(sender: UIGestureRecognizer) {
-        let locationOnMap = self.region.center // self.convert(locationInView, toCoordinateFrom: self)
-        let zoom = self.calculatedZoomLevel
-        let pitch = self.camera.pitch
-        let heading = self.actualHeading
         self.updateCameraValues()
-        channel?.invokeMethod("camera#onMove", arguments: ["position": ["heading": heading, "target":  [locationOnMap.latitude, locationOnMap.longitude], "pitch": pitch, "zoom": zoom]])
     }
 
     @objc func longTap(sender: UIGestureRecognizer){

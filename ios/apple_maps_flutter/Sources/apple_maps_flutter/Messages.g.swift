@@ -1237,6 +1237,7 @@ protocol AppleMapHostApi {
   func getZoomLevel() throws -> Double?
   func getVisibleRegion() throws -> PlatformLatLngBounds
   func getScreenCoordinate(latLng: PlatformLatLng) throws -> PlatformScreenCoordinate?
+  func getLatLng(screenCoordinate: PlatformScreenCoordinate) throws -> PlatformLatLng?
   func takeSnapshot(options: PlatformSnapshotOptions, completion: @escaping (Result<FlutterStandardTypedData?, Error>) -> Void)
   func dispose() throws
   func isCompassEnabled() throws -> Bool
@@ -1449,6 +1450,21 @@ class AppleMapHostApiSetup {
       }
     } else {
       getScreenCoordinateChannel.setMessageHandler(nil)
+    }
+    let getLatLngChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.getLatLng\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      getLatLngChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let screenCoordinateArg = args[0] as! PlatformScreenCoordinate
+        do {
+          let result = try api.getLatLng(screenCoordinate: screenCoordinateArg)
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      getLatLngChannel.setMessageHandler(nil)
     }
     let takeSnapshotChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.takeSnapshot\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

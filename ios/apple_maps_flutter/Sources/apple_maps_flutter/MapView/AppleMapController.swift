@@ -149,18 +149,27 @@ public class AppleMapController: NSObject, FlutterPlatformView, AppleMapHostApi 
     }
 
     func getVisibleRegion() throws -> PlatformLatLngBounds {
-        let region = self.mapView.getVisibleRegion()
-        let southwest = region["southwest"] ?? [0, 0]
-        let northeast = region["northeast"] ?? [0, 0]
+        let rect = self.mapView.visibleMapRect
+        let ne = MKMapPoint(x: rect.maxX, y: rect.origin.y).coordinate
+        let sw = MKMapPoint(x: rect.origin.x, y: rect.maxY).coordinate
         return PlatformLatLngBounds(
-            southwest: PlatformLatLng(latitude: southwest[0], longitude: southwest[1]),
-            northeast: PlatformLatLng(latitude: northeast[0], longitude: northeast[1])
+            southwest: PlatformLatLng(latitude: sw.latitude, longitude: sw.longitude),
+            northeast: PlatformLatLng(latitude: ne.latitude, longitude: ne.longitude)
         )
     }
 
     func getScreenCoordinate(latLng: PlatformLatLng) throws -> PlatformScreenCoordinate? {
         let point = self.mapView.convert(latLng.asCoordinate, toPointTo: self.view())
         return PlatformScreenCoordinate(x: point.x, y: point.y)
+    }
+
+    func getLatLng(screenCoordinate: PlatformScreenCoordinate) throws -> PlatformLatLng? {
+        let point = CGPoint(x: screenCoordinate.x, y: screenCoordinate.y)
+        let coordinate = self.mapView.convert(point, toCoordinateFrom: self.view())
+        guard CLLocationCoordinate2DIsValid(coordinate) else {
+            return nil
+        }
+        return PlatformLatLng(latitude: coordinate.latitude, longitude: coordinate.longitude)
     }
 
     func takeSnapshot(options: PlatformSnapshotOptions, completion: @escaping (Result<FlutterStandardTypedData?, Error>) -> Void) {
