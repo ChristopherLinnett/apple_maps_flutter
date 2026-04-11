@@ -183,11 +183,27 @@ class BitmapDescriptor {
     buildOwner.buildScope(rootElement);
     buildOwner.finalizeTree();
 
+    // Yield to the event loop twice so that work scheduled by widget
+    // initialization (setState from didChangeDependencies, font/codec
+    // callbacks, etc.) completes before layout. Unlike the previous
+    // pendingImageCount approach this is not coupled to any global state.
+    await Future<void>.delayed(Duration.zero);
+    buildOwner.buildScope(rootElement);
+    buildOwner.finalizeTree();
+    await Future<void>.delayed(Duration.zero);
+    buildOwner.buildScope(rootElement);
+    buildOwner.finalizeTree();
+
     repaintBoundary.layout(
       BoxConstraints.tight(logicalSize),
       parentUsesSize: false,
     );
     pipelineOwner.flushCompositingBits();
+
+    // Explicitly mark as needing paint. PaintingContext.repaintCompositedChild
+    // asserts child._needsPaint == true; in a fresh headless PipelineOwner that
+    // flag is not guaranteed to be set after layout alone.
+    repaintBoundary.markNeedsPaint();
 
     // Use repaintCompositedChild rather than pipelineOwner.flushPaint().
     // In a headless PipelineOwner the OffsetLayer is never attached to a real
