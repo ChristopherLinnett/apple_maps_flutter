@@ -184,15 +184,25 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
                 }
                 self.preferredConfiguration = config
             } else {
-                // Clamp to the last valid index so an unexpected future mapType value from Dart
-                // does not crash; standard is the safest fallback.
-                let safeIndex = mapTypeIndex < mapTypes.count ? mapTypeIndex : 0
+                // Clamp to a valid index. Guard both ends: a negative value or a value
+                // beyond the array length (e.g. a future Dart MapType added before the
+                // plugin is updated) would otherwise crash. Standard (0) is the safest
+                // fallback for unknown types.
+                let safeIndex = mapTypeIndex >= 0 && mapTypeIndex < mapTypes.count ? mapTypeIndex : 0
                 self.mapType = self.mapTypes[safeIndex]
                 self.showsTraffic = traffic
                 self.showsBuildings = buildings
                 self.pointOfInterestFilter = poi
             }
-            self.currentMapTypeIndex = mapTypeIndex
+            // Track the index that was actually applied so that state stays consistent
+            // when a future option update omits mapType and falls back to currentMapTypeIndex.
+            // On iOS 16+ the index was validated by the switch default; on iOS < 16 use safeIndex.
+            if #available(iOS 16.0, *) {
+                self.currentMapTypeIndex = mapTypeIndex
+            } else {
+                let appliedIndex = mapTypeIndex >= 0 && mapTypeIndex < mapTypes.count ? mapTypeIndex : 0
+                self.currentMapTypeIndex = appliedIndex
+            }
 
             // Selectable map features sit on MKMapView directly (iOS 16+).
             // bit 0=pointsOfInterest, bit 1=territories, bit 2=physicalFeatures.
