@@ -180,16 +180,23 @@ class _AnnotationsBodyState extends State<_AnnotationsBody> {
     );
   }
 
-
   Future<Uint8List> _createColoredCircleBytes(Color color, int size) async {
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
     final paint = Paint()..color = color;
     canvas.drawCircle(Offset(size / 2, size / 2), size / 2, paint);
-    final picture = recorder.endRecording();
-    final image = await picture.toImage(size, size);
-    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-    return byteData!.buffer.asUint8List();
+    ui.Picture? picture;
+    ui.Image? image;
+    try {
+      picture = recorder.endRecording();
+      image = await picture.toImage(size, size);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData == null) return Uint8List(0);
+      return byteData.buffer.asUint8List();
+    } finally {
+      image?.dispose();
+      picture?.dispose();
+    }
   }
 
   @override

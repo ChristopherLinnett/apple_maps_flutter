@@ -34,20 +34,36 @@ class ColorSwatch extends StatelessWidget {
       runSpacing: 8,
       children: colors.map((color) {
         final bool isSelected = color == selected;
-        return GestureDetector(
-          onTap: () => onChanged(color),
-          child: Container(
-            width: 30,
-            height: 30,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-              border: isSelected
-                  ? Border.all(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      width: 3,
-                    )
-                  : null,
+        // Use ARGB integer for a stable hex label that doesn't rely on
+        // deprecated Color.value.
+        final int argb = color.toARGB32();
+        final String hex = '#${argb.toRadixString(16).padLeft(8, '0').toUpperCase()}';
+        return Semantics(
+          button: true,
+          selected: isSelected,
+          label: 'Select color $hex',
+          child: Material(
+            color: Colors.transparent,
+            shape: const CircleBorder(),
+            child: InkResponse(
+              onTap: () => onChanged(color),
+              containedInkWell: true,
+              customBorder: const CircleBorder(),
+              radius: 20,
+              child: Container(
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(
+                  color: color,
+                  shape: BoxShape.circle,
+                  border: isSelected
+                      ? Border.all(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          width: 3,
+                        )
+                      : null,
+                ),
+              ),
             ),
           ),
         );

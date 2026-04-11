@@ -25,6 +25,15 @@ class EventLogState extends State<EventLog> {
         _entries.removeLast();
       }
     });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_scroll.hasClients) return;
+      _scroll.animateTo(
+        _scroll.position.minScrollExtent,
+        duration: const Duration(milliseconds: 150),
+        curve: Curves.easeOut,
+      );
+    });
   }
 
   void clear() {

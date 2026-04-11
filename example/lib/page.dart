@@ -104,8 +104,9 @@ class _ControlsSheet extends StatelessWidget {
             ),
           ),
           ...children,
-          // Bottom padding so last control clears home indicator
-          const SizedBox(height: 24),
+          // Bottom padding so last control clears the home indicator on all
+          // devices, using the actual safe-area inset rather than a fixed value.
+          SizedBox(height: MediaQuery.viewPaddingOf(context).bottom + 8),
         ],
       ),
     );
