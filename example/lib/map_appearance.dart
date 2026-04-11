@@ -31,20 +31,19 @@ class _MapAppearanceBodyState extends State<_MapAppearanceBody> {
 
   @override
   Widget build(BuildContext context) {
-    final map = AppleMap(
-      initialCameraPosition: _kInitial,
-      mapType: _mapType,
-      emphasisStyle: _emphasisStyle,
-      trafficEnabled: _trafficEnabled,
-      compassEnabled: _compassEnabled,
-      scaleEnabled: _scaleEnabled,
-      buildingsEnabled: _buildingsEnabled,
-      pointsOfInterestEnabled: _pointsOfInterestEnabled,
-    );
-
     return MapScaffold(
       title: 'Map Appearance',
-      map: map,
+      mapBuilder: (mapPadding) => AppleMap(
+        initialCameraPosition: _kInitial,
+        mapType: _mapType,
+        emphasisStyle: _emphasisStyle,
+        trafficEnabled: _trafficEnabled,
+        compassEnabled: _compassEnabled,
+        scaleEnabled: _scaleEnabled,
+        buildingsEnabled: _buildingsEnabled,
+        pointsOfInterestEnabled: _pointsOfInterestEnabled,
+        padding: mapPadding,
+      ),
       controls: [
         const _SectionHeader('Map Type'),
         Padding(

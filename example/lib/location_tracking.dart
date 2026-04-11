@@ -27,16 +27,15 @@ class _LocationTrackingBodyState extends State<_LocationTrackingBody> {
 
   @override
   Widget build(BuildContext context) {
-    final map = AppleMap(
-      initialCameraPosition: _kInitial,
-      myLocationEnabled: _myLocationEnabled,
-      myLocationButtonEnabled: _myLocationButton,
-      trackingMode: _trackingMode,
-    );
-
     return MapScaffold(
       title: 'Location & Tracking',
-      map: map,
+      mapBuilder: (mapPadding) => AppleMap(
+        initialCameraPosition: _kInitial,
+        myLocationEnabled: _myLocationEnabled,
+        myLocationButtonEnabled: _myLocationButton,
+        trackingMode: _trackingMode,
+        padding: mapPadding,
+      ),
       controls: [
         const _SectionHeader('Location'),
         SwitchListTile(

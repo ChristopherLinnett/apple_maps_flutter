@@ -45,15 +45,14 @@ class _CameraControlBodyState extends State<_CameraControlBody> {
 
   @override
   Widget build(BuildContext context) {
-    final map = AppleMap(
-      initialCameraPosition: _kInitial,
-      onMapCreated: _onMapCreated,
-      onCameraMove: _onCameraMove,
-    );
-
     return MapScaffold(
       title: 'Camera Control',
-      map: map,
+      mapBuilder: (mapPadding) => AppleMap(
+        initialCameraPosition: _kInitial,
+        onMapCreated: _onMapCreated,
+        onCameraMove: _onCameraMove,
+        padding: mapPadding,
+      ),
       controls: [
         const _SectionHeader('Target Location'),
         Padding(
@@ -99,31 +98,41 @@ class _CameraControlBodyState extends State<_CameraControlBody> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              FilledButton.tonal(
-                onPressed: () => _controller?.animateCamera(
-                  CameraUpdate.newCameraPosition(
-                    const CameraPosition(
-                      target: LatLng(51.5074, -0.1278),
-                      heading: 45,
-                      pitch: 30,
-                      zoom: 15,
+              Expanded(
+                child: FilledButton.tonal(
+                  onPressed: () => _controller?.animateCamera(
+                    CameraUpdate.newCameraPosition(
+                      const CameraPosition(
+                        target: LatLng(51.5074, -0.1278),
+                        heading: 45,
+                        pitch: 30,
+                        zoom: 15,
+                      ),
                     ),
                   ),
+                  child: const Text(
+                    'Animate\n(pitch + heading)',
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-                child: const Text('Animate (pitch + heading)'),
               ),
-              FilledButton.tonal(
-                onPressed: () => _controller?.moveCamera(
-                  CameraUpdate.newCameraPosition(
-                    const CameraPosition(
-                      target: LatLng(51.5074, -0.1278),
-                      zoom: 11,
+              const SizedBox(width: 8),
+              Expanded(
+                child: FilledButton.tonal(
+                  onPressed: () => _controller?.moveCamera(
+                    CameraUpdate.newCameraPosition(
+                      const CameraPosition(
+                        target: LatLng(51.5074, -0.1278),
+                        zoom: 11,
+                      ),
                     ),
                   ),
+                  child: const Text(
+                    'Move\n(instant)',
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-                child: const Text('Move (instant)'),
               ),
             ],
           ),

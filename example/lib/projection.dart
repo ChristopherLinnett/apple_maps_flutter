@@ -67,15 +67,14 @@ class _ProjectionBodyState extends State<_ProjectionBody> {
 
   @override
   Widget build(BuildContext context) {
-    final map = AppleMap(
-      initialCameraPosition: _kInitial,
-      onMapCreated: _onMapCreated,
-      onTap: _onTap,
-    );
-
     return MapScaffold(
       title: 'Projection & Coordinates',
-      map: map,
+      mapBuilder: (mapPadding) => AppleMap(
+        initialCameraPosition: _kInitial,
+        onMapCreated: _onMapCreated,
+        onTap: _onTap,
+        padding: mapPadding,
+      ),
       initialSheetSize: 0.40,
       controls: [
         const _SectionHeader('Visible Region'),

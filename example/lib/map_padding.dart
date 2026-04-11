@@ -29,15 +29,15 @@ class _MapPaddingBodyState extends State<_MapPaddingBody> {
 
   @override
   Widget build(BuildContext context) {
-    final map = AppleMap(
-      initialCameraPosition: _kInitial,
-      padding: EdgeInsets.fromLTRB(_left, _top, _right, _bottom),
-      insetsLayoutMarginsFromSafeArea: _insetsFromSafeArea,
-    );
-
     return MapScaffold(
       title: 'Map Padding',
-      map: map,
+      // Ignore the injected mapPadding: this page exclusively controls padding
+      // through its own sliders, which is the point of the demo.
+      mapBuilder: (_) => AppleMap(
+        initialCameraPosition: _kInitial,
+        padding: EdgeInsets.fromLTRB(_left, _top, _right, _bottom),
+        insetsLayoutMarginsFromSafeArea: _insetsFromSafeArea,
+      ),
       controls: [
         const _SectionHeader('Padding (pts)'),
         _PaddingSlider(

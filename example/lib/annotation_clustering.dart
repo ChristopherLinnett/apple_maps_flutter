@@ -54,14 +54,13 @@ class _AnnotationClusteringBodyState extends State<_AnnotationClusteringBody> {
   @override
   Widget build(BuildContext context) {
     final annotations = _buildGrid(clustering: _clusteringEnabled);
-    final map = AppleMap(
-      initialCameraPosition: const CameraPosition(target: _kCenter, zoom: 13),
-      annotations: annotations.toSet(),
-    );
-
     return MapScaffold(
       title: 'Annotation Clustering',
-      map: map,
+      mapBuilder: (mapPadding) => AppleMap(
+        initialCameraPosition: const CameraPosition(target: _kCenter, zoom: 13),
+        annotations: annotations.toSet(),
+        padding: mapPadding,
+      ),
       controls: [
         SwitchListTile(
           title: const Text('Enable clustering'),

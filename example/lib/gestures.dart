@@ -29,18 +29,17 @@ class _GesturesBodyState extends State<_GesturesBody> {
 
   @override
   Widget build(BuildContext context) {
-    final map = AppleMap(
-      initialCameraPosition: _kInitial,
-      rotateGesturesEnabled: _rotateGestures,
-      scrollGesturesEnabled: _scrollGestures,
-      zoomGesturesEnabled: _zoomGestures,
-      pitchGesturesEnabled: _pitchGestures,
-      myLocationButtonEnabled: _myLocationButton,
-    );
-
     return MapScaffold(
       title: 'Gestures & Controls',
-      map: map,
+      mapBuilder: (mapPadding) => AppleMap(
+        initialCameraPosition: _kInitial,
+        rotateGesturesEnabled: _rotateGestures,
+        scrollGesturesEnabled: _scrollGestures,
+        zoomGesturesEnabled: _zoomGestures,
+        pitchGesturesEnabled: _pitchGestures,
+        myLocationButtonEnabled: _myLocationButton,
+        padding: mapPadding,
+      ),
       controls: [
         const _SectionHeader('Gesture Recognizers'),
         SwitchListTile(

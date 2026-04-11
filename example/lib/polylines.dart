@@ -59,14 +59,13 @@ class _PolylinesBodyState extends State<_PolylinesBody> {
       onTap: () => setState(() => _lastTapId = 'demo'),
     );
 
-    final map = AppleMap(
-      initialCameraPosition: _kInitial,
-      polylines: {polyline},
-    );
-
     return MapScaffold(
       title: 'Polylines',
-      map: map,
+      mapBuilder: (mapPadding) => AppleMap(
+        initialCameraPosition: _kInitial,
+        polylines: {polyline},
+        padding: mapPadding,
+      ),
       controls: [
         const _SectionHeader('Stroke'),
         ListTile(

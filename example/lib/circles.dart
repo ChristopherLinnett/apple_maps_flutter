@@ -45,11 +45,13 @@ class _CirclesBodyState extends State<_CirclesBody> {
       onTap: () => setState(() => _lastTapId = 'demo'),
     );
 
-    final map = AppleMap(initialCameraPosition: _kInitial, circles: {circle});
-
     return MapScaffold(
       title: 'Circles',
-      map: map,
+      mapBuilder: (mapPadding) => AppleMap(
+        initialCameraPosition: _kInitial,
+        circles: {circle},
+        padding: mapPadding,
+      ),
       controls: [
         const _SectionHeader('Radius'),
         ListTile(

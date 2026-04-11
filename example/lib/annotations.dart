@@ -201,15 +201,14 @@ class _AnnotationsBodyState extends State<_AnnotationsBody> {
 
   @override
   Widget build(BuildContext context) {
-    final map = AppleMap(
-      initialCameraPosition: _kInitial,
-      onMapCreated: _onMapCreated,
-      annotations: _annotations.values.toSet(),
-    );
-
     return MapScaffold(
       title: 'Annotations',
-      map: map,
+      mapBuilder: (mapPadding) => AppleMap(
+        initialCameraPosition: _kInitial,
+        onMapCreated: _onMapCreated,
+        annotations: _annotations.values.toSet(),
+        padding: mapPadding,
+      ),
       initialSheetSize: 0.35,
       controls: [
         const _SectionHeader('Add Annotation'),
@@ -283,7 +282,9 @@ class _AnnotationsBodyState extends State<_AnnotationsBody> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-            child: Row(
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
               children: [
                 FilledButton.tonal(
                   onPressed: () {
@@ -293,7 +294,6 @@ class _AnnotationsBodyState extends State<_AnnotationsBody> {
                   },
                   child: const Text('Show callout'),
                 ),
-                const SizedBox(width: 8),
                 FilledButton.tonal(
                   onPressed: () {
                     if (_selectedId != null) {
@@ -302,7 +302,6 @@ class _AnnotationsBodyState extends State<_AnnotationsBody> {
                   },
                   child: const Text('Hide callout'),
                 ),
-                const SizedBox(width: 8),
                 OutlinedButton(
                   onPressed: () {
                     final id = _selectedId;

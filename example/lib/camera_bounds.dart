@@ -39,15 +39,14 @@ class _CameraBoundsBodyState extends State<_CameraBoundsBody> {
 
   @override
   Widget build(BuildContext context) {
-    final map = AppleMap(
-      initialCameraPosition: _kInitial,
-      minMaxZoomPreference: _zoom,
-      cameraTargetBounds: _bounds,
-    );
-
     return MapScaffold(
       title: 'Camera Bounds',
-      map: map,
+      mapBuilder: (mapPadding) => AppleMap(
+        initialCameraPosition: _kInitial,
+        minMaxZoomPreference: _zoom,
+        cameraTargetBounds: _bounds,
+        padding: mapPadding,
+      ),
       controls: [
         const _SectionHeader('Zoom Restrictions'),
         SwitchListTile(

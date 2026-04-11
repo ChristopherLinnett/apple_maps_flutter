@@ -49,11 +49,13 @@ class _PolygonsBodyState extends State<_PolygonsBody> {
       onTap: () => setState(() => _lastTapId = 'demo'),
     );
 
-    final map = AppleMap(initialCameraPosition: _kInitial, polygons: {polygon});
-
     return MapScaffold(
       title: 'Polygons',
-      map: map,
+      mapBuilder: (mapPadding) => AppleMap(
+        initialCameraPosition: _kInitial,
+        polygons: {polygon},
+        padding: mapPadding,
+      ),
       controls: [
         const _SectionHeader('Fill'),
         Padding(

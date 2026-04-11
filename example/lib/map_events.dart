@@ -29,28 +29,27 @@ class _MapEventsBodyState extends State<_MapEventsBody> {
 
   @override
   Widget build(BuildContext context) {
-    final map = AppleMap(
-      initialCameraPosition: _kInitial,
-      onTap: (pos) => _logKey.currentState?.add(
-        'Tap  lat=${pos.latitude.toStringAsFixed(5)}  lng=${pos.longitude.toStringAsFixed(5)}',
-      ),
-      onLongPress: (pos) => _logKey.currentState?.add(
-        'LongPress  lat=${pos.latitude.toStringAsFixed(5)}  lng=${pos.longitude.toStringAsFixed(5)}',
-      ),
-      onCameraMoveStarted: () {
-        setState(() => _moveStartedCount++);
-        _logKey.currentState?.add('Camera move started (#$_moveStartedCount)');
-      },
-      onCameraMove: (pos) => setState(() => _position = pos),
-      onCameraIdle: () {
-        setState(() => _idleCount++);
-        _logKey.currentState?.add('Camera idle (#$_idleCount)');
-      },
-    );
-
     return MapScaffold(
       title: 'Map Events',
-      map: map,
+      mapBuilder: (mapPadding) => AppleMap(
+        initialCameraPosition: _kInitial,
+        onTap: (pos) => _logKey.currentState?.add(
+          'Tap  lat=${pos.latitude.toStringAsFixed(5)}  lng=${pos.longitude.toStringAsFixed(5)}',
+        ),
+        onLongPress: (pos) => _logKey.currentState?.add(
+          'LongPress  lat=${pos.latitude.toStringAsFixed(5)}  lng=${pos.longitude.toStringAsFixed(5)}',
+        ),
+        onCameraMoveStarted: () {
+          setState(() => _moveStartedCount++);
+          _logKey.currentState?.add('Camera move started (#$_moveStartedCount)');
+        },
+        onCameraMove: (pos) => setState(() => _position = pos),
+        onCameraIdle: () {
+          setState(() => _idleCount++);
+          _logKey.currentState?.add('Camera idle (#$_idleCount)');
+        },
+        padding: mapPadding,
+      ),
       initialSheetSize: 0.38,
       controls: [
         const _SectionHeader('Camera'),

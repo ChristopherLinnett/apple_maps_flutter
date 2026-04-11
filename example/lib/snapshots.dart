@@ -69,16 +69,15 @@ class _SnapshotsBodyState extends State<_SnapshotsBody> {
       strokeWidth: 2,
     );
 
-    final map = AppleMap(
-      initialCameraPosition: _kInitial,
-      onMapCreated: (c) => setState(() => _controller = c),
-      annotations: _showAnnotations ? {annotation} : {},
-      circles: _showOverlays ? {circle} : {},
-    );
-
     return MapScaffold(
       title: 'Snapshots',
-      map: map,
+      mapBuilder: (mapPadding) => AppleMap(
+        initialCameraPosition: _kInitial,
+        onMapCreated: (c) => setState(() => _controller = c),
+        annotations: _showAnnotations ? {annotation} : {},
+        circles: _showOverlays ? {circle} : {},
+        padding: mapPadding,
+      ),
       initialSheetSize: 0.40,
       controls: [
         const _SectionHeader('Snapshot Options'),

@@ -12,17 +12,18 @@ abstract class ExamplePage extends StatelessWidget {
 // Shared layout helpers used by all map pages.
 // ---------------------------------------------------------------------------
 
-/// A map-page scaffold where the [AppleMap] fills the entire screen and
-/// [controls] float in a drag-to-reveal panel at the bottom.
+/// A map-page scaffold where the [AppleMap] fills the body below the AppBar
+/// and [controls] float in a drag-to-reveal panel at the bottom.
 ///
-/// This ensures the map occupies the centre of the screen so simulator
-/// pinch-to-zoom (which anchors at the screen centre) always lands inside
-/// the map rather than in a controls column below it.
+/// [mapBuilder] receives the recommended [EdgeInsets] to pass as the
+/// [AppleMap.padding] parameter so MapKit positions its native controls
+/// (compass, scale bar, location button) above the draggable sheet and
+/// below the AppBar.
 class MapScaffold extends StatelessWidget {
   const MapScaffold({
     super.key,
     required this.title,
-    required this.map,
+    required this.mapBuilder,
     required this.controls,
     this.initialSheetSize = 0.26,
     this.minSheetSize = 0.08,
@@ -30,7 +31,7 @@ class MapScaffold extends StatelessWidget {
   });
 
   final String title;
-  final Widget map;
+  final Widget Function(EdgeInsets mapPadding) mapBuilder;
   final List<Widget> controls;
   final double initialSheetSize;
   final double minSheetSize;
@@ -40,30 +41,38 @@ class MapScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: colorScheme.surface.withValues(alpha: 0.85),
+        backgroundColor: colorScheme.surface,
         foregroundColor: colorScheme.onSurface,
         elevation: 0,
         title: Text(title),
       ),
-      body: Stack(
-        children: [
-          Positioned.fill(child: map),
-          DraggableScrollableSheet(
-            initialChildSize: initialSheetSize,
-            minChildSize: minSheetSize,
-            maxChildSize: maxSheetSize,
-            snap: true,
-            snapSizes: [minSheetSize, initialSheetSize, maxSheetSize],
-            builder: (context, scrollController) {
-              return _ControlsSheet(
-                scrollController: scrollController,
-                children: controls,
-              );
-            },
-          ),
-        ],
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          // Tell MapKit to inset its native controls so they sit above the
+          // draggable sheet rather than behind it.
+          final mapPadding = EdgeInsets.only(
+            bottom: constraints.maxHeight * initialSheetSize,
+          );
+          return Stack(
+            children: [
+              Positioned.fill(child: mapBuilder(mapPadding)),
+                  DraggableScrollableSheet(
+                initialChildSize: initialSheetSize,
+                minChildSize: minSheetSize,
+                maxChildSize: maxSheetSize,
+                snap: true,
+                snapSizes: [minSheetSize, initialSheetSize, maxSheetSize],
+                builder: (context, scrollController) {
+                  return _ControlsSheet(
+                    scrollController: scrollController,
+                    children: controls,
+                  );
+                },
+              ),
+            ],
+          );
+        },
       ),
     );
   }
