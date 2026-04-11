@@ -13,7 +13,7 @@ const CameraPosition _kInitialPosition = CameraPosition(
 );
 
 class MapCoordinatesPage extends ExamplePage {
-  MapCoordinatesPage() : super(const Icon(Icons.map), 'Map coordinates');
+  const MapCoordinatesPage({super.key}) : super(const Icon(Icons.map), 'Map coordinates');
 
   @override
   Widget build(BuildContext context) {

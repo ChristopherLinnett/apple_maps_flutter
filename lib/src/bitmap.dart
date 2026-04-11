@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-part of apple_maps_flutter;
+part of '../apple_maps_flutter.dart';
 
 /// Defines a bitmap image. For a annotation, this class can be used to set the
 /// image of the annotation icon. For a ground overlay, it can be used to set the

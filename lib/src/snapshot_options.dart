@@ -1,4 +1,4 @@
-part of apple_maps_flutter;
+part of '../apple_maps_flutter.dart';
 
 class SnapshotOptions {
   const SnapshotOptions({

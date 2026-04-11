@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-part of apple_maps_flutter;
+part of '../apple_maps_flutter.dart';
 
 /// Uniquely identifies a [Polygon] among [AppleMap] polygons.
 ///
@@ -10,7 +10,7 @@ part of apple_maps_flutter;
 @immutable
 class PolygonId {
   /// Creates an immutable identifier for a [Polygon].
-  PolygonId(this.value);
+  const PolygonId(this.value);
 
   /// value of the [PolygonId].
   final String value;

@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'page.dart';
 
 class PlaceCirclePage extends ExamplePage {
-  PlaceCirclePage() : super(const Icon(Icons.linear_scale), 'Place circle');
+  const PlaceCirclePage({super.key}) : super(const Icon(Icons.linear_scale), 'Place circle');
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +21,7 @@ class PlaceCirclePage extends ExamplePage {
 }
 
 class PlaceCircleBody extends StatefulWidget {
-  const PlaceCircleBody();
+  const PlaceCircleBody({super.key});
 
   @override
   State<StatefulWidget> createState() => PlaceCircleBodyState();
@@ -156,35 +156,35 @@ class PlaceCircleBodyState extends State<PlaceCircleBody> {
           Wrap(
             alignment: WrapAlignment.spaceEvenly,
             children: [
-              TextButton(child: const Text('add'), onPressed: _add),
+              TextButton(onPressed: _add, child: const Text('add')),
               TextButton(
-                child: const Text('remove'),
                 onPressed: (selectedCircle == null) ? null : _remove,
+                child: const Text('remove'),
               ),
               TextButton(
-                child: const Text('toggle visible'),
                 onPressed: (selectedCircle == null) ? null : _toggleVisible,
+                child: const Text('toggle visible'),
               ),
               TextButton(
-                child: const Text('change zIndex'),
                 onPressed: _changeZIndex,
+                child: const Text('change zIndex'),
               ),
               TextButton(
-                child: const Text('change stroke width'),
                 onPressed: (selectedCircle == null) ? null : _changeStrokeWidth,
+                child: const Text('change stroke width'),
               ),
               TextButton(
-                child: const Text('change stroke color'),
                 onPressed: (selectedCircle == null) ? null : _changeStrokeColor,
+                child: const Text('change stroke color'),
               ),
               TextButton(
-                child: const Text('change fill color'),
                 onPressed: (selectedCircle == null) ? null : _changeFillColor,
+                child: const Text('change fill color'),
               ),
               TextButton(
                 child: Text('Take a snapshot'),
                 onPressed: () async {
-                  final imageBytes = await this.controller.takeSnapshot(
+                  final imageBytes = await controller.takeSnapshot(
                     SnapshotOptions(showOverlays: true),
                   );
                   setState(() {

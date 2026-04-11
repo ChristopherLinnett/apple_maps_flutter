@@ -37,6 +37,8 @@ final List<ExamplePage> _allPages = <ExamplePage>[
 ];
 
 class MapsDemo extends StatelessWidget {
+  const MapsDemo({super.key});
+
   void _pushPage(BuildContext context, ExamplePage page) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(

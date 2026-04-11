@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-part of apple_maps_flutter;
+part of '../apple_maps_flutter.dart';
 
 /// [Polygon] update events to be applied to the [AppleMap].
 ///
@@ -10,13 +10,9 @@ part of apple_maps_flutter;
 class _PolygonUpdates {
   /// Computes [_PolygonUpdates] given previous and current [Polygon]s.
   _PolygonUpdates.from(Set<Polygon>? previous, Set<Polygon>? current) {
-    if (previous == null) {
-      previous = Set<Polygon>.identity();
-    }
+    previous ??= Set<Polygon>.identity();
 
-    if (current == null) {
-      current = Set<Polygon>.identity();
-    }
+    current ??= Set<Polygon>.identity();
 
     final Map<PolygonId, Polygon> previousPolygons = _keyByPolygonId(previous);
     final Map<PolygonId, Polygon> currentPolygons = _keyByPolygonId(current);

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-part of apple_maps_flutter;
+part of '../apple_maps_flutter.dart';
 
 /// Uniquely identifies a [Circle] among [AppleMap] circles.
 ///
@@ -10,7 +10,7 @@ part of apple_maps_flutter;
 @immutable
 class CircleId {
   /// Creates an immutable identifier for a [Circle].
-  CircleId(this.value);
+  const CircleId(this.value);
 
   /// value of the [CircleId].
   final String value;

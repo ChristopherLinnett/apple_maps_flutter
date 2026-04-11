@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'page.dart';
 
 class PaddingPage extends ExamplePage {
-  PaddingPage() : super(const Icon(Icons.map), 'Add padding to the map');
+  const PaddingPage({super.key}) : super(const Icon(Icons.map), 'Add padding to the map');
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class PaddingPage extends ExamplePage {
 }
 
 class MarkerIconsBody extends StatefulWidget {
-  const MarkerIconsBody();
+  const MarkerIconsBody({super.key});
 
   @override
   State<StatefulWidget> createState() => MarkerIconsBodyState();
@@ -67,10 +67,10 @@ class MarkerIconsBodyState extends State<MarkerIconsBody> {
     });
   }
 
-  TextEditingController _topController = TextEditingController();
-  TextEditingController _bottomController = TextEditingController();
-  TextEditingController _leftController = TextEditingController();
-  TextEditingController _rightController = TextEditingController();
+  final TextEditingController _topController = TextEditingController();
+  final TextEditingController _bottomController = TextEditingController();
+  final TextEditingController _leftController = TextEditingController();
+  final TextEditingController _rightController = TextEditingController();
 
   Widget _paddingInput() {
     return Padding(

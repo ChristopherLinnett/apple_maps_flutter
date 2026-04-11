@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-part of apple_maps_flutter;
+part of '../apple_maps_flutter.dart';
 
 /// [Annotation] update events to be applied to the [AppleMap].
 ///
@@ -10,13 +10,9 @@ part of apple_maps_flutter;
 class _AnnotationUpdates {
   /// Computes [_AnnotationUpdates] given previous and current [Annotation]s.
   _AnnotationUpdates.from(Set<Annotation>? previous, Set<Annotation>? current) {
-    if (previous == null) {
-      previous = Set<Annotation>.identity();
-    }
+    previous ??= Set<Annotation>.identity();
 
-    if (current == null) {
-      current = Set<Annotation>.identity();
-    }
+    current ??= Set<Annotation>.identity();
 
     final Map<AnnotationId, Annotation> previousAnnotations =
         _keyByAnnotationId(previous);

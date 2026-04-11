@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'page.dart';
 
 class AnnotationIconsPage extends ExamplePage {
-  AnnotationIconsPage() : super(const Icon(Icons.image), 'Annotation icons');
+  const AnnotationIconsPage({super.key}) : super(const Icon(Icons.image), 'Annotation icons');
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class AnnotationIconsPage extends ExamplePage {
 }
 
 class AnnotationIconsBody extends StatefulWidget {
-  const AnnotationIconsBody();
+  const AnnotationIconsBody({super.key});
 
   @override
   State<StatefulWidget> createState() => AnnotationIconsBodyState();
@@ -45,19 +45,19 @@ class AnnotationIconsBodyState extends State<AnnotationIconsBody> {
   }
 
   Set<Annotation> _createAnnotation() {
-    return <Annotation>[
+    return <Annotation>{
       Annotation(
         annotationId: AnnotationId("annotation_1"),
         anchor: Offset(0.5, -4),
         position: LatLng(52.707755, -2.7540658),
         icon: _annotationIcon ?? BitmapDescriptor.defaultAnnotation,
       ),
-    ].toSet();
+    };
   }
 
   Future<void> _createAnnotationImageFromAsset(BuildContext context) async {
     if (_annotationIcon == null) {
-      final ImageConfiguration imageConfiguration = new ImageConfiguration(
+      final ImageConfiguration imageConfiguration = ImageConfiguration(
         devicePixelRatio: 1.0,
       );
       BitmapDescriptor.fromAssetImage(

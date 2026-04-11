@@ -1,4 +1,4 @@
-part of apple_maps_flutter;
+part of '../apple_maps_flutter.dart';
 
 PlatformMapOptions _platformMapOptionsFromMap(Map<String, dynamic> map) {
   return PlatformMapOptions(

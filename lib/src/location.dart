@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-part of apple_maps_flutter;
+part of '../apple_maps_flutter.dart';
 
 /// A pair of latitude and longitude coordinates, stored as degrees.
 class LatLng {
@@ -39,8 +39,8 @@ class LatLng {
   String toString() => '$runtimeType($latitude, $longitude)';
 
   @override
-  bool operator ==(Object o) {
-    return o is LatLng && o.latitude == latitude && o.longitude == longitude;
+  bool operator ==(Object other) {
+    return other is LatLng && other.latitude == latitude && other.longitude == longitude;
   }
 
   @override
@@ -104,10 +104,10 @@ class LatLngBounds {
   }
 
   @override
-  bool operator ==(Object o) {
-    return o is LatLngBounds &&
-        o.southwest == southwest &&
-        o.northeast == northeast;
+  bool operator ==(Object other) {
+    return other is LatLngBounds &&
+        other.southwest == southwest &&
+        other.northeast == northeast;
   }
 
   /// Converts this object to something serializable in JSON.

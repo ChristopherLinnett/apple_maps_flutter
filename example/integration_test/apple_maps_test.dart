@@ -3,6 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:apple_maps_flutter/apple_maps_flutter.dart';
 import 'package:apple_maps_flutter/src/messages.g.dart';
@@ -39,7 +40,33 @@ Future<T> _waitForValue<T>({
     await Future<void>.delayed(interval);
   } while (stopwatch.elapsed < timeout);
 
-  return value;
+  throw TimeoutException(
+    '_waitForValue timed out after ${timeout.inSeconds}s without matching',
+    timeout,
+  );
+}
+
+Future<AppleMapController> _pumpMapAndGetController(
+  WidgetTester tester,
+) async {
+  final Completer<AppleMapController> completer =
+      Completer<AppleMapController>();
+  await _pumpMap(
+    tester,
+    Directionality(
+      textDirection: TextDirection.ltr,
+      child: AppleMap(
+        initialCameraPosition: _kInitialCameraPosition,
+        onMapCreated: completer.complete,
+      ),
+    ),
+  );
+  final AppleMapController controller = await completer.future;
+  await _waitForValue<LatLngBounds>(
+    read: () => controller.getVisibleRegion(),
+    matches: (LatLngBounds value) => value.contains(_kInitialMapCenter),
+  );
+  return controller;
 }
 
 void main() {
@@ -882,5 +909,28 @@ void main() {
     final int moveStartedIndex = events.indexOf('moveStarted');
     final int idleIndex = events.indexOf('idle');
     expect(moveStartedIndex, lessThan(idleIndex));
+  });
+
+  testWidgets('takeSnapshot returns image bytes for default options',
+      (WidgetTester tester) async {
+    final AppleMapController controller =
+        await _pumpMapAndGetController(tester);
+
+    final Uint8List? bytes = await controller.takeSnapshot();
+    expect(bytes, isNotNull);
+    expect(bytes!.isNotEmpty, isTrue);
+  });
+
+  testWidgets(
+      'takeSnapshot with annotations and buildings disabled returns image bytes',
+      (WidgetTester tester) async {
+    final AppleMapController controller =
+        await _pumpMapAndGetController(tester);
+
+    final Uint8List? bytes = await controller.takeSnapshot(
+      const SnapshotOptions(showAnnotations: false, showBuildings: false),
+    );
+    expect(bytes, isNotNull);
+    expect(bytes!.isNotEmpty, isTrue);
   });
 }

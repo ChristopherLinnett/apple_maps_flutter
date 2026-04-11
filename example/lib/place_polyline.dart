@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'page.dart';
 
 class PlacePolylinePage extends ExamplePage {
-  PlacePolylinePage() : super(const Icon(Icons.linear_scale), 'Place polyline');
+  const PlacePolylinePage({super.key}) : super(const Icon(Icons.linear_scale), 'Place polyline');
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +19,7 @@ class PlacePolylinePage extends ExamplePage {
 }
 
 class PlacePolylineBody extends StatefulWidget {
-  const PlacePolylineBody();
+  const PlacePolylineBody({super.key});
 
   @override
   State<StatefulWidget> createState() => PlacePolylineBodyState();
@@ -200,43 +200,43 @@ class PlacePolylineBodyState extends State<PlacePolylineBody> {
           child: Wrap(
             alignment: WrapAlignment.spaceEvenly,
             children: [
-              TextButton(child: const Text('add'), onPressed: _add),
+              TextButton(onPressed: _add, child: const Text('add')),
               TextButton(
-                child: const Text('remove'),
                 onPressed: (selectedPolyline == null) ? null : _remove,
+                child: const Text('remove'),
               ),
               TextButton(
-                child: const Text('toggle visible'),
                 onPressed: (selectedPolyline == null) ? null : _toggleVisible,
+                child: const Text('toggle visible'),
               ),
               TextButton(
-                child: const Text('change zIndex'),
                 onPressed: _changeZIndex,
+                child: const Text('change zIndex'),
               ),
               TextButton(
-                child: const Text('change width'),
                 onPressed: (selectedPolyline == null) ? null : _changeWidth,
+                child: const Text('change width'),
               ),
               TextButton(
-                child: const Text('change color'),
                 onPressed: (selectedPolyline == null) ? null : _changeColor,
+                child: const Text('change color'),
               ),
               TextButton(
-                child: const Text('change polyline caps'),
                 onPressed: (selectedPolyline == null) ? null : _changeCaps,
+                child: const Text('change polyline caps'),
               ),
               TextButton(
-                child: const Text('change joint type'),
                 onPressed: (selectedPolyline == null) ? null : _changeJointType,
+                child: const Text('change joint type'),
               ),
               TextButton(
-                child: const Text('change pattern'),
                 onPressed: (selectedPolyline == null) ? null : _changePattern,
+                child: const Text('change pattern'),
               ),
               TextButton(
                 child: Text('Take a snapshot'),
                 onPressed: () async {
-                  final imageBytes = await this.controller.takeSnapshot(
+                  final imageBytes = await controller.takeSnapshot(
                     SnapshotOptions(showOverlays: true),
                   );
                   setState(() {

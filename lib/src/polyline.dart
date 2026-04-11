@@ -2,14 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-part of apple_maps_flutter;
+part of '../apple_maps_flutter.dart';
 
 /// Uniquely identifies a [Polyline] among [AppleMap] polylines.
 ///
 /// This does not have to be globally unique, only unique among the list.
 @immutable
 class PolylineId {
-  PolylineId(this.value);
+  const PolylineId(this.value);
 
   /// value of the [PolylineId].
   final String value;
