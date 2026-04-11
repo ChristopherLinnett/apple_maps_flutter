@@ -45,6 +45,10 @@ class BitmapDescriptor {
     <dynamic>['defaultAnnotation'],
   );
 
+  // Process-lifetime cache for markerAnnotation descriptors. Keyed by the
+  // caller-supplied cacheKey, so re-renders are avoided across widget rebuilds.
+  static final Map<String, BitmapDescriptor> _markerAnnotationCache = {};
+
   /// Creates a [BitmapDescriptor] that uses the native Apple marker balloon
   /// (`MKMarkerAnnotationView`).
   ///
@@ -53,12 +57,20 @@ class BitmapDescriptor {
   ///
   /// [glyphWidget] is rendered off-screen to a PNG and placed as the small
   /// glyph image inside the balloon. [glyphSize] controls the logical pixel
-  /// size of the rendered image (default 20×20).
+  /// size of the rendered image (default 20×20). Any widget is supported,
+  /// including [Image.asset] — async image loading is handled internally.
   ///
-  /// When neither argument is supplied this behaves the same as the old
-  /// `BitmapDescriptor.markerAnnotation` constant — the default system balloon
-  /// with no tint override.
+  /// [cacheKey] is an optional string that uniquely identifies this
+  /// configuration. When provided, the result is cached for the process
+  /// lifetime so subsequent calls with the same key return instantly without
+  /// re-rendering. Use a key that encodes all the relevant parameters, for
+  /// example `'dive-freediver-cyan-24x36'`.
+  ///
+  /// When neither [glyphWidget] nor [hue] is supplied this behaves the same as
+  /// the old `BitmapDescriptor.markerAnnotation` constant — the default system
+  /// balloon with no tint override.
   static Future<BitmapDescriptor> markerAnnotation({
+    String? cacheKey,
     Widget? glyphWidget,
     Size glyphSize = const Size(20, 20),
     double? hue,
@@ -66,8 +78,15 @@ class BitmapDescriptor {
     if (hue != null) {
       assert(0.0 <= hue && hue < 360.0, 'hue must be in [0, 360)');
     }
+
+    if (cacheKey != null) {
+      final cached = _markerAnnotationCache[cacheKey];
+      if (cached != null) return cached;
+    }
+
     final double? iosHue = hue != null ? hue / 360.0 : null;
 
+    BitmapDescriptor result;
     if (glyphWidget != null) {
       final Uint8List bytes = await _renderWidgetToBytes(
         glyphWidget,
@@ -75,15 +94,17 @@ class BitmapDescriptor {
       );
       // Encoding: ['markerAnnotation', iosHue?, glyphBytes]
       // When iosHue is null we omit it so the list stays compact.
-      return iosHue != null
+      result = iosHue != null
           ? BitmapDescriptor._(<dynamic>['markerAnnotation', iosHue, bytes])
           : BitmapDescriptor._(<dynamic>['markerAnnotation', bytes]);
+    } else if (iosHue != null) {
+      result = BitmapDescriptor._(<dynamic>['markerAnnotation', iosHue]);
+    } else {
+      result = BitmapDescriptor._(<dynamic>['markerAnnotation']);
     }
 
-    if (iosHue != null) {
-      return BitmapDescriptor._(<dynamic>['markerAnnotation', iosHue]);
-    }
-    return BitmapDescriptor._(<dynamic>['markerAnnotation']);
+    if (cacheKey != null) _markerAnnotationCache[cacheKey] = result;
+    return result;
   }
 
   /// Creates a [BitmapDescriptor] for a native marker annotation using
@@ -150,12 +171,33 @@ class BitmapDescriptor {
     buildOwner.buildScope(rootElement);
     buildOwner.finalizeTree();
 
+    // Pump the event loop to allow async image providers (Image.asset,
+    // Image.memory, Image.network, etc.) to load. Image loading involves
+    // rootBundle.load (IO event) + codec decode (compute isolate), both of
+    // which need event-loop cycles to complete. We rebuild after each pump to
+    // flush the dirty _ImageState elements created by their setState calls.
+    for (var i = 0; i < 10; i++) {
+      if (PaintingBinding.instance.imageCache.pendingImageCount == 0) break;
+      await Future.delayed(const Duration(milliseconds: 5));
+      buildOwner.buildScope(rootElement);
+      buildOwner.finalizeTree();
+    }
+    // One final rebuild to flush any dirty elements settled after the loop.
+    buildOwner.buildScope(rootElement);
+    buildOwner.finalizeTree();
+
     repaintBoundary.layout(
       BoxConstraints.tight(logicalSize),
       parentUsesSize: false,
     );
     pipelineOwner.flushCompositingBits();
-    pipelineOwner.flushPaint();
+
+    // Use repaintCompositedChild rather than pipelineOwner.flushPaint().
+    // In a headless PipelineOwner the OffsetLayer is never attached to a real
+    // scene, so flushPaint() calls _skippedPaintingOnLayer() and silently skips
+    // the node.  debugAlsoPaintedParent: true suppresses the debug assertion
+    // that requires the layer to be attached, which is not meaningful here.
+    PaintingContext.repaintCompositedChild(repaintBoundary, debugAlsoPaintedParent: true);
 
     final ui.Image image = await repaintBoundary.toImage(
       pixelRatio: devicePixelRatio,
