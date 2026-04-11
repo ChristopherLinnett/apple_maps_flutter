@@ -47,7 +47,7 @@ This is a major modernization release. The core plugin architecture, native iOS 
 
 ### Example app
 
-The example app has been fully rewritten using Material 3 with a `MapScaffold` component (full-screen map + draggable bottom sheet for controls). The old collection of loosely organized pages has been replaced with thirteen focused demo screens:
+The example app has been fully rewritten using Material 3 with a `MapScaffold` component (full-screen map + draggable bottom sheet for controls). The old collection of loosely organized pages has been replaced with fourteen focused demo screens:
 
 - Map appearance (map type, emphasis style, UI toggles)
 - Camera control (animate, move, zoom, bounds)

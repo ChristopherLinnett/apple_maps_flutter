@@ -82,6 +82,7 @@ If you previously used this package with CocoaPods:
 ## Basic usage
 
 ```dart
+import 'package:flutter/material.dart';
 import 'package:apple_maps_flutter/apple_maps_flutter.dart';
 
 class MapPage extends StatefulWidget {
@@ -116,22 +117,25 @@ class _MapPageState extends State<MapPage> {
 
 ```dart
 // Animate the camera to a new position
-await _controller?.animateCamera(
-  CameraUpdate.newCameraPosition(
-    const CameraPosition(
-      target: LatLng(51.5074, -0.1278),
-      zoom: 14,
-      pitch: 30,
-      heading: 90,
+final controller = _controller;
+if (controller != null) {
+  await controller.animateCamera(
+    CameraUpdate.newCameraPosition(
+      const CameraPosition(
+        target: LatLng(51.5074, -0.1278),
+        zoom: 14,
+        pitch: 30,
+        heading: 90,
+      ),
     ),
-  ),
-);
+  );
+}
 
 // Constrain zoom levels
 AppleMap(
   initialCameraPosition: ...,
   minMaxZoomPreference: const MinMaxZoomPreference(10, 18),
-)
+);
 
 // Restrict camera target to a region
 AppleMap(
@@ -142,7 +146,7 @@ AppleMap(
       northeast: const LatLng(53.0, 2.0),
     ),
   ),
-)
+);
 ```
 
 ## Annotations
@@ -268,16 +272,19 @@ final LatLng? latLng = await _controller!.getLatLng(Offset(200, 300));
 ## Snapshots
 
 ```dart
-final Uint8List? bytes = await _controller?.takeSnapshot(
-  const SnapshotOptions(
-    showBuildings: true,
-    showPointsOfInterest: true,
-    showAnnotations: true,
-    showOverlays: true,
-  ),
-);
-if (bytes != null) {
-  // Display or save the image bytes
+final controller = _controller;
+if (controller != null) {
+  final Uint8List? bytes = await controller.takeSnapshot(
+    const SnapshotOptions(
+      showBuildings: true,
+      showPointsOfInterest: true,
+      showAnnotations: true,
+      showOverlays: true,
+    ),
+  );
+  if (bytes != null) {
+    // Display or save the image bytes
+  }
 }
 ```
 
@@ -345,7 +352,7 @@ There is no Android implementation. If you need cross-platform maps, see [platfo
 Pull requests are welcome. Before submitting, please ensure:
 
 ```bash
-dart analyze
+flutter analyze
 flutter test
 cd example && flutter build ios --no-codesign
 ```
