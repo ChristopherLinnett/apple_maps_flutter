@@ -23,8 +23,11 @@ import 'fake_maps_controllers.dart';
 
 const CameraPosition _kDefaultCamera = CameraPosition(target: LatLng(0.0, 0.0));
 
-/// Pumps an [AppleMap] built from [child], waits for it to settle, and returns
-/// the [FakePlatformAppleMap] that was created.
+/// Pumps an [AppleMap] built from [child] and returns the
+/// [FakePlatformAppleMap] that was created.
+///
+/// A single [pumpWidget] is sufficient because creation options are captured
+/// synchronously during platform-view initialization; no settle is required.
 ///
 /// Sets and immediately clears [debugDefaultTargetPlatformOverride] around the
 /// pump so the platform view is created on iOS without leaving the debug
