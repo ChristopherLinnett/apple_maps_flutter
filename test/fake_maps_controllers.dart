@@ -685,10 +685,11 @@ class FakePlatformAppleMap {
         }
         return BitmapDescriptor.defaultAnnotation;
       case BitmapDescriptorType.markerAnnotation:
+        if (icon.bytes != null) return BitmapDescriptor.fromBytes(icon.bytes!);
         if (icon.hue != null) {
-          return BitmapDescriptor.markerAnnotationWithHue(icon.hue! * 360.0);
+          return BitmapDescriptor.defaultAnnotationWithHue(icon.hue! * 360.0);
         }
-        return BitmapDescriptor.markerAnnotation;
+        return BitmapDescriptor.defaultAnnotation;
       case BitmapDescriptorType.fromAssetImage:
         return BitmapDescriptor.defaultAnnotation;
       case BitmapDescriptorType.fromBytes:

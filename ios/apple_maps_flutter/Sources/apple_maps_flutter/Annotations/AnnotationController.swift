@@ -303,6 +303,9 @@ extension AppleMapController: AnnotationDelegate {
             markerAnnotationView.markerTintColor = UIColor.init(hue: hueColor, saturation: 1, brightness: 1, alpha: 1)
         }
 
+        // Place the Flutter-rendered widget image inside the balloon glyph area.
+        markerAnnotationView.glyphImage = annotation.icon.glyphImage
+
         return markerAnnotationView
     }
 

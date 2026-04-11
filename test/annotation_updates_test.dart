@@ -268,7 +268,9 @@ void main() {
       alpha: 0.7,
       anchor: const Offset(0.25, 0.75),
       draggable: true,
-      icon: BitmapDescriptor.markerAnnotationWithHue(BitmapDescriptor.hueCyan),
+      icon: await BitmapDescriptor.markerAnnotation(
+        hue: BitmapDescriptor.hueCyan,
+      ),
       infoWindow: InfoWindow(
         title: 'title',
         snippet: 'snippet',
