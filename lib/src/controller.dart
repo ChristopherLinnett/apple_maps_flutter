@@ -131,6 +131,31 @@ class AppleMapController implements AppleMapFlutterApi {
     _appleMapState.onPermissionDenied();
   }
 
+  @override
+  void onMapFeatureTapped(PlatformMapFeature feature) {
+    final MapFeature mapFeature = MapFeature(
+      coordinate: LatLng(
+        feature.coordinate.latitude,
+        feature.coordinate.longitude,
+      ),
+      featureType: _mapFeatureType(feature.featureType),
+      title: feature.title,
+      pointOfInterestCategory: feature.pointOfInterestCategory,
+    );
+    _appleMapState.onMapFeatureTapped(mapFeature);
+  }
+
+  static MapFeatureType _mapFeatureType(PlatformMapFeatureType type) {
+    switch (type) {
+      case PlatformMapFeatureType.pointOfInterest:
+        return MapFeatureType.pointOfInterest;
+      case PlatformMapFeatureType.territory:
+        return MapFeatureType.territory;
+      case PlatformMapFeatureType.physicalFeature:
+        return MapFeatureType.physicalFeature;
+    }
+  }
+
   /// Updates configuration options of the map user interface.
   ///
   /// Change listeners are notified once the update has been made on the

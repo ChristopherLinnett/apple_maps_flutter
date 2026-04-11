@@ -163,6 +163,12 @@ extension PlatformMapOptions {
         if let scaleEnabled {
             options["scaleEnabled"] = scaleEnabled
         }
+        if let emphasisStyle {
+            options["emphasisStyle"] = emphasisStyle.rawValue
+        }
+        if let selectableFeatures {
+            options["selectableFeatures"] = Int(selectableFeatures)
+        }
 
         return options
     }

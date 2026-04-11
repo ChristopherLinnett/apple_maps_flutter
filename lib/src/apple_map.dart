@@ -35,6 +35,8 @@ class AppleMap extends StatefulWidget {
     this.buildingsEnabled = true,
     this.pointsOfInterestEnabled = true,
     this.scaleEnabled = false,
+    this.emphasisStyle = MapEmphasisStyle.defaultStyle,
+    this.selectableFeatures = const {MapSelectableFeature.pointsOfInterest},
     this.padding = EdgeInsets.zero,
     this.annotations,
     this.polylines,
@@ -46,6 +48,7 @@ class AppleMap extends StatefulWidget {
     this.onTap,
     this.onLongPress,
     this.onPermissionDenied,
+    this.onFeatureTapped,
     this.snapshotOptions,
     this.insetsLayoutMarginsFromSafeArea = true,
   });
@@ -136,6 +139,15 @@ class AppleMap extends StatefulWidget {
   /// by enabling [myLocationEnabled].
   final VoidCallback? onPermissionDenied;
 
+  /// Called when the user taps a built-in map feature (iOS 16+).
+  ///
+  /// Fires for points of interest, landmarks, and other native map elements
+  /// depending on [selectableFeatures]. This is separate from tapping a
+  /// user-defined [Annotation].
+  ///
+  /// Only called on iOS 16 and later; ignored on earlier OS versions.
+  final ArgumentCallback<MapFeature>? onFeatureTapped;
+
   /// True if a "My Location" layer should be shown on the map.
   ///
   /// This layer includes a location indicator at the current device location,
@@ -160,6 +172,22 @@ class AppleMap extends StatefulWidget {
 
   /// True if the map scale indicator should be shown.
   final bool scaleEnabled;
+
+  /// The visual emphasis style for the standard map (iOS 16+).
+  ///
+  /// Only applies when [mapType] is [MapType.standard]. Ignored on satellite
+  /// and hybrid map types, and silently ignored on iOS versions below 16.
+  final MapEmphasisStyle emphasisStyle;
+
+  /// The set of built-in map features that can be tapped (iOS 16+).
+  ///
+  /// Controls which native map elements fire [onFeatureTapped] when tapped.
+  /// On iOS versions below 16 this field is ignored and all points of interest
+  /// remain tappable by default.
+  ///
+  /// Defaults to `{MapSelectableFeature.pointsOfInterest}`, which matches the
+  /// iOS platform default.
+  final Set<MapSelectableFeature> selectableFeatures;
 
   /// Enables or disables the my-location button.
   ///
@@ -409,6 +437,10 @@ class _AppleMapState extends State<AppleMap> {
   void onPermissionDenied() {
     widget.onPermissionDenied?.call();
   }
+
+  void onMapFeatureTapped(MapFeature feature) {
+    widget.onFeatureTapped?.call(feature);
+  }
 }
 
 /// Configuration options for the AppleMaps user interface.
@@ -432,6 +464,8 @@ class _AppleMapOptions {
     this.buildingsEnabled,
     this.pointsOfInterestEnabled,
     this.scaleEnabled,
+    this.emphasisStyle,
+    this.selectableFeatures,
     this.padding,
     this.insetsLayoutMarginsFromSafeArea,
   });
@@ -453,43 +487,31 @@ class _AppleMapOptions {
       buildingsEnabled: map.buildingsEnabled,
       pointsOfInterestEnabled: map.pointsOfInterestEnabled,
       scaleEnabled: map.scaleEnabled,
+      emphasisStyle: map.emphasisStyle,
+      selectableFeatures: map.selectableFeatures,
       padding: map.padding,
       insetsLayoutMarginsFromSafeArea: map.insetsLayoutMarginsFromSafeArea,
     );
   }
 
   final bool? compassEnabled;
-
   final bool? trafficEnabled;
-
   final MapType? mapType;
-
   final MinMaxZoomPreference? minMaxZoomPreference;
-
   final CameraTargetBounds? cameraTargetBounds;
-
   final bool? rotateGesturesEnabled;
-
   final bool? scrollGesturesEnabled;
-
   final bool? pitchGesturesEnabled;
-
   final TrackingMode? trackingMode;
-
   final bool? zoomGesturesEnabled;
-
   final bool? myLocationEnabled;
-
   final bool? myLocationButtonEnabled;
-
   final bool? buildingsEnabled;
-
   final bool? pointsOfInterestEnabled;
-
   final bool? scaleEnabled;
-
+  final MapEmphasisStyle? emphasisStyle;
+  final Set<MapSelectableFeature>? selectableFeatures;
   final EdgeInsets? padding;
-
   final bool? insetsLayoutMarginsFromSafeArea;
 
   Map<String, dynamic> toMap() {
@@ -515,6 +537,22 @@ class _AppleMapOptions {
     addIfNonNull('buildingsEnabled', buildingsEnabled);
     addIfNonNull('pointsOfInterestEnabled', pointsOfInterestEnabled);
     addIfNonNull('scaleEnabled', scaleEnabled);
+    addIfNonNull('emphasisStyle', emphasisStyle?.index);
+    // Encode selectableFeatures as a bitmask:
+    // bit 0 = pointsOfInterest, bit 1 = territories, bit 2 = physicalFeatures.
+    if (selectableFeatures != null) {
+      int mask = 0;
+      if (selectableFeatures!.contains(MapSelectableFeature.pointsOfInterest)) {
+        mask |= 1;
+      }
+      if (selectableFeatures!.contains(MapSelectableFeature.territories)) {
+        mask |= 2;
+      }
+      if (selectableFeatures!.contains(MapSelectableFeature.physicalFeatures)) {
+        mask |= 4;
+      }
+      addIfNonNull('selectableFeatures', mask);
+    }
     // CameraTargetBounds is always included so that unbounded (null) is
     // distinguishable from "no change" (key absent) in the diff.
     // Serialized as a flat list [swLat, swLng, neLat, neLng] so that
