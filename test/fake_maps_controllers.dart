@@ -248,7 +248,9 @@ class FakePlatformAppleMap {
       final String polylineId = polylineData['polylineId'];
       final bool visible = polylineData['visible'];
 
-      result.add(Polyline(polylineId: PolylineId(polylineId), visible: visible));
+      result.add(
+        Polyline(polylineId: PolylineId(polylineId), visible: visible),
+      );
     }
 
     return result;
