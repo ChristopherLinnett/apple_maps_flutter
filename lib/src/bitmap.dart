@@ -103,6 +103,13 @@ class BitmapDescriptor {
     final RenderRepaintBoundary repaintBoundary = RenderRepaintBoundary();
     final PipelineOwner pipelineOwner = PipelineOwner();
 
+    // Attach before building the widget tree so that child render objects have
+    // an owner when they first call markNeedsPaint(). If attach comes after
+    // attachToRenderTree, _needsPaint is set to true on children but they are
+    // never added to _nodesNeedingPaint (no owner yet), so flushPaint() misses
+    // them and toImage() fails the !debugNeedsPaint assertion.
+    repaintBoundary.attach(pipelineOwner);
+
     final BuildOwner buildOwner = BuildOwner(focusManager: FocusManager());
     final rootElement = RenderObjectToWidgetAdapter<RenderBox>(
       container: repaintBoundary,
@@ -114,8 +121,6 @@ class BitmapDescriptor {
         ),
       ),
     ).attachToRenderTree(buildOwner);
-
-    repaintBoundary.attach(pipelineOwner);
 
     buildOwner.buildScope(rootElement);
     buildOwner.finalizeTree();
