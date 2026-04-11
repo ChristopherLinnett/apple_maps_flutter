@@ -17,7 +17,6 @@ public class AppleMapController: NSObject, FlutterPlatformView, AppleMapHostApi 
     let mapId: Int64
     let hostApiSuffix: String
     var initialCameraPosition: [String: Any]
-    var options: [String: Any]
     var currentlySelectedAnnotation: String?
     var snapShotOptions: MKMapSnapshotter.Options = MKMapSnapshotter.Options()
     var snapShot: MKMapSnapshotter?
@@ -26,10 +25,10 @@ public class AppleMapController: NSObject, FlutterPlatformView, AppleMapHostApi 
     public init(withFrame frame: CGRect, withRegistrar registrar: FlutterPluginRegistrar, withargs args: Dictionary<String, Any> ,withId id: Int64) {
         self.mapId = id
         self.hostApiSuffix = String(id)
-        self.options = args["options"] as! [String: Any]
+        let mapOptions = PlatformMapOptions.fromCreationDictionary(args["options"] as! [String: Any])
         self.flutterApi = AppleMapFlutterApi(binaryMessenger: registrar.messenger(), messageChannelSuffix: String(id))
         
-        self.mapView = FlutterMapView(flutterApi: flutterApi, options: options)
+        self.mapView = FlutterMapView(flutterApi: flutterApi, options: mapOptions)
         self.registrar = registrar
         
         // To stop the odd movement of the Apple logo.
@@ -69,7 +68,7 @@ public class AppleMapController: NSObject, FlutterPlatformView, AppleMapHostApi 
     }
 
     func updateMapOptions(options: PlatformMapOptions) throws {
-        self.mapView.interpretOptions(options: options.asDictionary)
+        self.mapView.applyOptions(options)
     }
 
     func updateAnnotations(updates: PlatformAnnotationUpdates) throws {
@@ -222,7 +221,7 @@ public class AppleMapController: NSObject, FlutterPlatformView, AppleMapHostApi 
     }
 
     func isMyLocationButtonEnabled() throws -> Bool {
-        mapView.isMyLocationButtonShowing ?? false
+        mapView.isMyLocationButtonShowing
     }
 
     func isBuildingsEnabled() throws -> Bool {
