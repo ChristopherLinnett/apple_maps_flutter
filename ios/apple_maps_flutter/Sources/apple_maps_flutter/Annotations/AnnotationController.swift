@@ -150,7 +150,6 @@ extension AppleMapController: AnnotationDelegate {
 
     func onAnnotationClick(annotation: MKAnnotation) {
         if let flutterAnnotation: FlutterAnnotation = annotation as? FlutterAnnotation {
-            flutterAnnotation.wasDragged = true
             flutterApi.onAnnotationTap(annotationId: flutterAnnotation.id, completion: pigeonLogOnError)
         }
     }
