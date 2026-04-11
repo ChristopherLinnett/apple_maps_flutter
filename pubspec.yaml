@@ -1,6 +1,6 @@
 name: apple_maps_flutter
 description: Apple Maps plugin for Flutter with annotations, overlays, camera controls, and snapshots on iOS.
-version: 1.4.0
+version: 2.0.0
 homepage: https://github.com/ChristopherLinnett/apple_maps_flutter
 repository: https://github.com/ChristopherLinnett/apple_maps_flutter
 issue_tracker: https://github.com/ChristopherLinnett/apple_maps_flutter/issues
