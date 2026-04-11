@@ -296,9 +296,16 @@ PlatformBitmapDescriptor _platformBitmapDescriptorFromBitmapDescriptor(
         hue: (json.elementAtOrNull(1) as num?)?.toDouble(),
       );
     case 'markerAnnotation':
+      // Encoding: ['markerAnnotation', double? hue, Uint8List? glyphBytes]
+      // When only glyph bytes are present (no hue), the bytes sit at index 1.
+      // When both are present, hue is at index 1 and bytes at index 2.
+      final dynamic pos1 = json.elementAtOrNull(1);
       return PlatformBitmapDescriptor(
         type: BitmapDescriptorType.markerAnnotation,
-        hue: (json.elementAtOrNull(1) as num?)?.toDouble(),
+        hue: pos1 is num ? pos1.toDouble() : null,
+        bytes: pos1 is Uint8List
+            ? pos1
+            : json.elementAtOrNull(2) as Uint8List?,
       );
     case 'fromAssetImage':
       return PlatformBitmapDescriptor(

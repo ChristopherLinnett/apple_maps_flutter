@@ -87,7 +87,7 @@ class _AnnotationsBodyState extends State<_AnnotationsBody> {
       Annotation(
         annotationId: id,
         position: const LatLng(51.512, -0.115),
-        icon: BitmapDescriptor.markerAnnotation,
+        icon: await BitmapDescriptor.markerAnnotation(),
         infoWindow: const InfoWindow(title: 'Marker style'),
         onTap: () => _onAnnotationTap(id),
       ),
@@ -115,8 +115,8 @@ class _AnnotationsBodyState extends State<_AnnotationsBody> {
       Annotation(
         annotationId: id,
         position: const LatLng(51.505, -0.105),
-        icon: BitmapDescriptor.markerAnnotationWithHue(
-          BitmapDescriptor.hueAzure,
+        icon: await BitmapDescriptor.markerAnnotation(
+          hue: BitmapDescriptor.hueAzure,
         ),
         infoWindow: const InfoWindow(title: 'Hue marker (azure)'),
         onTap: () => _onAnnotationTap(id),

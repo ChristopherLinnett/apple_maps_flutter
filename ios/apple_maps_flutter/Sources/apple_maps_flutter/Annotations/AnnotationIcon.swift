@@ -19,6 +19,9 @@ class AnnotationIcon: Equatable {
     var id: String
     var image: UIImage?
     var hueColor: Double?
+    /// Image rendered inside the marker balloon glyph area.
+    /// Only used when iconType == .MARKER.
+    var glyphImage: UIImage?
     
     public init(id: String, iconType: IconType) {
         self.iconType = iconType
@@ -29,6 +32,16 @@ class AnnotationIcon: Equatable {
         self.iconType = iconType
         self.id = id
         self.hueColor = hueColor
+    }
+
+    public init(id: String, iconType: IconType, hueColor: Double?, glyphData: FlutterStandardTypedData?) {
+        self.iconType = iconType
+        self.id = id
+        self.hueColor = hueColor
+        if let data = glyphData {
+            let scale = UIScreen.main.scale
+            self.glyphImage = UIImage(data: data.data, scale: scale)
+        }
     }
     
     public init(withAsset name: String, id: String, iconScale: CGFloat? = 1.0) {
@@ -62,7 +75,11 @@ class AnnotationIcon: Equatable {
     }
     
     static func == (lhs: AnnotationIcon, rhs: AnnotationIcon) -> Bool {
-        return lhs.iconType == rhs.iconType && lhs.id == rhs.id && lhs.image == rhs.image
+        return lhs.iconType == rhs.iconType
+            && lhs.id == rhs.id
+            && lhs.image == rhs.image
+            && lhs.glyphImage == rhs.glyphImage
+            && lhs.hueColor == rhs.hueColor
     }
     
     static func != (lhs: AnnotationIcon, rhs: AnnotationIcon) -> Bool {

@@ -75,9 +75,19 @@ class FlutterAnnotation: NSObject, MKAnnotation {
             icon = AnnotationIcon(withAsset: registrar.lookupKey(forAsset: assetPath), id: annotationId, iconScale: scaleParam)
         } else if iconType == .CUSTOM_FROM_BYTES {
             icon = AnnotationIcon(fromBytes: iconData[1] as! FlutterStandardTypedData, id: annotationId)
+        } else if iconType == .MARKER && iconData.count > 1 {
+            // Index 1 is either a Double (hue) or FlutterStandardTypedData (glyph bytes).
+            // When both are present hue is at index 1 and glyph bytes at index 2.
+            let pos1 = iconData[1]
+            if let hue = pos1 as? Double {
+                let glyphData = iconData.count > 2 ? iconData[2] as? FlutterStandardTypedData : nil
+                icon = AnnotationIcon(id: annotationId, iconType: .MARKER, hueColor: hue, glyphData: glyphData)
+            } else if let bytes = pos1 as? FlutterStandardTypedData {
+                icon = AnnotationIcon(id: annotationId, iconType: .MARKER, hueColor: nil, glyphData: bytes)
+            }
         } else if iconData.count > 1 {
+            // PIN with hue (defaultAnnotation with hue)
             icon = AnnotationIcon(id: annotationId, iconType: iconType, hueColor: iconData[1] as! Double)
-            
         }
         return icon
     }

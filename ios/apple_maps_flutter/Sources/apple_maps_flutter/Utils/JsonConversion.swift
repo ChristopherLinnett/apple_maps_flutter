@@ -223,9 +223,16 @@ extension PlatformBitmapDescriptor {
         var iconData: [Any] = [type.identifier]
 
         switch type {
-        case .defaultAnnotation, .markerAnnotation:
+        case .defaultAnnotation:
             if let hue {
                 iconData.append(hue)
+            }
+        case .markerAnnotation:
+            if let hue {
+                iconData.append(hue)
+            }
+            if let bytes {
+                iconData.append(bytes)
             }
         case .fromAssetImage:
             if let assetName {

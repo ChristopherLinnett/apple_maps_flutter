@@ -260,6 +260,15 @@ extension AppleMapController: AnnotationDelegate {
         if let view = self.mapView.view(for: oldAnnotation) {
             let newAnnotationView = getAnnotationView(annotation: annotation)
             view.image = newAnnotationView.image
+            // For marker annotations, tint and glyph must be kept in sync too.
+            if let markerView = view as? FlutterMarkerAnnotationView {
+                if let hue = annotation.icon.hueColor {
+                    markerView.markerTintColor = UIColor(hue: hue, saturation: 1, brightness: 1, alpha: 1)
+                } else {
+                    markerView.markerTintColor = nil
+                }
+                markerView.glyphImage = annotation.icon.glyphImage
+            }
             // Reflect visibility: invisible annotations have alpha 0 and no callout.
             let isVisible = annotation.isVisible != false
             view.alpha = isVisible ? CGFloat(annotation.alpha ?? 1.0) : 0.0
@@ -302,6 +311,9 @@ extension AppleMapController: AnnotationDelegate {
         if let hueColor: Double = annotation.icon.hueColor {
             markerAnnotationView.markerTintColor = UIColor.init(hue: hueColor, saturation: 1, brightness: 1, alpha: 1)
         }
+
+        // Place the Flutter-rendered widget image inside the balloon glyph area.
+        markerAnnotationView.glyphImage = annotation.icon.glyphImage
 
         return markerAnnotationView
     }
