@@ -73,6 +73,15 @@ class MarkerIconsBodyState extends State<MarkerIconsBody> {
   final TextEditingController _leftController = TextEditingController();
   final TextEditingController _rightController = TextEditingController();
 
+  @override
+  void dispose() {
+    _topController.dispose();
+    _bottomController.dispose();
+    _leftController.dispose();
+    _rightController.dispose();
+    super.dispose();
+  }
+
   Widget _paddingInput() {
     return Padding(
       padding: const EdgeInsets.all(16.0),

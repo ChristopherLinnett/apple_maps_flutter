@@ -243,10 +243,11 @@ class PlaceAnnotationBodyState extends State<PlaceAnnotationBody> {
     if (id == null) return false;
     final Annotation? annotation = annotations[id];
     if (annotation == null) return false;
-    debugPrint(
-      'Is InfowWindow visible: ${await controller.isMarkerInfoWindowShown(annotation.annotationId)}',
+    final bool? isShown = await controller.isMarkerInfoWindowShown(
+      annotation.annotationId,
     );
-    return (await controller.isMarkerInfoWindowShown(annotation.annotationId))!;
+    debugPrint('Is InfoWindow visible: $isShown');
+    return isShown!;
   }
 
   Future<void> _getBytesFromAsset(String path, int width) async {
@@ -326,7 +327,7 @@ class PlaceAnnotationBodyState extends State<PlaceAnnotationBody> {
                 ),
                 TextButton(
                   onPressed: _isInfoWindowShown,
-                  child: const Text('infoWindow is shown?s'),
+                  child: const Text('Is infoWindow shown?'),
                 ),
                 TextButton(
                   onPressed: _changeAlpha,
