@@ -238,16 +238,6 @@ extension AppleMapController: AnnotationDelegate {
     private func updateAnnotation(annotation: FlutterAnnotation) {
         guard let oldAnnotation = self.getAnnotation(with: annotation.id) else { return }
 
-        // MapKit only re-evaluates clustering when annotations are added, not when
-        // clusteringIdentifier changes on an existing view. Remove and re-add to force it.
-        if oldAnnotation.clusteringIdentifier != annotation.clusteringIdentifier {
-            let preservedZIndex = oldAnnotation.zIndex
-            self.mapView.removeAnnotation(oldAnnotation)
-            annotation.zIndex = preservedZIndex
-            self.mapView.addAnnotation(annotation)
-            return
-        }
-
         UIView.animate(withDuration: 0.32, animations: {
             oldAnnotation.coordinate = annotation.coordinate
             oldAnnotation.zIndex = annotation.zIndex

@@ -8,9 +8,14 @@ const _kCenter = LatLng(51.507, -0.127);
 
 List<Annotation> _buildGrid({required bool clustering}) {
   final annotations = <Annotation>[];
+  // Encode the clustering state into the ID so Flutter's diff removes all old
+  // annotations and adds new ones when toggling. MapKit only re-evaluates
+  // clustering when annotations are added, not when clusteringIdentifier
+  // changes on a live view, so a remove+add cycle is required.
+  final idSuffix = clustering ? '_c' : '_n';
   for (var row = 0; row < 5; row++) {
     for (var col = 0; col < 6; col++) {
-      final id = AnnotationId('cluster_${row}_$col');
+      final id = AnnotationId('cluster_${row}_$col$idSuffix');
       annotations.add(
         Annotation(
           annotationId: id,
