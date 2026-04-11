@@ -65,6 +65,14 @@ extension AppleMapController: AnnotationDelegate {
             return nil
         } else if let flutterAnnotation = annotation as? FlutterAnnotation {
             return self.getAnnotationView(annotation: flutterAnnotation)
+        } else if #available(iOS 16.0, *), annotation is MKMapFeatureAnnotation {
+            // Return a non-nil view so didSelectAnnotationView fires for built-in map
+            // features (POIs, territories, physical features). Without this, MKMapView
+            // shows its own native callout sheet and the Flutter onFeatureTapped callback
+            // is never reached. canShowCallout=false suppresses the native sheet entirely.
+            let view = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: "MapFeature")
+            view.canShowCallout = false
+            return view
         }
         return nil
     }
