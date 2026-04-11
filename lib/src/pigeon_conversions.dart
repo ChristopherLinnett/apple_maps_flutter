@@ -25,13 +25,16 @@ PlatformMapOptions _platformMapOptionsFromMap(Map<String, dynamic> map) {
     buildingsEnabled: map['buildingsEnabled'] as bool?,
     pointsOfInterestEnabled: map['pointsOfInterestEnabled'] as bool?,
     scaleEnabled: map['scaleEnabled'] as bool?,
-    emphasisStyle: _platformMapEmphasisStyleFromInt(map['emphasisStyle'] as int?),
+    emphasisStyle: _platformMapEmphasisStyleFromInt(
+      map['emphasisStyle'] as int?,
+    ),
     selectableFeatures: map['selectableFeatures'] as int?,
     padding: _platformPaddingFromDynamic(map['padding']),
     insetsLayoutMarginsFromSafeArea:
         map['insetsLayoutMarginsFromSafeArea'] as bool?,
   );
 }
+
 PlatformMapEmphasisStyle? _platformMapEmphasisStyleFromInt(int? raw) {
   if (raw == null) return null;
   switch (raw) {

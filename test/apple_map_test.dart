@@ -1991,91 +1991,85 @@ void main() {
     },
   );
 
-  testWidgets(
-    'onFeatureTapped is null-safe — no callback does not throw',
-    (WidgetTester tester) async {
-      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-      await tester.pumpWidget(
-        const Directionality(
-          textDirection: TextDirection.ltr,
-          child: AppleMap(
-            initialCameraPosition: CameraPosition(target: LatLng(0, 0)),
-          ),
+  testWidgets('onFeatureTapped is null-safe — no callback does not throw', (
+    WidgetTester tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: CameraPosition(target: LatLng(0, 0)),
         ),
-      );
+      ),
+    );
 
-      final FakePlatformAppleMap platformAppleMap =
-          fakePlatformViewsController.lastCreatedView!;
-      await expectLater(
-        platformAppleMap.sendFlutterApiEvent(
-          'onMapFeatureTapped',
-          <Object?>[
-            PlatformMapFeature(
-              coordinate: PlatformLatLng(latitude: 0, longitude: 0),
-              featureType: PlatformMapFeatureType.territory,
-            ),
-          ],
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+    await expectLater(
+      platformAppleMap.sendFlutterApiEvent('onMapFeatureTapped', <Object?>[
+        PlatformMapFeature(
+          coordinate: PlatformLatLng(latitude: 0, longitude: 0),
+          featureType: PlatformMapFeatureType.territory,
         ),
-        completes,
-      );
-      debugDefaultTargetPlatformOverride = null;
-    },
-  );
+      ]),
+      completes,
+    );
+    debugDefaultTargetPlatformOverride = null;
+  });
 
-  testWidgets(
-    'emphasisStyle is serialised in initial options',
-    (WidgetTester tester) async {
-      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-      await tester.pumpWidget(
-        const Directionality(
-          textDirection: TextDirection.ltr,
-          child: AppleMap(
-            initialCameraPosition: CameraPosition(target: LatLng(0, 0)),
-            emphasisStyle: MapEmphasisStyle.muted,
-          ),
+  testWidgets('emphasisStyle is serialised in initial options', (
+    WidgetTester tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: CameraPosition(target: LatLng(0, 0)),
+          emphasisStyle: MapEmphasisStyle.muted,
         ),
-      );
+      ),
+    );
 
-      final FakePlatformAppleMap platformAppleMap =
-          fakePlatformViewsController.lastCreatedView!;
-      // emphasisStyle index 1 = muted
-      expect(platformAppleMap.emphasisStyle, MapEmphasisStyle.muted);
-      debugDefaultTargetPlatformOverride = null;
-    },
-  );
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+    // emphasisStyle index 1 = muted
+    expect(platformAppleMap.emphasisStyle, MapEmphasisStyle.muted);
+    debugDefaultTargetPlatformOverride = null;
+  });
 
-  testWidgets(
-    'emphasisStyle can be updated via widget rebuild',
-    (WidgetTester tester) async {
-      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-      await tester.pumpWidget(
-        const Directionality(
-          textDirection: TextDirection.ltr,
-          child: AppleMap(
-            initialCameraPosition: CameraPosition(target: LatLng(0, 0)),
-            emphasisStyle: MapEmphasisStyle.defaultStyle,
-          ),
+  testWidgets('emphasisStyle can be updated via widget rebuild', (
+    WidgetTester tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: CameraPosition(target: LatLng(0, 0)),
+          emphasisStyle: MapEmphasisStyle.defaultStyle,
         ),
-      );
+      ),
+    );
 
-      final FakePlatformAppleMap platformAppleMap =
-          fakePlatformViewsController.lastCreatedView!;
-      expect(platformAppleMap.emphasisStyle, MapEmphasisStyle.defaultStyle);
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+    expect(platformAppleMap.emphasisStyle, MapEmphasisStyle.defaultStyle);
 
-      await tester.pumpWidget(
-        const Directionality(
-          textDirection: TextDirection.ltr,
-          child: AppleMap(
-            initialCameraPosition: CameraPosition(target: LatLng(0, 0)),
-            emphasisStyle: MapEmphasisStyle.muted,
-          ),
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: CameraPosition(target: LatLng(0, 0)),
+          emphasisStyle: MapEmphasisStyle.muted,
         ),
-      );
+      ),
+    );
 
-      expect(platformAppleMap.emphasisStyle, MapEmphasisStyle.muted);
-      debugDefaultTargetPlatformOverride = null;
-    },
-  );
+    expect(platformAppleMap.emphasisStyle, MapEmphasisStyle.muted);
+    debugDefaultTargetPlatformOverride = null;
+  });
 
   testWidgets(
     'onMapFeatureTapped maps all three MapFeatureType values correctly',
@@ -2102,19 +2096,24 @@ void main() {
           MapFeatureType.pointOfInterest,
         ),
         (PlatformMapFeatureType.territory, MapFeatureType.territory),
-        (PlatformMapFeatureType.physicalFeature, MapFeatureType.physicalFeature),
+        (
+          PlatformMapFeatureType.physicalFeature,
+          MapFeatureType.physicalFeature,
+        ),
       ]) {
         received = null;
-        await platformAppleMap.sendFlutterApiEvent(
-          'onMapFeatureTapped',
-          <Object?>[
-            PlatformMapFeature(
-              coordinate: PlatformLatLng(latitude: 0, longitude: 0),
-              featureType: platform,
-            ),
-          ],
+        await platformAppleMap
+            .sendFlutterApiEvent('onMapFeatureTapped', <Object?>[
+              PlatformMapFeature(
+                coordinate: PlatformLatLng(latitude: 0, longitude: 0),
+                featureType: platform,
+              ),
+            ]);
+        expect(
+          received,
+          isNotNull,
+          reason: 'callback not invoked for $platform',
         );
-        expect(received, isNotNull, reason: 'callback not invoked for $platform');
         expect(received!.featureType, dart, reason: 'wrong type for $platform');
       }
 
@@ -2140,16 +2139,14 @@ void main() {
 
       final FakePlatformAppleMap platformAppleMap =
           fakePlatformViewsController.lastCreatedView!;
-      await platformAppleMap.sendFlutterApiEvent(
-        'onMapFeatureTapped',
-        <Object?>[
-          PlatformMapFeature(
-            coordinate: PlatformLatLng(latitude: 1, longitude: 2),
-            featureType: PlatformMapFeatureType.territory,
-            // title and pointOfInterestCategory intentionally omitted (null)
-          ),
-        ],
-      );
+      await platformAppleMap
+          .sendFlutterApiEvent('onMapFeatureTapped', <Object?>[
+            PlatformMapFeature(
+              coordinate: PlatformLatLng(latitude: 1, longitude: 2),
+              featureType: PlatformMapFeatureType.territory,
+              // title and pointOfInterestCategory intentionally omitted (null)
+            ),
+          ]);
 
       expect(received, isNotNull);
       expect(received!.title, isNull);
