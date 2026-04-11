@@ -13,7 +13,7 @@ final LatLngBounds sydneyBounds = LatLngBounds(
 );
 
 class MapUiPage extends ExamplePage {
-  MapUiPage() : super(const Icon(Icons.map), 'User interface');
+  const MapUiPage({super.key}) : super(const Icon(Icons.map), 'User interface');
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class MapUiPage extends ExamplePage {
 }
 
 class MapUiBody extends StatefulWidget {
-  const MapUiBody();
+  const MapUiBody({super.key});
 
   @override
   State<StatefulWidget> createState() => MapUiBodyState();
@@ -38,7 +38,7 @@ class MapUiBodyState extends State<MapUiBody> {
 
   CameraPosition _position = _kInitialPosition;
   bool _isMapCreated = false;
-  bool _isMoving = false;
+  final bool _isMoving = false;
   bool _compassEnabled = true;
   bool _myLocationButtonEnabled = true;
   MinMaxZoomPreference _minMaxZoomPreference = MinMaxZoomPreference.unbounded;
@@ -48,7 +48,7 @@ class MapUiBodyState extends State<MapUiBody> {
   bool _pitchGesturesEnabled = true;
   bool _zoomGesturesEnabled = true;
   bool _myLocationEnabled = true;
-  TrackingMode _trackingMode = TrackingMode.none;
+  final TrackingMode _trackingMode = TrackingMode.none;
   @override
   void initState() {
     super.initState();

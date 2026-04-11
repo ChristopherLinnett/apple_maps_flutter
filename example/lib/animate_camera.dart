@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'page.dart';
 
 class AnimateCameraPage extends ExamplePage {
-  AnimateCameraPage()
+  const AnimateCameraPage({super.key})
     : super(const Icon(Icons.map), 'Camera control, animated');
 
   @override
@@ -18,7 +18,7 @@ class AnimateCameraPage extends ExamplePage {
 }
 
 class AnimateCamera extends StatefulWidget {
-  const AnimateCamera();
+  const AnimateCamera({super.key});
   @override
   State createState() => AnimateCameraState();
 }

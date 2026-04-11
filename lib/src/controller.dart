@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-part of apple_maps_flutter;
+part of '../apple_maps_flutter.dart';
 
 /// Controller for a single AppleMap instance running on the host platform.
 class AppleMapController implements AppleMapFlutterApi {
@@ -22,6 +22,7 @@ class AppleMapController implements AppleMapFlutterApi {
   static AppleMapController init(
     int id,
     CameraPosition initialCameraPosition,
+    // ignore: library_private_types_in_public_api
     _AppleMapState appleMapState,
   ) {
     // initialCameraPosition is passed natively via creation params; the

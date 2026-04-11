@@ -125,10 +125,7 @@ class FakePlatformAppleMap {
   /// `'onAnnotationDragEnd'`). [args] is the ordered list of typed arguments
   /// that Pigeon encodes into the channel message. For methods with no
   /// arguments, Pigeon sends `null` rather than an empty list.
-  Future<void> sendFlutterApiEvent(
-    String method, [
-    List<Object?>? args,
-  ]) async {
+  Future<void> sendFlutterApiEvent(String method, [List<Object?>? args]) async {
     final String channelName =
         'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.$method.$id';
     final Object? message = (args == null || args.isEmpty) ? null : args;
@@ -157,7 +154,7 @@ class FakePlatformAppleMap {
 
   Set<AnnotationId> _deserializeAnnotationIds(List<dynamic>? annotationIds) {
     if (annotationIds == null) {
-      return Set<AnnotationId>();
+      return <AnnotationId>{};
     }
     return annotationIds
         .map((dynamic annotationId) => AnnotationId(annotationId))
@@ -166,10 +163,10 @@ class FakePlatformAppleMap {
 
   Set<Annotation> _deserializeAnnotations(dynamic annotations) {
     if (annotations == null) {
-      return Set<Annotation>();
+      return <Annotation>{};
     }
     final List<dynamic> annotationsData = annotations;
-    final Set<Annotation> result = Set<Annotation>();
+    final Set<Annotation> result = <Annotation>{};
     for (Map<dynamic, dynamic> annotationData in annotationsData) {
       final String annotationId = annotationData['annotationId'];
       final bool draggable = annotationData['draggable'];
@@ -215,7 +212,7 @@ class FakePlatformAppleMap {
 
   Set<PolylineId> _deserializePolylineIds(List<dynamic>? polylineIds) {
     if (polylineIds == null) {
-      return Set<PolylineId>();
+      return <PolylineId>{};
     }
     return polylineIds
         .map((dynamic polylineId) => PolylineId(polylineId))
@@ -224,10 +221,10 @@ class FakePlatformAppleMap {
 
   Set<Polyline> _deserializePolylines(dynamic polylines) {
     if (polylines == null) {
-      return Set<Polyline>();
+      return <Polyline>{};
     }
     final List<dynamic> polylinesData = polylines;
-    final Set<Polyline> result = Set<Polyline>();
+    final Set<Polyline> result = <Polyline>{};
     for (Map<dynamic, dynamic> polylineData in polylinesData) {
       final String polylineId = polylineData['polylineId'];
       final bool visible = polylineData['visible'];
@@ -258,17 +255,17 @@ class FakePlatformAppleMap {
 
   Set<PolygonId> _deserializePolygonIds(List<dynamic>? polygonIds) {
     if (polygonIds == null) {
-      return Set<PolygonId>();
+      return <PolygonId>{};
     }
     return polygonIds.map((dynamic polygonId) => PolygonId(polygonId)).toSet();
   }
 
   Set<Polygon> _deserializePolygons(dynamic polygons) {
     if (polygons == null) {
-      return Set<Polygon>();
+      return <Polygon>{};
     }
     final List<dynamic> polygonsData = polygons;
-    final Set<Polygon> result = Set<Polygon>();
+    final Set<Polygon> result = <Polygon>{};
     for (Map<dynamic, dynamic> polygonData in polygonsData) {
       final String polygonId = polygonData['polygonId'];
       final bool visible = polygonData['visible'];
@@ -307,17 +304,17 @@ class FakePlatformAppleMap {
 
   Set<CircleId>? _deserializeCircleIds(List<dynamic>? circleIds) {
     if (circleIds == null) {
-      return Set<CircleId>();
+      return <CircleId>{};
     }
     return circleIds.map((dynamic circleId) => CircleId(circleId)).toSet();
   }
 
   Set<Circle> _deserializeCircles(dynamic circles) {
     if (circles == null) {
-      return Set<Circle>();
+      return <Circle>{};
     }
     final List<dynamic> circlesData = circles;
-    final Set<Circle> result = Set<Circle>();
+    final Set<Circle> result = <Circle>{};
     for (Map<dynamic, dynamic> circleData in circlesData) {
       final String circleId = circleData['circleId'];
       final bool visible = circleData['visible'];

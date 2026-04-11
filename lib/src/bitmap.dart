@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-part of apple_maps_flutter;
+part of '../apple_maps_flutter.dart';
 
 /// Defines a bitmap image. For a annotation, this class can be used to set the
 /// image of the annotation icon. For a ground overlay, it can be used to set the
@@ -41,12 +41,14 @@ class BitmapDescriptor {
   static const double hueRose = 330.0;
 
   /// Creates a BitmapDescriptor that refers to the default/Pin annotation image.
-  static const BitmapDescriptor defaultAnnotation =
-      BitmapDescriptor._(<dynamic>['defaultAnnotation']);
+  static const BitmapDescriptor defaultAnnotation = BitmapDescriptor._(
+    <dynamic>['defaultAnnotation'],
+  );
 
   /// Creates a BitmapDescriptor that refers to the marker annotation image.
-  static const BitmapDescriptor markerAnnotation =
-      BitmapDescriptor._(<dynamic>['markerAnnotation']);
+  static const BitmapDescriptor markerAnnotation = BitmapDescriptor._(<dynamic>[
+    'markerAnnotation',
+  ]);
 
   /// Creates a BitmapDescriptor that refers to a colorization of the default
   /// marker image. For convenience, there is a predefined set of hue values.
@@ -86,10 +88,14 @@ class BitmapDescriptor {
         configuration.devicePixelRatio,
       ]);
     }
-    final AssetImage assetImage =
-        AssetImage(assetName, package: package, bundle: bundle);
-    final AssetBundleImageKey assetBundleImageKey =
-        await assetImage.obtainKey(configuration);
+    final AssetImage assetImage = AssetImage(
+      assetName,
+      package: package,
+      bundle: bundle,
+    );
+    final AssetBundleImageKey assetBundleImageKey = await assetImage.obtainKey(
+      configuration,
+    );
     return BitmapDescriptor._(<dynamic>[
       'fromAssetImage',
       assetBundleImageKey.name,

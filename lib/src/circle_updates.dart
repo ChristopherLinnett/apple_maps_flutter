@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-part of apple_maps_flutter;
+part of '../apple_maps_flutter.dart';
 
 /// [Circle] update events to be applied to the [AppleMap].
 ///
@@ -10,13 +10,9 @@ part of apple_maps_flutter;
 class _CircleUpdates {
   /// Computes [_CircleUpdates] given previous and current [Circle]s.
   _CircleUpdates.from(Set<Circle>? previous, Set<Circle>? current) {
-    if (previous == null) {
-      previous = Set<Circle>.identity();
-    }
+    previous ??= Set<Circle>.identity();
 
-    if (current == null) {
-      current = Set<Circle>.identity();
-    }
+    current ??= Set<Circle>.identity();
 
     final Map<CircleId, Circle> previousCircles = _keyByCircleId(previous);
     final Map<CircleId, Circle> currentCircles = _keyByCircleId(current);
@@ -65,10 +61,10 @@ class _CircleUpdates {
 
   @override
   int get hashCode => Object.hash(
-        Object.hashAllUnordered(circlesToAdd),
-        Object.hashAllUnordered(circleIdsToRemove),
-        Object.hashAllUnordered(circlesToChange),
-      );
+    Object.hashAllUnordered(circlesToAdd),
+    Object.hashAllUnordered(circleIdsToRemove),
+    Object.hashAllUnordered(circlesToChange),
+  );
 
   @override
   String toString() {

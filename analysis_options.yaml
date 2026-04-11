@@ -1,0 +1,6 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    # Require super parameters for widget constructors (Flutter 3.x idiomatic style).
+    - use_super_parameters

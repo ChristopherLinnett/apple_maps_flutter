@@ -2,9 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-part of apple_maps_flutter;
+part of '../apple_maps_flutter.dart';
 
-typedef void MapCreatedCallback(AppleMapController controller);
+typedef MapCreatedCallback = void Function(AppleMapController controller);
 
 /// Callback that receives updates to the camera position.
 ///
@@ -12,11 +12,11 @@ typedef void MapCreatedCallback(AppleMapController controller);
 /// registers a camera movement.
 ///
 /// This is used in [AppleMap.onCameraMove].
-typedef void CameraPositionCallback(CameraPosition position);
+typedef CameraPositionCallback = void Function(CameraPosition position);
 
 class AppleMap extends StatefulWidget {
   const AppleMap({
-    Key? key,
+    super.key,
     required this.initialCameraPosition,
     this.onMapCreated,
     this.gestureRecognizers,
@@ -48,7 +48,7 @@ class AppleMap extends StatefulWidget {
     this.onPermissionDenied,
     this.snapshotOptions,
     this.insetsLayoutMarginsFromSafeArea = true,
-  }) : super(key: key);
+  });
 
   final MapCreatedCallback? onMapCreated;
 

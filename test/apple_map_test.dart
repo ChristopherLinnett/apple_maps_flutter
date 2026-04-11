@@ -1745,7 +1745,10 @@ void main() {
     const LatLng droppedAt = LatLng(11.0, 16.0);
     await platformAppleMap.sendFlutterApiEvent('onAnnotationDragEnd', <Object?>[
       'ann_1',
-      PlatformLatLng(latitude: droppedAt.latitude, longitude: droppedAt.longitude),
+      PlatformLatLng(
+        latitude: droppedAt.latitude,
+        longitude: droppedAt.longitude,
+      ),
     ]);
 
     expect(dragEndPosition, isNotNull);
@@ -1851,27 +1854,95 @@ void main() {
     debugDefaultTargetPlatformOverride = null;
   });
 
-  testWidgets('onPermissionDenied fires widget callback when permission is denied', (
+  testWidgets(
+    'onPermissionDenied fires widget callback when permission is denied',
+    (WidgetTester tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      bool wasCalled = false;
+
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: AppleMap(
+            initialCameraPosition: const CameraPosition(target: LatLng(0, 0)),
+            onPermissionDenied: () => wasCalled = true,
+          ),
+        ),
+      );
+
+      final FakePlatformAppleMap platformAppleMap =
+          fakePlatformViewsController.lastCreatedView!;
+      await platformAppleMap.sendFlutterApiEvent('onPermissionDenied');
+
+      expect(wasCalled, isTrue);
+      debugDefaultTargetPlatformOverride = null;
+    },
+  );
+
+  testWidgets('takeSnapshot with default options forwards all-true flags', (
     WidgetTester tester,
   ) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-    bool wasCalled = false;
+    final Completer<AppleMapController> controllerCompleter =
+        Completer<AppleMapController>();
 
     await tester.pumpWidget(
       Directionality(
         textDirection: TextDirection.ltr,
         child: AppleMap(
           initialCameraPosition: const CameraPosition(target: LatLng(0, 0)),
-          onPermissionDenied: () => wasCalled = true,
+          onMapCreated: controllerCompleter.complete,
         ),
       ),
     );
 
+    final AppleMapController controller = await controllerCompleter.future;
     final FakePlatformAppleMap platformAppleMap =
         fakePlatformViewsController.lastCreatedView!;
-    await platformAppleMap.sendFlutterApiEvent('onPermissionDenied');
+    platformAppleMap.snapshotBytes = Uint8List.fromList(<int>[4, 5, 6]);
 
-    expect(wasCalled, isTrue);
+    final Uint8List? bytes = await controller.takeSnapshot();
+    expect(bytes, Uint8List.fromList(<int>[4, 5, 6]));
+    // Default SnapshotOptions enables all layers.
+    expect(platformAppleMap.takenSnapshotFlags, <int>[1, 1, 1, 1]);
     debugDefaultTargetPlatformOverride = null;
+  });
+
+  group('SnapshotOptions', () {
+    test('equality — same field values are equal', () {
+      const SnapshotOptions a = SnapshotOptions(
+        showBuildings: true,
+        showPointsOfInterest: false,
+        showAnnotations: true,
+        showOverlays: false,
+      );
+      const SnapshotOptions b = SnapshotOptions(
+        showBuildings: true,
+        showPointsOfInterest: false,
+        showAnnotations: true,
+        showOverlays: false,
+      );
+      expect(a, equals(b));
+    });
+
+    test('equality — different field values are not equal', () {
+      const SnapshotOptions a = SnapshotOptions(showBuildings: true);
+      const SnapshotOptions b = SnapshotOptions(showBuildings: false);
+      expect(a, isNot(equals(b)));
+    });
+
+    test('hashCode is consistent with equality', () {
+      const SnapshotOptions a = SnapshotOptions(showAnnotations: false);
+      const SnapshotOptions b = SnapshotOptions(showAnnotations: false);
+      expect(a.hashCode, equals(b.hashCode));
+    });
+
+    test('default constructor enables all layers', () {
+      const SnapshotOptions opts = SnapshotOptions();
+      expect(opts.showBuildings, isTrue);
+      expect(opts.showPointsOfInterest, isTrue);
+      expect(opts.showAnnotations, isTrue);
+      expect(opts.showOverlays, isTrue);
+    });
   });
 }

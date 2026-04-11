@@ -1,4 +1,4 @@
-part of apple_maps_flutter;
+part of '../apple_maps_flutter.dart';
 
 class SnapshotOptions {
   const SnapshotOptions({
@@ -26,7 +26,11 @@ class SnapshotOptions {
 
   @override
   int get hashCode => Object.hash(
-        showBuildings, showPointsOfInterest, showAnnotations, showOverlays);
+    showBuildings,
+    showPointsOfInterest,
+    showAnnotations,
+    showOverlays,
+  );
 
   @override
   String toString() =>

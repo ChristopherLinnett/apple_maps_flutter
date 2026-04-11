@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-part of apple_maps_flutter;
+part of '../apple_maps_flutter.dart';
 
 /// [Polyline] update events to be applied to the [AppleMap].
 ///
@@ -10,13 +10,9 @@ part of apple_maps_flutter;
 class _PolylineUpdates {
   /// Computes [_PolylineUpdates] given previous and current [Polyline]s.
   _PolylineUpdates.from(Set<Polyline>? previous, Set<Polyline>? current) {
-    if (previous == null) {
-      previous = Set<Polyline>.identity();
-    }
+    previous ??= Set<Polyline>.identity();
 
-    if (current == null) {
-      current = Set<Polyline>.identity();
-    }
+    current ??= Set<Polyline>.identity();
 
     final Map<PolylineId, Polyline> previousPolylines = _keyByPolylineId(
       previous,
@@ -68,10 +64,10 @@ class _PolylineUpdates {
 
   @override
   int get hashCode => Object.hash(
-        Object.hashAllUnordered(polylinesToAdd),
-        Object.hashAllUnordered(polylineIdsToRemove),
-        Object.hashAllUnordered(polylinesToChange),
-      );
+    Object.hashAllUnordered(polylinesToAdd),
+    Object.hashAllUnordered(polylineIdsToRemove),
+    Object.hashAllUnordered(polylinesToChange),
+  );
 
   @override
   String toString() {

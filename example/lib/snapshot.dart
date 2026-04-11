@@ -16,7 +16,7 @@ const CameraPosition _kInitialPosition = CameraPosition(
 );
 
 class SnapshotPage extends ExamplePage {
-  SnapshotPage()
+  const SnapshotPage({super.key})
     : super(const Icon(Icons.camera_alt), 'Take a snapshot of the map');
 
   @override
