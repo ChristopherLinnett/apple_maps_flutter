@@ -30,7 +30,9 @@ class _ScrollingMapBody extends StatelessWidget {
             _MapCard(
               title: 'Map consumes all gestures',
               subtitle:
-                  'EagerGestureRecognizer — the map intercepts every touch, including the vertical drag that scrolls this list.',
+                  'EagerGestureRecognizer — the map intercepts every touch, '
+                  'including vertical drags. While your finger is on this map '
+                  'the page cannot be scrolled.',
               mapHeight: 280,
               map: AppleMap(
                 initialCameraPosition: _kInitial,
@@ -45,7 +47,8 @@ class _ScrollingMapBody extends StatelessWidget {
             _MapCard(
               title: 'Map shares gestures with scroll view',
               subtitle:
-                  'ScaleGestureRecognizer only — vertical drags scroll the page; pinch-to-zoom and tap still work on the map.',
+                  'ScaleGestureRecognizer only — vertical drags scroll the '
+                  'page normally. Pinch-to-zoom and pan still work on the map.',
               mapHeight: 280,
               map: AppleMap(
                 initialCameraPosition: _kInitial,

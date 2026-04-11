@@ -62,8 +62,9 @@ class _AnnotationClusteringBodyState extends State<_AnnotationClusteringBody> {
           title: const Text('Enable clustering'),
           subtitle: Text(
             _clusteringEnabled
-                ? 'Zoom out to see the cluster collapse; zoom in to expand it'
-                : '30 individual annotations — no clustering identifier set',
+                ? 'Clustering active. Zoom out until annotations are close '
+                  'enough to merge, then zoom in to expand them again.'
+                : '30 individual annotations — no clustering identifier set.',
           ),
           value: _clusteringEnabled,
           onChanged: (v) => setState(() => _clusteringEnabled = v),
@@ -72,7 +73,10 @@ class _AnnotationClusteringBodyState extends State<_AnnotationClusteringBody> {
           padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
           child: Text(
             '30 annotations are placed in a 5×6 grid within a ~0.04° '
-            'bounding box. Toggle clustering to see MapKit merge them.',
+            'bounding box. Toggle clustering on, then zoom out to around '
+            'zoom level 10–11 to see MapKit merge them into cluster pins. '
+            'Zoom back in to expand the cluster. This is MapKit native '
+            'clustering — purely visual, no data is discarded.',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),

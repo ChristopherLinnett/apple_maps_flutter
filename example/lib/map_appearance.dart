@@ -80,6 +80,10 @@ class _MapAppearanceBodyState extends State<_MapAppearanceBody> {
         const _SectionHeader('Overlays & Controls'),
         SwitchListTile(
           title: const Text('Traffic'),
+          subtitle: const Text(
+            'Requires live traffic data for your region. '
+            'May not be visible on the simulator or in areas without data.',
+          ),
           value: _trafficEnabled,
           onChanged: (v) => setState(() => _trafficEnabled = v),
         ),
@@ -90,11 +94,18 @@ class _MapAppearanceBodyState extends State<_MapAppearanceBody> {
         ),
         SwitchListTile(
           title: const Text('Scale indicator'),
+          subtitle: const Text(
+            'Briefly visible during and just after a zoom gesture.',
+          ),
           value: _scaleEnabled,
           onChanged: (v) => setState(() => _scaleEnabled = v),
         ),
         SwitchListTile(
           title: const Text('Buildings'),
+          subtitle: const Text(
+            'On iOS 16+ this controls 3D building extrusion — tilt the map '
+            'to see the effect. On older iOS it hides building footprints.',
+          ),
           value: _buildingsEnabled,
           onChanged: (v) => setState(() => _buildingsEnabled = v),
         ),

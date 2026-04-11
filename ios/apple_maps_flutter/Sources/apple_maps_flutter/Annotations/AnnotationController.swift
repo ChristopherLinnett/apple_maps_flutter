@@ -252,6 +252,8 @@ extension AppleMapController: AnnotationDelegate {
             if let view = self.mapView.view(for: oldAnnotation) {
                 let newAnnotationView = getAnnotationView(annotation: annotation)
                 view.image = newAnnotationView.image
+                view.alpha = CGFloat(annotation.alpha ?? 1.0)
+                view.isDraggable = annotation.isDraggable ?? false
                 view.clusteringIdentifier = annotation.clusteringIdentifier
             }
         }

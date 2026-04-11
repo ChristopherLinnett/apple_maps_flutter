@@ -75,7 +75,10 @@ class FlutterPolyline: MKPolyline {
         self.coordinates = _points
         self.color = JsonConversions.convertColor(data: polylineData["color"] as! NSNumber)
         self.isConsumingTapEvents = polylineData["consumeTapEvents"] as? Bool
-        self.width = polylineData["width"] as? CGFloat
+        // "width" arrives as a Swift Int from the legacy dict bridge; Int cannot
+        // be cast directly to CGFloat with `as?`, so we extract as Int first.
+        self.width = (polylineData["width"] as? Int).map(CGFloat.init)
+            ?? polylineData["width"] as? CGFloat
         self.id = polylineData["polylineId"] as? String
         self.isVisible = polylineData["visible"] as? Bool
         self.pattern = self.linePatternToArray(patternData: linePattern, lineWidth: self.width)

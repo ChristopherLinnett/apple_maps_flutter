@@ -27,7 +27,10 @@ class FlutterCircle: MKCircle {
         self.strokeColor = JsonConversions.convertColor(data: circleData["strokeColor"] as! NSNumber)
         self.fillColor = JsonConversions.convertColor(data: circleData["fillColor"] as! NSNumber)
         self.isConsumingTapEvents = circleData["consumeTapEvents"] as? Bool
-        self.strokeWidth = circleData["strokeWidth"] as? CGFloat
+        // "strokeWidth" arrives as a Swift Int from the legacy dict bridge; Int
+        // cannot be cast directly to CGFloat with `as?`.
+        self.strokeWidth = (circleData["strokeWidth"] as? Int).map(CGFloat.init)
+            ?? circleData["strokeWidth"] as? CGFloat
         self.id = circleData["circleId"] as? String
         self.isVisible = circleData["visible"] as? Bool
         self.zIndex = circleData["zIndex"] as? Int

@@ -41,8 +41,7 @@ class _ProjectionBodyState extends State<_ProjectionBody> {
     final controller = _controller;
     if (controller == null) return;
 
-    final Offset? screenCoord =
-        await controller.getScreenCoordinate(latLng);
+    final Offset? screenCoord = await controller.getScreenCoordinate(latLng);
     if (screenCoord == null) {
       _logKey.currentState?.add('getScreenCoordinate returned null');
       return;
