@@ -13,6 +13,9 @@ import 'package:flutter_test/flutter_test.dart';
 
 class FakePlatformAppleMap {
   FakePlatformAppleMap(this.id, Map<dynamic, dynamic> params) {
+    rawCreationOptions = params['options'] as Map<dynamic, dynamic>?;
+    rawCreationCameraPosition =
+        params['initialCameraPosition'] as Map<dynamic, dynamic>?;
     cameraPosition = CameraPosition.fromMap(params['initialCameraPosition']);
     _registerTypedHandlers();
     updateOptions(params['options']);
@@ -23,6 +26,14 @@ class FakePlatformAppleMap {
   }
 
   final int id;
+
+  /// The raw `options` dict from `creationParams` as Flutter delivered it over
+  /// `StandardMessageCodec`.  Lets tests pin the exact wire format that Swift's
+  /// `fromCreationDictionary` must parse.
+  Map<dynamic, dynamic>? rawCreationOptions;
+
+  /// The raw `initialCameraPosition` dict from `creationParams`.
+  Map<dynamic, dynamic>? rawCreationCameraPosition;
 
   final List<BasicMessageChannel<Object?>> _typedChannels =
       <BasicMessageChannel<Object?>>[];
@@ -45,6 +56,10 @@ class FakePlatformAppleMap {
   CameraPosition? cameraPosition;
 
   bool? compassEnabled;
+
+  bool? trafficEnabled;
+
+  bool? insetsLayoutMarginsFromSafeArea;
 
   MapType? mapType;
 
@@ -232,15 +247,8 @@ class FakePlatformAppleMap {
     for (Map<dynamic, dynamic> polylineData in polylinesData) {
       final String polylineId = polylineData['polylineId'];
       final bool visible = polylineData['visible'];
-      // final bool geodesic = polylineData['geodesic'];
 
-      result.add(
-        Polyline(
-          polylineId: PolylineId(polylineId),
-          visible: visible,
-          // geodesic: geodesic,
-        ),
-      );
+      result.add(Polyline(polylineId: PolylineId(polylineId), visible: visible));
     }
 
     return result;
@@ -306,7 +314,7 @@ class FakePlatformAppleMap {
     circlesToChange = _deserializeCircles(circleUpdates['circlesToChange']);
   }
 
-  Set<CircleId>? _deserializeCircleIds(List<dynamic>? circleIds) {
+  Set<CircleId> _deserializeCircleIds(List<dynamic>? circleIds) {
     if (circleIds == null) {
       return <CircleId>{};
     }
@@ -335,6 +343,13 @@ class FakePlatformAppleMap {
   void updateOptions(Map<dynamic, dynamic> options) {
     if (options.containsKey('compassEnabled')) {
       compassEnabled = options['compassEnabled'];
+    }
+    if (options.containsKey('trafficEnabled')) {
+      trafficEnabled = options['trafficEnabled'];
+    }
+    if (options.containsKey('insetsLayoutMarginsFromSafeArea')) {
+      insetsLayoutMarginsFromSafeArea =
+          options['insetsLayoutMarginsFromSafeArea'];
     }
     if (options.containsKey('mapType')) {
       mapType = MapType.values[options['mapType']];
@@ -418,6 +433,12 @@ class FakePlatformAppleMap {
   void updateOptionsFromPlatform(PlatformMapOptions options) {
     if (options.compassEnabled != null) {
       compassEnabled = options.compassEnabled;
+    }
+    if (options.trafficEnabled != null) {
+      trafficEnabled = options.trafficEnabled;
+    }
+    if (options.insetsLayoutMarginsFromSafeArea != null) {
+      insetsLayoutMarginsFromSafeArea = options.insetsLayoutMarginsFromSafeArea;
     }
     if (options.mapType != null) {
       mapType = MapType.values[options.mapType!];
