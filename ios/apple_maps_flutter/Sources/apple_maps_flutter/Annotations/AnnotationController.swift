@@ -87,11 +87,11 @@ extension AppleMapController: AnnotationDelegate {
         }
         annotationView!.annotation = annotation
         // If annotation is not visible set alpha to 0 and don't let the user interact with it
-        if !annotation.isVisible! {
+        if annotation.isVisible == false {
             annotationView!.canShowCallout = false
             annotationView!.alpha = CGFloat(0.0)
             annotationView!.isDraggable = false
-            return annotationView! as! FlutterAnnotationView
+            return annotationView!
         }
         if annotation.icon.iconType != .MARKER {
             self.initInfoWindow(annotation: annotation, annotationView: annotationView!)
@@ -236,26 +236,39 @@ extension AppleMapController: AnnotationDelegate {
     }
 
     private func updateAnnotation(annotation: FlutterAnnotation) {
-        if let oldAnnotation = self.getAnnotation(with: annotation.id) {
-            UIView.animate(withDuration: 0.32, animations: {
-                oldAnnotation.coordinate = annotation.coordinate
-                oldAnnotation.zIndex = annotation.zIndex
-                oldAnnotation.anchor = annotation.anchor
-                oldAnnotation.alpha = annotation.alpha
-                oldAnnotation.isVisible = annotation.isVisible
-                oldAnnotation.title = annotation.title
-                oldAnnotation.subtitle = annotation.subtitle
-                oldAnnotation.clusteringIdentifier = annotation.clusteringIdentifier
-            })
-            
-            // Update the annotation view with the new image and clustering identifier.
-            if let view = self.mapView.view(for: oldAnnotation) {
-                let newAnnotationView = getAnnotationView(annotation: annotation)
-                view.image = newAnnotationView.image
-                view.alpha = CGFloat(annotation.alpha ?? 1.0)
-                view.isDraggable = annotation.isDraggable ?? false
-                view.clusteringIdentifier = annotation.clusteringIdentifier
-            }
+        guard let oldAnnotation = self.getAnnotation(with: annotation.id) else { return }
+
+        // MapKit only re-evaluates clustering when annotations are added, not when
+        // clusteringIdentifier changes on an existing view. Remove and re-add to force it.
+        if oldAnnotation.clusteringIdentifier != annotation.clusteringIdentifier {
+            let preservedZIndex = oldAnnotation.zIndex
+            self.mapView.removeAnnotation(oldAnnotation)
+            annotation.zIndex = preservedZIndex
+            self.mapView.addAnnotation(annotation)
+            return
+        }
+
+        UIView.animate(withDuration: 0.32, animations: {
+            oldAnnotation.coordinate = annotation.coordinate
+            oldAnnotation.zIndex = annotation.zIndex
+            oldAnnotation.anchor = annotation.anchor
+            oldAnnotation.alpha = annotation.alpha
+            oldAnnotation.isVisible = annotation.isVisible
+            oldAnnotation.title = annotation.title
+            oldAnnotation.subtitle = annotation.subtitle
+            oldAnnotation.clusteringIdentifier = annotation.clusteringIdentifier
+        })
+        
+        // Update the annotation view with the new image and clustering identifier.
+        if let view = self.mapView.view(for: oldAnnotation) {
+            let newAnnotationView = getAnnotationView(annotation: annotation)
+            view.image = newAnnotationView.image
+            // Reflect visibility: invisible annotations have alpha 0 and no callout.
+            let isVisible = annotation.isVisible != false
+            view.alpha = isVisible ? CGFloat(annotation.alpha ?? 1.0) : 0.0
+            view.canShowCallout = isVisible
+            view.isDraggable = isVisible && (annotation.isDraggable ?? false)
+            view.clusteringIdentifier = annotation.clusteringIdentifier
         }
     }
 
