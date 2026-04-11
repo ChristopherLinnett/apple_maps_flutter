@@ -14,12 +14,6 @@ import 'package:flutter_test/flutter_test.dart';
 class FakePlatformAppleMap {
   FakePlatformAppleMap(this.id, Map<dynamic, dynamic> params) {
     cameraPosition = CameraPosition.fromMap(params['initialCameraPosition']);
-    channel = MethodChannel(
-      'apple_maps_plugin.luisthein.de/apple_maps_$id',
-      const StandardMethodCodec(),
-    );
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(channel, onMethodCall);
     _registerTypedHandlers();
     updateOptions(params['options']);
     updatePolylines(params);
@@ -29,8 +23,6 @@ class FakePlatformAppleMap {
   }
 
   final int id;
-
-  late MethodChannel channel;
 
   final List<BasicMessageChannel<Object?>> _typedChannels =
       <BasicMessageChannel<Object?>>[];
@@ -119,8 +111,33 @@ class FakePlatformAppleMap {
   bool delayDisposeResponses = false;
   Completer<void>? pendingDisposeCompleter;
 
-  Future<dynamic> onMethodCall(MethodCall call) {
-    return Future<void>.sync(() {});
+  void disposeMockHandlers() {
+    for (final BasicMessageChannel<Object?> typedChannel in _typedChannels) {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockDecodedMessageHandler<Object?>(typedChannel, null);
+    }
+    _typedChannels.clear();
+  }
+
+  /// Simulates a native-to-Dart event on the Pigeon FlutterApi channel.
+  ///
+  /// [method] must match the method name in [AppleMapFlutterApi] (e.g.
+  /// `'onAnnotationDragEnd'`). [args] is the ordered list of typed arguments
+  /// that Pigeon encodes into the channel message. For methods with no
+  /// arguments, Pigeon sends `null` rather than an empty list.
+  Future<void> sendFlutterApiEvent(
+    String method, [
+    List<Object?>? args,
+  ]) async {
+    final String channelName =
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.$method.$id';
+    final Object? message = (args == null || args.isEmpty) ? null : args;
+    await TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .handlePlatformMessage(
+          channelName,
+          AppleMapFlutterApi.pigeonChannelCodec.encodeMessage(message),
+          (_) {},
+        );
   }
 
   void updateAnnotations(Map<dynamic, dynamic>? annotationUpdates) {
@@ -663,16 +680,6 @@ class FakePlatformAppleMap {
       case PatternItemType.gap:
         return PatternItem.gap(item.length!);
     }
-  }
-
-  void disposeMockHandlers() {
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(channel, null);
-    for (final BasicMessageChannel<Object?> typedChannel in _typedChannels) {
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockDecodedMessageHandler<Object?>(typedChannel, null);
-    }
-    _typedChannels.clear();
   }
 
   void _registerTypedHandlers() {

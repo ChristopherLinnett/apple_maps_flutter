@@ -128,9 +128,7 @@ void main() {
     debugDefaultTargetPlatformOverride = null;
   });
 
-  testWidgets("Updating a polygon — strokeColor", (
-    WidgetTester tester,
-  ) async {
+  testWidgets("Updating a polygon — strokeColor", (WidgetTester tester) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     final Polygon p1 = Polygon(polygonId: PolygonId("polygon_1"));
     final Polygon p2 = Polygon(

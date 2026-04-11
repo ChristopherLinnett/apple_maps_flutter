@@ -12,8 +12,8 @@ import MapKit
 public class AppleMapController: NSObject, FlutterPlatformView, AppleMapHostApi {
     var contentView: UIView
     var mapView: FlutterMapView
-    var registrar: FlutterPluginRegistrar
-    var channel: FlutterMethodChannel
+    let registrar: FlutterPluginRegistrar
+    var flutterApi: AppleMapFlutterApi
     let mapId: Int64
     let hostApiSuffix: String
     var initialCameraPosition: [String: Any]
@@ -21,15 +21,15 @@ public class AppleMapController: NSObject, FlutterPlatformView, AppleMapHostApi 
     var currentlySelectedAnnotation: String?
     var snapShotOptions: MKMapSnapshotter.Options = MKMapSnapshotter.Options()
     var snapShot: MKMapSnapshotter?
-    var isDisposed: Bool = false
+    private var isDisposed: Bool = false
     
     public init(withFrame frame: CGRect, withRegistrar registrar: FlutterPluginRegistrar, withargs args: Dictionary<String, Any> ,withId id: Int64) {
         self.mapId = id
         self.hostApiSuffix = String(id)
         self.options = args["options"] as! [String: Any]
-        self.channel = FlutterMethodChannel(name: "apple_maps_plugin.luisthein.de/apple_maps_\(id)", binaryMessenger: registrar.messenger())
+        self.flutterApi = AppleMapFlutterApi(binaryMessenger: registrar.messenger(), messageChannelSuffix: String(id))
         
-        self.mapView = FlutterMapView(channel: channel, options: options)
+        self.mapView = FlutterMapView(flutterApi: flutterApi, options: options)
         self.registrar = registrar
         
         // To stop the odd movement of the Apple logo.
@@ -187,11 +187,10 @@ public class AppleMapController: NSObject, FlutterPlatformView, AppleMapHostApi 
     }
 
     private func tearDownHostApi() {
-        if isDisposed {
-            return
-        }
+        guard !isDisposed else { return }
         isDisposed = true
         AppleMapHostApiSetup.setUp(binaryMessenger: registrar.messenger(), api: nil, messageChannelSuffix: hostApiSuffix)
+        mapView.flutterApi = nil
         mapView.delegate = nil
         snapShot?.cancel()
         snapShot = nil
@@ -317,14 +316,25 @@ extension AppleMapController: MKMapViewDelegate {
     public func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
         if ((self.mapView.mapContainerView) != nil) {
             let locationOnMap = self.mapView.region.center
-            self.channel.invokeMethod("camera#onMove", arguments: ["position": ["heading": self.mapView.actualHeading, "target":  [locationOnMap.latitude, locationOnMap.longitude], "pitch": self.mapView.camera.pitch, "zoom": self.mapView.calculatedZoomLevel]])
+            flutterApi.onCameraMove(
+                position: PlatformCameraPosition(
+                    target: PlatformLatLng(
+                        latitude: locationOnMap.latitude,
+                        longitude: locationOnMap.longitude
+                    ),
+                    heading: self.mapView.actualHeading,
+                    pitch: Double(self.mapView.camera.pitch),
+                    zoom: self.mapView.calculatedZoomLevel
+                ),
+                completion: pigeonLogOnError
+            )
         }
-        self.channel.invokeMethod("camera#onIdle", arguments: "")
+        flutterApi.onCameraIdle(completion: pigeonLogOnError)
     }
     
     // onMoveStarted
     public func mapView(_ mapView: MKMapView, regionWillChangeAnimated animated: Bool) {
-        self.channel.invokeMethod("camera#onMoveStarted", arguments: "")
+        flutterApi.onCameraMoveStarted(completion: pigeonLogOnError)
     }
 
     public func mapView(
@@ -342,10 +352,11 @@ extension AppleMapController: MKMapViewDelegate {
             return
         }
         let coordinate = annotation.coordinate
-        channel.invokeMethod("annotation#onDragEnd", arguments: [
-            "annotationId": annotation.id as Any,
-            "position": [coordinate.latitude, coordinate.longitude],
-        ])
+        flutterApi.onAnnotationDragEnd(
+            annotationId: annotation.id,
+            position: PlatformLatLng(latitude: coordinate.latitude, longitude: coordinate.longitude),
+            completion: pigeonLogOnError
+        )
     }
     
     public func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {

@@ -1743,17 +1743,10 @@ void main() {
         fakePlatformViewsController.lastCreatedView!;
 
     const LatLng droppedAt = LatLng(11.0, 16.0);
-    await TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .handlePlatformMessage(
-          platformAppleMap.channel.name,
-          platformAppleMap.channel.codec.encodeMethodCall(
-            MethodCall('annotation#onDragEnd', <String, dynamic>{
-              'annotationId': 'ann_1',
-              'position': <double>[droppedAt.latitude, droppedAt.longitude],
-            }),
-          ),
-          (_) {},
-        );
+    await platformAppleMap.sendFlutterApiEvent('onAnnotationDragEnd', <Object?>[
+      'ann_1',
+      PlatformLatLng(latitude: droppedAt.latitude, longitude: droppedAt.longitude),
+    ]);
 
     expect(dragEndPosition, isNotNull);
     expect(dragEndPosition!.latitude, closeTo(11.0, 0.001));
@@ -1855,6 +1848,30 @@ void main() {
     );
 
     expect(platformAppleMap.mapUpdateCallCount, 0);
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets('onPermissionDenied fires widget callback when permission is denied', (
+    WidgetTester tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    bool wasCalled = false;
+
+    await tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: const CameraPosition(target: LatLng(0, 0)),
+          onPermissionDenied: () => wasCalled = true,
+        ),
+      ),
+    );
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+    await platformAppleMap.sendFlutterApiEvent('onPermissionDenied');
+
+    expect(wasCalled, isTrue);
     debugDefaultTargetPlatformOverride = null;
   });
 }

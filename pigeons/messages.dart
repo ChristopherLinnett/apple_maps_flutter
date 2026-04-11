@@ -411,3 +411,33 @@ abstract class AppleMapHostApi {
 
   PlatformCameraTargetBounds? getCameraTargetBounds();
 }
+
+/// Callbacks from the native map to Flutter.
+@FlutterApi()
+abstract class AppleMapFlutterApi {
+  void onCameraMoveStarted();
+
+  void onCameraMove(PlatformCameraPosition position);
+
+  void onCameraIdle();
+
+  void onMapTap(PlatformLatLng position);
+
+  void onMapLongPress(PlatformLatLng position);
+
+  void onAnnotationTap(String annotationId);
+
+  void onAnnotationDragEnd(String annotationId, PlatformLatLng position);
+
+  void onAnnotationZIndexChanged(String annotationId, double zIndex);
+
+  void onInfoWindowTap(String annotationId);
+
+  void onPolylineTap(String polylineId);
+
+  void onPolygonTap(String polygonId);
+
+  void onCircleTap(String circleId);
+
+  void onPermissionDenied();
+}

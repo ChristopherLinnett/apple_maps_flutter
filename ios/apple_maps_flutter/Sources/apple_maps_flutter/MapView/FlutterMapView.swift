@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Flutter
 import MapKit
 import CoreLocation
 
@@ -17,7 +16,7 @@ private enum ButtonId: Int {
 
 class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
     weak var mapContainerView: UIView?
-    weak var channel: FlutterMethodChannel?
+    var flutterApi: AppleMapFlutterApi?
     var oldBounds: CGRect?
     var options: Dictionary<String, Any>?
     var isMyLocationButtonShowing: Bool = false
@@ -43,9 +42,9 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
         MKUserTrackingMode.followWithHeading,
     ]
     
-    convenience init(channel: FlutterMethodChannel, options: Dictionary<String, Any>) {
+    convenience init(flutterApi: AppleMapFlutterApi, options: Dictionary<String, Any>) {
         self.init(frame: CGRect.zero)
-        self.channel = channel
+        self.flutterApi = flutterApi
         self.options = options
         // Delegate is set once here so the callback is active for the view's full lifetime.
         locationManager.delegate = self
@@ -81,8 +80,8 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
     override func layoutSubviews() {
         // Only update the map in layoutSubviews if the bounds changed
         if self.bounds != oldBounds {
-            if self.options != nil {
-                self.interpretOptions(options: self.options!)
+            if let options = self.options {
+                self.interpretOptions(options: options)
             }
             setCenterCoordinateWithAltitude(centerCoordinate: centerCoordinate, zoomLevel: zoomLevel, animated: false)
             mapContainerView = self.findViewOfType("MKScrollContainerView", inView: self)
@@ -204,12 +203,7 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
         }
         
         if let myLocationEnabled: Bool = options["myLocationEnabled"] as? Bool {
-            if (myLocationEnabled) {
-                self.setUserLocation()
-            } else {
-                self.removeUserLocation()
-            }
-            
+            myLocationEnabled ? self.setUserLocation() : self.removeUserLocation()
         }
         
         if let myLocationButtonEnabled: Bool = options["myLocationButtonEnabled"] as? Bool {
@@ -370,13 +364,16 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
            let locationInView = sender.location(in: self)
            let locationOnMap = self.convert(locationInView, toCoordinateFrom: self)
            
-           channel?.invokeMethod("map#onLongPress", arguments: ["position": [locationOnMap.latitude, locationOnMap.longitude]])
+           flutterApi?.onMapLongPress(
+               position: PlatformLatLng(latitude: locationOnMap.latitude, longitude: locationOnMap.longitude),
+               completion: pigeonLogOnError
+           )
         }
     }
 
     @objc func onTap(tap: UITapGestureRecognizer) {
         if tap.state == .recognized {
-            TouchHandler.handleMapTaps(tap: tap, overlays: self.overlays, channel: self.channel, in: self)
+            TouchHandler.handleMapTaps(tap: tap, overlays: self.overlays, flutterApi: self.flutterApi, in: self)
         }
     }
     
@@ -423,7 +420,7 @@ extension FlutterMapView: CLLocationManagerDelegate {
         case .denied, .restricted:
             // Clear the flag so a later setUserLocation() call re-evaluates correctly.
             pendingUserLocationEnabled = false
-            channel?.invokeMethod("map#onPermissionDenied", arguments: nil)
+            flutterApi?.onPermissionDenied(completion: pigeonLogOnError)
         default:
             break
         }
