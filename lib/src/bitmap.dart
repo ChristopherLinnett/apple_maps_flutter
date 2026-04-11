@@ -46,7 +46,9 @@ class BitmapDescriptor {
   );
 
   // Process-lifetime cache for markerAnnotation descriptors. Keyed by the
-  // caller-supplied cacheKey, so re-renders are avoided across widget rebuilds.
+  // caller-supplied cacheKey. Capped at [_kMarkerCacheMaxSize] to bound memory
+  // use; the oldest entry is evicted when the limit is reached.
+  static const int _kMarkerCacheMaxSize = 50;
   static final Map<String, BitmapDescriptor> _markerAnnotationCache = {};
 
   /// Creates a [BitmapDescriptor] that uses the native Apple marker balloon
@@ -103,7 +105,12 @@ class BitmapDescriptor {
       result = BitmapDescriptor._(<dynamic>['markerAnnotation']);
     }
 
-    if (cacheKey != null) _markerAnnotationCache[cacheKey] = result;
+    if (cacheKey != null) {
+      if (_markerAnnotationCache.length >= _kMarkerCacheMaxSize) {
+        _markerAnnotationCache.remove(_markerAnnotationCache.keys.first);
+      }
+      _markerAnnotationCache[cacheKey] = result;
+    }
     return result;
   }
 
@@ -132,6 +139,11 @@ class BitmapDescriptor {
   ///
   /// Uses Flutter's headless rendering pipeline so no `BuildContext` is
   /// required. The result is suitable for use as a marker glyph image.
+  ///
+  /// Note: async image providers (e.g. [Image.asset]) are not guaranteed to
+  /// load within the headless pipeline. Pass pre-resolved bytes via
+  /// [Image.memory] or [markerAnnotationFromBytes] when the glyph source is
+  /// async.
   static Future<Uint8List> _renderWidgetToBytes(
     Widget widget, {
     required Size logicalSize,
@@ -171,21 +183,6 @@ class BitmapDescriptor {
     buildOwner.buildScope(rootElement);
     buildOwner.finalizeTree();
 
-    // Pump the event loop to allow async image providers (Image.asset,
-    // Image.memory, Image.network, etc.) to load. Image loading involves
-    // rootBundle.load (IO event) + codec decode (compute isolate), both of
-    // which need event-loop cycles to complete. We rebuild after each pump to
-    // flush the dirty _ImageState elements created by their setState calls.
-    for (var i = 0; i < 10; i++) {
-      if (PaintingBinding.instance.imageCache.pendingImageCount == 0) break;
-      await Future.delayed(const Duration(milliseconds: 5));
-      buildOwner.buildScope(rootElement);
-      buildOwner.finalizeTree();
-    }
-    // One final rebuild to flush any dirty elements settled after the loop.
-    buildOwner.buildScope(rootElement);
-    buildOwner.finalizeTree();
-
     repaintBoundary.layout(
       BoxConstraints.tight(logicalSize),
       parentUsesSize: false,
@@ -202,10 +199,31 @@ class BitmapDescriptor {
     final ui.Image image = await repaintBoundary.toImage(
       pixelRatio: devicePixelRatio,
     );
-    final ByteData? byteData = await image.toByteData(
-      format: ui.ImageByteFormat.png,
-    );
-    return byteData!.buffer.asUint8List();
+    try {
+      final ByteData? byteData = await image.toByteData(
+        format: ui.ImageByteFormat.png,
+      );
+      if (byteData == null) {
+        throw StateError(
+          'toByteData returned null — the headless render produced no PNG output.',
+        );
+      }
+      return byteData.buffer.asUint8List();
+    } finally {
+      image.dispose();
+    }
+  }
+
+  /// For test use only: synchronously construct a marker annotation descriptor
+  /// without running the async widget-rendering pipeline. Callers should prefer
+  /// [markerAnnotation] in production code.
+  @visibleForTesting
+  static BitmapDescriptor markerAnnotationForTest({double? hue}) {
+    final double? iosHue = hue != null ? hue / 360.0 : null;
+    if (iosHue != null) {
+      return BitmapDescriptor._(<dynamic>['markerAnnotation', iosHue]);
+    }
+    return BitmapDescriptor._(<dynamic>['markerAnnotation']);
   }
 
   /// Creates a BitmapDescriptor that refers to a colorization of the default/Pin
