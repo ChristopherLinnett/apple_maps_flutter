@@ -1869,7 +1869,7 @@ void main() {
 
     final FakePlatformAppleMap platformAppleMap =
         fakePlatformViewsController.lastCreatedView!;
-    await platformAppleMap.sendFlutterApiEvent('onPermissionDenied', <Object?>[]);
+    await platformAppleMap.sendFlutterApiEvent('onPermissionDenied');
 
     expect(wasCalled, isTrue);
     debugDefaultTargetPlatformOverride = null;

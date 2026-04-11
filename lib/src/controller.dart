@@ -9,7 +9,6 @@ class AppleMapController implements AppleMapFlutterApi {
   AppleMapController._(
     this.mapId,
     this._hostApi,
-    CameraPosition initialCameraPosition,
     this._appleMapState,
     this._binaryMessenger,
   ) {
@@ -25,10 +24,11 @@ class AppleMapController implements AppleMapFlutterApi {
     CameraPosition initialCameraPosition,
     _AppleMapState appleMapState,
   ) {
+    // initialCameraPosition is passed natively via creation params; the
+    // Dart controller does not need to store it.
     return AppleMapController._(
       id,
       AppleMapHostApi(messageChannelSuffix: '$id'),
-      initialCameraPosition,
       appleMapState,
       null,
     );
