@@ -86,6 +86,27 @@ class BitmapDescriptor {
     return BitmapDescriptor._(<dynamic>['markerAnnotation']);
   }
 
+  /// Creates a [BitmapDescriptor] for a native marker annotation using
+  /// pre-rendered PNG [glyphBytes] as the glyph image.
+  ///
+  /// Use this instead of [markerAnnotation] with a [glyphWidget] when you
+  /// already have PNG bytes (e.g. rendered via [dart:ui.PictureRecorder]).
+  /// This bypasses the headless widget pipeline entirely, avoiding frame-timing
+  /// issues that can occur when [markerAnnotation] is called during a Flutter
+  /// build/paint phase.
+  static BitmapDescriptor markerAnnotationFromBytes(
+    Uint8List glyphBytes, {
+    double? hue,
+  }) {
+    if (hue != null) {
+      assert(0.0 <= hue && hue < 360.0, 'hue must be in [0, 360)');
+    }
+    final double? iosHue = hue != null ? hue / 360.0 : null;
+    return iosHue != null
+        ? BitmapDescriptor._(<dynamic>['markerAnnotation', iosHue, glyphBytes])
+        : BitmapDescriptor._(<dynamic>['markerAnnotation', glyphBytes]);
+  }
+
   /// Renders [widget] off-screen to a PNG.
   ///
   /// Uses Flutter's headless rendering pipeline so no `BuildContext` is
@@ -96,9 +117,13 @@ class BitmapDescriptor {
   }) async {
     final double devicePixelRatio =
         WidgetsBinding.instance.renderViews.isNotEmpty
-            ? WidgetsBinding.instance.renderViews.first.configuration
-                .devicePixelRatio
-            : 1.0;
+        ? WidgetsBinding
+              .instance
+              .renderViews
+              .first
+              .configuration
+              .devicePixelRatio
+        : 1.0;
 
     final RenderRepaintBoundary repaintBoundary = RenderRepaintBoundary();
     final PipelineOwner pipelineOwner = PipelineOwner();
