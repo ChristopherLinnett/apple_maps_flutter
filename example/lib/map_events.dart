@@ -41,7 +41,9 @@ class _MapEventsBodyState extends State<_MapEventsBody> {
         ),
         onCameraMoveStarted: () {
           setState(() => _moveStartedCount++);
-          _logKey.currentState?.add('Camera move started (#$_moveStartedCount)');
+          _logKey.currentState?.add(
+            'Camera move started (#$_moveStartedCount)',
+          );
         },
         onCameraMove: (pos) => setState(() => _position = pos),
         onCameraIdle: () {

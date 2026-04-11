@@ -37,7 +37,8 @@ class ColorSwatch extends StatelessWidget {
         // Use ARGB integer for a stable hex label that doesn't rely on
         // deprecated Color.value.
         final int argb = color.toARGB32();
-        final String hex = '#${argb.toRadixString(16).padLeft(8, '0').toUpperCase()}';
+        final String hex =
+            '#${argb.toRadixString(16).padLeft(8, '0').toUpperCase()}';
         return Semantics(
           button: true,
           selected: isSelected,

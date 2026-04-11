@@ -67,7 +67,7 @@ class _AnnotationClusteringBodyState extends State<_AnnotationClusteringBody> {
           subtitle: Text(
             _clusteringEnabled
                 ? 'Clustering active. Zoom out until annotations are close '
-                  'enough to merge, then zoom in to expand them again.'
+                      'enough to merge, then zoom in to expand them again.'
                 : '30 individual annotations — no clustering identifier set.',
           ),
           value: _clusteringEnabled,

@@ -57,7 +57,7 @@ class MapScaffold extends StatelessWidget {
           return Stack(
             children: [
               Positioned.fill(child: mapBuilder(mapPadding)),
-                  DraggableScrollableSheet(
+              DraggableScrollableSheet(
                 initialChildSize: initialSheetSize,
                 minChildSize: minSheetSize,
                 maxChildSize: maxSheetSize,
