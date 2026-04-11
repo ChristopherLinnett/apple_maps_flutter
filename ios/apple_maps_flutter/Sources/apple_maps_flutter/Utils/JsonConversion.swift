@@ -102,72 +102,81 @@ extension PlatformCameraPosition {
 }
 
 extension PlatformMapOptions {
-    var asDictionary: [String: Any] {
-        var options: [String: Any] = [:]
+    /// Parses the `[String: Any]` dictionary delivered via `StandardMessageCodec` from the
+    /// Flutter platform-view creation params into a typed `PlatformMapOptions`.
+    ///
+    /// Key names and encoding match `_AppleMapOptions.toMap()` in the Dart package.
+    /// `cameraTargetBounds` is encoded as a flat `[Double]` list `[swLat, swLng, neLat, neLng]`
+    /// or `null` when unbounded. All other list fields use the same format as the Pigeon path.
+    /// This factory is the creation-path boundary only; Pigeon handles the update path directly.
+    static func fromCreationDictionary(_ dict: [String: Any]) -> PlatformMapOptions {
+        var options = PlatformMapOptions()
 
-        if let compassEnabled {
-            options["compassEnabled"] = compassEnabled
+        options.compassEnabled = dict["compassEnabled"] as? Bool
+        options.trafficEnabled = dict["trafficEnabled"] as? Bool
+
+        if let mapType = dict["mapType"] as? Int {
+            options.mapType = Int64(mapType)
         }
-        if let trafficEnabled {
-            options["trafficEnabled"] = trafficEnabled
+
+        if let minMaxZoom = dict["minMaxZoomPreference"] as? [Any], minMaxZoom.count >= 2 {
+            options.minMaxZoomPreference = PlatformMinMaxZoomPreference(
+                minZoom: minMaxZoom[0] as? Double,
+                maxZoom: minMaxZoom[1] as? Double
+            )
         }
-        if let mapType {
-            options["mapType"] = Int(mapType)
+
+        options.rotateGesturesEnabled = dict["rotateGesturesEnabled"] as? Bool
+        options.scrollGesturesEnabled = dict["scrollGesturesEnabled"] as? Bool
+        options.pitchGesturesEnabled = dict["pitchGesturesEnabled"] as? Bool
+
+        if let trackingMode = dict["trackingMode"] as? Int {
+            options.trackingMode = Int64(trackingMode)
         }
-        if let minMaxZoomPreference {
-            options["minMaxZoomPreference"] = [
-                nullOrValue(minMaxZoomPreference.minZoom),
-                nullOrValue(minMaxZoomPreference.maxZoom),
-            ]
+
+        options.zoomGesturesEnabled = dict["zoomGesturesEnabled"] as? Bool
+        options.myLocationEnabled = dict["myLocationEnabled"] as? Bool
+        options.myLocationButtonEnabled = dict["myLocationButtonEnabled"] as? Bool
+
+        if let padding = dict["padding"] as? [Any], padding.count >= 4 {
+            options.padding = PlatformPadding(
+                top: padding[0] as? Double ?? 0.0,
+                left: padding[1] as? Double ?? 0.0,
+                bottom: padding[2] as? Double ?? 0.0,
+                right: padding[3] as? Double ?? 0.0
+            )
         }
-        if let rotateGesturesEnabled {
-            options["rotateGesturesEnabled"] = rotateGesturesEnabled
-        }
-        if let scrollGesturesEnabled {
-            options["scrollGesturesEnabled"] = scrollGesturesEnabled
-        }
-        if let pitchGesturesEnabled {
-            options["pitchGesturesEnabled"] = pitchGesturesEnabled
-        }
-        if let trackingMode {
-            options["trackingMode"] = Int(trackingMode)
-        }
-        if let zoomGesturesEnabled {
-            options["zoomGesturesEnabled"] = zoomGesturesEnabled
-        }
-        if let myLocationEnabled {
-            options["myLocationEnabled"] = myLocationEnabled
-        }
-        if let myLocationButtonEnabled {
-            options["myLocationButtonEnabled"] = myLocationButtonEnabled
-        }
-        if let padding {
-            options["padding"] = [padding.top, padding.left, padding.bottom, padding.right]
-        }
-        if let insetsLayoutMarginsFromSafeArea {
-            options["insetsLayoutMarginsFromSafeArea"] = insetsLayoutMarginsFromSafeArea
-        }
-        if let cameraTargetBounds {
-            if let bounds = cameraTargetBounds.bounds {
-                options["cameraTargetBounds"] = bounds.asTargetList
-            } else {
-                options["cameraTargetBounds"] = NSNull()
+
+        options.insetsLayoutMarginsFromSafeArea = dict["insetsLayoutMarginsFromSafeArea"] as? Bool
+
+        // Dart encodes cameraTargetBounds as a flat [swLat, swLng, neLat, neLng] list or null.
+        // The key is always present in the creation dict so the presence check is key-based.
+        if dict.keys.contains("cameraTargetBounds") {
+            let rawBounds = dict["cameraTargetBounds"]
+            if rawBounds is NSNull {
+                // Dart explicitly sent null → unbounded camera.
+                options.cameraTargetBounds = PlatformCameraTargetBounds(bounds: nil)
+            } else if let flat = rawBounds as? [Double], flat.count == 4 {
+                options.cameraTargetBounds = PlatformCameraTargetBounds(
+                    bounds: PlatformLatLngBounds(
+                        southwest: PlatformLatLng(latitude: flat[0], longitude: flat[1]),
+                        northeast: PlatformLatLng(latitude: flat[2], longitude: flat[3])
+                    )
+                )
             }
+            // else: malformed data — leave cameraTargetBounds nil (treat as no change).
         }
-        if let buildingsEnabled {
-            options["buildingsEnabled"] = buildingsEnabled
+
+        options.buildingsEnabled = dict["buildingsEnabled"] as? Bool
+        options.pointsOfInterestEnabled = dict["pointsOfInterestEnabled"] as? Bool
+        options.scaleEnabled = dict["scaleEnabled"] as? Bool
+
+        if let emphasisStyleRaw = dict["emphasisStyle"] as? Int {
+            options.emphasisStyle = PlatformMapEmphasisStyle(rawValue: emphasisStyleRaw) ?? .defaultStyle
         }
-        if let pointsOfInterestEnabled {
-            options["pointsOfInterestEnabled"] = pointsOfInterestEnabled
-        }
-        if let scaleEnabled {
-            options["scaleEnabled"] = scaleEnabled
-        }
-        if let emphasisStyle {
-            options["emphasisStyle"] = emphasisStyle.rawValue
-        }
-        if let selectableFeatures {
-            options["selectableFeatures"] = Int(selectableFeatures)
+
+        if let selectableFeatures = dict["selectableFeatures"] as? Int {
+            options.selectableFeatures = Int64(selectableFeatures)
         }
 
         return options

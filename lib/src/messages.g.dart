@@ -15,7 +15,11 @@ PlatformException _createConnectionError(String channelName) {
   );
 }
 
-List<Object?> wrapResponse({Object? result, PlatformException? error, bool empty = false}) {
+List<Object?> wrapResponse({
+  Object? result,
+  PlatformException? error,
+  bool empty = false,
+}) {
   if (empty) {
     return <Object?>[];
   }
@@ -24,20 +28,24 @@ List<Object?> wrapResponse({Object? result, PlatformException? error, bool empty
   }
   return <Object?>[error.code, error.message, error.details];
 }
+
 bool _deepEquals(Object? a, Object? b) {
   if (a is List && b is List) {
     return a.length == b.length &&
-        a.indexed
-        .every(((int, dynamic) item) => _deepEquals(item.$2, b[item.$1]));
+        a.indexed.every(
+          ((int, dynamic) item) => _deepEquals(item.$2, b[item.$1]),
+        );
   }
   if (a is Map && b is Map) {
-    return a.length == b.length && a.entries.every((MapEntry<Object?, Object?> entry) =>
-        (b as Map<Object?, Object?>).containsKey(entry.key) &&
-        _deepEquals(entry.value, b[entry.key]));
+    return a.length == b.length &&
+        a.entries.every(
+          (MapEntry<Object?, Object?> entry) =>
+              (b as Map<Object?, Object?>).containsKey(entry.key) &&
+              _deepEquals(entry.value, b[entry.key]),
+        );
   }
   return a == b;
 }
-
 
 enum CameraUpdateType {
   newCameraPosition,
@@ -57,59 +65,40 @@ enum BitmapDescriptorType {
   fromBytes,
 }
 
-enum CapType {
-  buttCap,
-  roundCap,
-  squareCap,
-}
+enum CapType { buttCap, roundCap, squareCap }
 
-enum PatternItemType {
-  dot,
-  dash,
-  gap,
-}
+enum PatternItemType { dot, dash, gap }
 
 /// Emphasis style for the standard map configuration (iOS 16+).
 enum PlatformMapEmphasisStyle {
   /// The default map appearance.
   defaultStyle,
+
   /// A muted appearance that de-emphasises labels and icons.
   muted,
 }
 
 /// The type of a built-in map feature tapped by the user (iOS 16+).
-enum PlatformMapFeatureType {
-  pointOfInterest,
-  territory,
-  physicalFeature,
-}
+enum PlatformMapFeatureType { pointOfInterest, territory, physicalFeature }
 
 class PlatformOffset {
-  PlatformOffset({
-    required this.x,
-    required this.y,
-  });
+  PlatformOffset({required this.x, required this.y});
 
   double x;
 
   double y;
 
   List<Object?> _toList() {
-    return <Object?>[
-      x,
-      y,
-    ];
+    return <Object?>[x, y];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PlatformOffset decode(Object result) {
     result as List<Object?>;
-    return PlatformOffset(
-      x: result[0]! as double,
-      y: result[1]! as double,
-    );
+    return PlatformOffset(x: result[0]! as double, y: result[1]! as double);
   }
 
   @override
@@ -126,29 +115,23 @@ class PlatformOffset {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class PlatformLatLng {
-  PlatformLatLng({
-    required this.latitude,
-    required this.longitude,
-  });
+  PlatformLatLng({required this.latitude, required this.longitude});
 
   double latitude;
 
   double longitude;
 
   List<Object?> _toList() {
-    return <Object?>[
-      latitude,
-      longitude,
-    ];
+    return <Object?>[latitude, longitude];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PlatformLatLng decode(Object result) {
     result as List<Object?>;
@@ -172,29 +155,23 @@ class PlatformLatLng {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class PlatformLatLngBounds {
-  PlatformLatLngBounds({
-    required this.southwest,
-    required this.northeast,
-  });
+  PlatformLatLngBounds({required this.southwest, required this.northeast});
 
   PlatformLatLng southwest;
 
   PlatformLatLng northeast;
 
   List<Object?> _toList() {
-    return <Object?>[
-      southwest,
-      northeast,
-    ];
+    return <Object?>[southwest, northeast];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PlatformLatLngBounds decode(Object result) {
     result as List<Object?>;
@@ -218,29 +195,23 @@ class PlatformLatLngBounds {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class PlatformScreenCoordinate {
-  PlatformScreenCoordinate({
-    required this.x,
-    required this.y,
-  });
+  PlatformScreenCoordinate({required this.x, required this.y});
 
   double x;
 
   double y;
 
   List<Object?> _toList() {
-    return <Object?>[
-      x,
-      y,
-    ];
+    return <Object?>[x, y];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PlatformScreenCoordinate decode(Object result) {
     result as List<Object?>;
@@ -253,7 +224,8 @@ class PlatformScreenCoordinate {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! PlatformScreenCoordinate || other.runtimeType != runtimeType) {
+    if (other is! PlatformScreenCoordinate ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -264,8 +236,7 @@ class PlatformScreenCoordinate {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class PlatformCameraPosition {
@@ -285,16 +256,12 @@ class PlatformCameraPosition {
   double zoom;
 
   List<Object?> _toList() {
-    return <Object?>[
-      target,
-      heading,
-      pitch,
-      zoom,
-    ];
+    return <Object?>[target, heading, pitch, zoom];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PlatformCameraPosition decode(Object result) {
     result as List<Object?>;
@@ -320,29 +287,23 @@ class PlatformCameraPosition {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class PlatformMinMaxZoomPreference {
-  PlatformMinMaxZoomPreference({
-    this.minZoom,
-    this.maxZoom,
-  });
+  PlatformMinMaxZoomPreference({this.minZoom, this.maxZoom});
 
   double? minZoom;
 
   double? maxZoom;
 
   List<Object?> _toList() {
-    return <Object?>[
-      minZoom,
-      maxZoom,
-    ];
+    return <Object?>[minZoom, maxZoom];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PlatformMinMaxZoomPreference decode(Object result) {
     result as List<Object?>;
@@ -355,7 +316,8 @@ class PlatformMinMaxZoomPreference {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! PlatformMinMaxZoomPreference || other.runtimeType != runtimeType) {
+    if (other is! PlatformMinMaxZoomPreference ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -366,8 +328,7 @@ class PlatformMinMaxZoomPreference {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class PlatformPadding {
@@ -387,16 +348,12 @@ class PlatformPadding {
   double right;
 
   List<Object?> _toList() {
-    return <Object?>[
-      top,
-      left,
-      bottom,
-      right,
-    ];
+    return <Object?>[top, left, bottom, right];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PlatformPadding decode(Object result) {
     result as List<Object?>;
@@ -422,25 +379,21 @@ class PlatformPadding {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class PlatformCameraTargetBounds {
-  PlatformCameraTargetBounds({
-    this.bounds,
-  });
+  PlatformCameraTargetBounds({this.bounds});
 
   PlatformLatLngBounds? bounds;
 
   List<Object?> _toList() {
-    return <Object?>[
-      bounds,
-    ];
+    return <Object?>[bounds];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PlatformCameraTargetBounds decode(Object result) {
     result as List<Object?>;
@@ -452,7 +405,8 @@ class PlatformCameraTargetBounds {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! PlatformCameraTargetBounds || other.runtimeType != runtimeType) {
+    if (other is! PlatformCameraTargetBounds ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -463,8 +417,7 @@ class PlatformCameraTargetBounds {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 /// A built-in map feature (e.g. POI, landmark) selected by the user (iOS 16+).
@@ -488,16 +441,12 @@ class PlatformMapFeature {
   String? pointOfInterestCategory;
 
   List<Object?> _toList() {
-    return <Object?>[
-      coordinate,
-      featureType,
-      title,
-      pointOfInterestCategory,
-    ];
+    return <Object?>[coordinate, featureType, title, pointOfInterestCategory];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PlatformMapFeature decode(Object result) {
     result as List<Object?>;
@@ -523,8 +472,7 @@ class PlatformMapFeature {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class PlatformMapOptions {
@@ -616,7 +564,8 @@ class PlatformMapOptions {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PlatformMapOptions decode(Object result) {
     result as List<Object?>;
@@ -657,8 +606,7 @@ class PlatformMapOptions {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class PlatformInfoWindow {
@@ -678,16 +626,12 @@ class PlatformInfoWindow {
   bool consumesTapEvents;
 
   List<Object?> _toList() {
-    return <Object?>[
-      title,
-      snippet,
-      anchor,
-      consumesTapEvents,
-    ];
+    return <Object?>[title, snippet, anchor, consumesTapEvents];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PlatformInfoWindow decode(Object result) {
     result as List<Object?>;
@@ -713,8 +657,7 @@ class PlatformInfoWindow {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class PlatformBitmapDescriptor {
@@ -737,17 +680,12 @@ class PlatformBitmapDescriptor {
   Uint8List? bytes;
 
   List<Object?> _toList() {
-    return <Object?>[
-      type,
-      hue,
-      assetName,
-      assetScale,
-      bytes,
-    ];
+    return <Object?>[type, hue, assetName, assetScale, bytes];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PlatformBitmapDescriptor decode(Object result) {
     result as List<Object?>;
@@ -763,7 +701,8 @@ class PlatformBitmapDescriptor {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! PlatformBitmapDescriptor || other.runtimeType != runtimeType) {
+    if (other is! PlatformBitmapDescriptor ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -774,8 +713,7 @@ class PlatformBitmapDescriptor {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class PlatformAnnotation {
@@ -830,7 +768,8 @@ class PlatformAnnotation {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PlatformAnnotation decode(Object result) {
     result as List<Object?>;
@@ -862,8 +801,7 @@ class PlatformAnnotation {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class PlatformAnnotationUpdates {
@@ -888,13 +826,16 @@ class PlatformAnnotationUpdates {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PlatformAnnotationUpdates decode(Object result) {
     result as List<Object?>;
     return PlatformAnnotationUpdates(
-      annotationsToAdd: (result[0] as List<Object?>?)?.cast<PlatformAnnotation>(),
-      annotationsToChange: (result[1] as List<Object?>?)?.cast<PlatformAnnotation>(),
+      annotationsToAdd: (result[0] as List<Object?>?)
+          ?.cast<PlatformAnnotation>(),
+      annotationsToChange: (result[1] as List<Object?>?)
+          ?.cast<PlatformAnnotation>(),
       annotationIdsToRemove: (result[2] as List<Object?>?)?.cast<String>(),
     );
   }
@@ -902,7 +843,8 @@ class PlatformAnnotationUpdates {
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
   bool operator ==(Object other) {
-    if (other is! PlatformAnnotationUpdates || other.runtimeType != runtimeType) {
+    if (other is! PlatformAnnotationUpdates ||
+        other.runtimeType != runtimeType) {
       return false;
     }
     if (identical(this, other)) {
@@ -913,29 +855,23 @@ class PlatformAnnotationUpdates {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class PlatformPatternItem {
-  PlatformPatternItem({
-    required this.type,
-    this.length,
-  });
+  PlatformPatternItem({required this.type, this.length});
 
   PatternItemType type;
 
   double? length;
 
   List<Object?> _toList() {
-    return <Object?>[
-      type,
-      length,
-    ];
+    return <Object?>[type, length];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PlatformPatternItem decode(Object result) {
     result as List<Object?>;
@@ -959,8 +895,7 @@ class PlatformPatternItem {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class PlatformPolyline {
@@ -1013,7 +948,8 @@ class PlatformPolyline {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PlatformPolyline decode(Object result) {
     result as List<Object?>;
@@ -1045,8 +981,7 @@ class PlatformPolyline {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class PlatformPolylineUpdates {
@@ -1063,21 +998,19 @@ class PlatformPolylineUpdates {
   List<String>? polylineIdsToRemove;
 
   List<Object?> _toList() {
-    return <Object?>[
-      polylinesToAdd,
-      polylinesToChange,
-      polylineIdsToRemove,
-    ];
+    return <Object?>[polylinesToAdd, polylinesToChange, polylineIdsToRemove];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PlatformPolylineUpdates decode(Object result) {
     result as List<Object?>;
     return PlatformPolylineUpdates(
       polylinesToAdd: (result[0] as List<Object?>?)?.cast<PlatformPolyline>(),
-      polylinesToChange: (result[1] as List<Object?>?)?.cast<PlatformPolyline>(),
+      polylinesToChange: (result[1] as List<Object?>?)
+          ?.cast<PlatformPolyline>(),
       polylineIdsToRemove: (result[2] as List<Object?>?)?.cast<String>(),
     );
   }
@@ -1096,8 +1029,7 @@ class PlatformPolylineUpdates {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class PlatformPolygon {
@@ -1142,7 +1074,8 @@ class PlatformPolygon {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PlatformPolygon decode(Object result) {
     result as List<Object?>;
@@ -1172,8 +1105,7 @@ class PlatformPolygon {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class PlatformPolygonUpdates {
@@ -1190,15 +1122,12 @@ class PlatformPolygonUpdates {
   List<String>? polygonIdsToRemove;
 
   List<Object?> _toList() {
-    return <Object?>[
-      polygonsToAdd,
-      polygonsToChange,
-      polygonIdsToRemove,
-    ];
+    return <Object?>[polygonsToAdd, polygonsToChange, polygonIdsToRemove];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PlatformPolygonUpdates decode(Object result) {
     result as List<Object?>;
@@ -1223,8 +1152,7 @@ class PlatformPolygonUpdates {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class PlatformCircle {
@@ -1273,7 +1201,8 @@ class PlatformCircle {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PlatformCircle decode(Object result) {
     result as List<Object?>;
@@ -1304,8 +1233,7 @@ class PlatformCircle {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class PlatformCircleUpdates {
@@ -1322,15 +1250,12 @@ class PlatformCircleUpdates {
   List<String>? circleIdsToRemove;
 
   List<Object?> _toList() {
-    return <Object?>[
-      circlesToAdd,
-      circlesToChange,
-      circleIdsToRemove,
-    ];
+    return <Object?>[circlesToAdd, circlesToChange, circleIdsToRemove];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PlatformCircleUpdates decode(Object result) {
     result as List<Object?>;
@@ -1355,8 +1280,7 @@ class PlatformCircleUpdates {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class PlatformSnapshotOptions {
@@ -1385,7 +1309,8 @@ class PlatformSnapshotOptions {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PlatformSnapshotOptions decode(Object result) {
     result as List<Object?>;
@@ -1411,8 +1336,7 @@ class PlatformSnapshotOptions {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
 
 class PlatformCameraUpdate {
@@ -1453,7 +1377,8 @@ class PlatformCameraUpdate {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PlatformCameraUpdate decode(Object result) {
     result as List<Object?>;
@@ -1482,10 +1407,8 @@ class PlatformCameraUpdate {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes
-  int get hashCode => Object.hashAll(_toList())
-;
+  int get hashCode => Object.hashAll(_toList());
 }
-
 
 class _PigeonCodec extends StandardMessageCodec {
   const _PigeonCodec();
@@ -1494,91 +1417,91 @@ class _PigeonCodec extends StandardMessageCodec {
     if (value is int) {
       buffer.putUint8(4);
       buffer.putInt64(value);
-    }    else if (value is CameraUpdateType) {
+    } else if (value is CameraUpdateType) {
       buffer.putUint8(129);
       writeValue(buffer, value.index);
-    }    else if (value is BitmapDescriptorType) {
+    } else if (value is BitmapDescriptorType) {
       buffer.putUint8(130);
       writeValue(buffer, value.index);
-    }    else if (value is CapType) {
+    } else if (value is CapType) {
       buffer.putUint8(131);
       writeValue(buffer, value.index);
-    }    else if (value is PatternItemType) {
+    } else if (value is PatternItemType) {
       buffer.putUint8(132);
       writeValue(buffer, value.index);
-    }    else if (value is PlatformMapEmphasisStyle) {
+    } else if (value is PlatformMapEmphasisStyle) {
       buffer.putUint8(133);
       writeValue(buffer, value.index);
-    }    else if (value is PlatformMapFeatureType) {
+    } else if (value is PlatformMapFeatureType) {
       buffer.putUint8(134);
       writeValue(buffer, value.index);
-    }    else if (value is PlatformOffset) {
+    } else if (value is PlatformOffset) {
       buffer.putUint8(135);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformLatLng) {
+    } else if (value is PlatformLatLng) {
       buffer.putUint8(136);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformLatLngBounds) {
+    } else if (value is PlatformLatLngBounds) {
       buffer.putUint8(137);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformScreenCoordinate) {
+    } else if (value is PlatformScreenCoordinate) {
       buffer.putUint8(138);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformCameraPosition) {
+    } else if (value is PlatformCameraPosition) {
       buffer.putUint8(139);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformMinMaxZoomPreference) {
+    } else if (value is PlatformMinMaxZoomPreference) {
       buffer.putUint8(140);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformPadding) {
+    } else if (value is PlatformPadding) {
       buffer.putUint8(141);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformCameraTargetBounds) {
+    } else if (value is PlatformCameraTargetBounds) {
       buffer.putUint8(142);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformMapFeature) {
+    } else if (value is PlatformMapFeature) {
       buffer.putUint8(143);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformMapOptions) {
+    } else if (value is PlatformMapOptions) {
       buffer.putUint8(144);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformInfoWindow) {
+    } else if (value is PlatformInfoWindow) {
       buffer.putUint8(145);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformBitmapDescriptor) {
+    } else if (value is PlatformBitmapDescriptor) {
       buffer.putUint8(146);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformAnnotation) {
+    } else if (value is PlatformAnnotation) {
       buffer.putUint8(147);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformAnnotationUpdates) {
+    } else if (value is PlatformAnnotationUpdates) {
       buffer.putUint8(148);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformPatternItem) {
+    } else if (value is PlatformPatternItem) {
       buffer.putUint8(149);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformPolyline) {
+    } else if (value is PlatformPolyline) {
       buffer.putUint8(150);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformPolylineUpdates) {
+    } else if (value is PlatformPolylineUpdates) {
       buffer.putUint8(151);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformPolygon) {
+    } else if (value is PlatformPolygon) {
       buffer.putUint8(152);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformPolygonUpdates) {
+    } else if (value is PlatformPolygonUpdates) {
       buffer.putUint8(153);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformCircle) {
+    } else if (value is PlatformCircle) {
       buffer.putUint8(154);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformCircleUpdates) {
+    } else if (value is PlatformCircleUpdates) {
       buffer.putUint8(155);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformSnapshotOptions) {
+    } else if (value is PlatformSnapshotOptions) {
       buffer.putUint8(156);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformCameraUpdate) {
+    } else if (value is PlatformCameraUpdate) {
       buffer.putUint8(157);
       writeValue(buffer, value.encode());
     } else {
@@ -1589,69 +1512,69 @@ class _PigeonCodec extends StandardMessageCodec {
   @override
   Object? readValueOfType(int type, ReadBuffer buffer) {
     switch (type) {
-      case 129: 
+      case 129:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : CameraUpdateType.values[value];
-      case 130: 
+      case 130:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : BitmapDescriptorType.values[value];
-      case 131: 
+      case 131:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : CapType.values[value];
-      case 132: 
+      case 132:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : PatternItemType.values[value];
-      case 133: 
+      case 133:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : PlatformMapEmphasisStyle.values[value];
-      case 134: 
+      case 134:
         final int? value = readValue(buffer) as int?;
         return value == null ? null : PlatformMapFeatureType.values[value];
-      case 135: 
+      case 135:
         return PlatformOffset.decode(readValue(buffer)!);
-      case 136: 
+      case 136:
         return PlatformLatLng.decode(readValue(buffer)!);
-      case 137: 
+      case 137:
         return PlatformLatLngBounds.decode(readValue(buffer)!);
-      case 138: 
+      case 138:
         return PlatformScreenCoordinate.decode(readValue(buffer)!);
-      case 139: 
+      case 139:
         return PlatformCameraPosition.decode(readValue(buffer)!);
-      case 140: 
+      case 140:
         return PlatformMinMaxZoomPreference.decode(readValue(buffer)!);
-      case 141: 
+      case 141:
         return PlatformPadding.decode(readValue(buffer)!);
-      case 142: 
+      case 142:
         return PlatformCameraTargetBounds.decode(readValue(buffer)!);
-      case 143: 
+      case 143:
         return PlatformMapFeature.decode(readValue(buffer)!);
-      case 144: 
+      case 144:
         return PlatformMapOptions.decode(readValue(buffer)!);
-      case 145: 
+      case 145:
         return PlatformInfoWindow.decode(readValue(buffer)!);
-      case 146: 
+      case 146:
         return PlatformBitmapDescriptor.decode(readValue(buffer)!);
-      case 147: 
+      case 147:
         return PlatformAnnotation.decode(readValue(buffer)!);
-      case 148: 
+      case 148:
         return PlatformAnnotationUpdates.decode(readValue(buffer)!);
-      case 149: 
+      case 149:
         return PlatformPatternItem.decode(readValue(buffer)!);
-      case 150: 
+      case 150:
         return PlatformPolyline.decode(readValue(buffer)!);
-      case 151: 
+      case 151:
         return PlatformPolylineUpdates.decode(readValue(buffer)!);
-      case 152: 
+      case 152:
         return PlatformPolygon.decode(readValue(buffer)!);
-      case 153: 
+      case 153:
         return PlatformPolygonUpdates.decode(readValue(buffer)!);
-      case 154: 
+      case 154:
         return PlatformCircle.decode(readValue(buffer)!);
-      case 155: 
+      case 155:
         return PlatformCircleUpdates.decode(readValue(buffer)!);
-      case 156: 
+      case 156:
         return PlatformSnapshotOptions.decode(readValue(buffer)!);
-      case 157: 
+      case 157:
         return PlatformCameraUpdate.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -1663,9 +1586,13 @@ class AppleMapHostApi {
   /// Constructor for [AppleMapHostApi].  The [binaryMessenger] named argument is
   /// available for dependency injection.  If it is left null, the default
   /// BinaryMessenger will be used which routes to the host platform.
-  AppleMapHostApi({BinaryMessenger? binaryMessenger, String messageChannelSuffix = ''})
-      : pigeonVar_binaryMessenger = binaryMessenger,
-        pigeonVar_messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
+  AppleMapHostApi({
+    BinaryMessenger? binaryMessenger,
+    String messageChannelSuffix = '',
+  }) : pigeonVar_binaryMessenger = binaryMessenger,
+       pigeonVar_messageChannelSuffix = messageChannelSuffix.isNotEmpty
+           ? '.$messageChannelSuffix'
+           : '';
   final BinaryMessenger? pigeonVar_binaryMessenger;
 
   static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
@@ -1673,13 +1600,17 @@ class AppleMapHostApi {
   final String pigeonVar_messageChannelSuffix;
 
   Future<void> updateMapOptions(PlatformMapOptions options) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.updateMapOptions$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.updateMapOptions$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[options],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[options]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1696,13 +1627,17 @@ class AppleMapHostApi {
   }
 
   Future<void> updateAnnotations(PlatformAnnotationUpdates updates) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.updateAnnotations$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.updateAnnotations$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[updates],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[updates]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1719,13 +1654,17 @@ class AppleMapHostApi {
   }
 
   Future<void> updatePolylines(PlatformPolylineUpdates updates) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.updatePolylines$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.updatePolylines$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[updates],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[updates]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1742,13 +1681,17 @@ class AppleMapHostApi {
   }
 
   Future<void> updatePolygons(PlatformPolygonUpdates updates) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.updatePolygons$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.updatePolygons$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[updates],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[updates]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1765,13 +1708,17 @@ class AppleMapHostApi {
   }
 
   Future<void> updateCircles(PlatformCircleUpdates updates) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.updateCircles$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.updateCircles$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[updates],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[updates]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1788,13 +1735,17 @@ class AppleMapHostApi {
   }
 
   Future<void> animateCamera(PlatformCameraUpdate cameraUpdate) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.animateCamera$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.animateCamera$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[cameraUpdate],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[cameraUpdate]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1811,13 +1762,17 @@ class AppleMapHostApi {
   }
 
   Future<void> moveCamera(PlatformCameraUpdate cameraUpdate) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.moveCamera$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.moveCamera$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[cameraUpdate],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[cameraUpdate]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1834,13 +1789,17 @@ class AppleMapHostApi {
   }
 
   Future<void> showMarkerInfoWindow(String annotationId) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.showMarkerInfoWindow$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.showMarkerInfoWindow$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[annotationId],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[annotationId]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1857,13 +1816,17 @@ class AppleMapHostApi {
   }
 
   Future<void> hideMarkerInfoWindow(String annotationId) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.hideMarkerInfoWindow$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.hideMarkerInfoWindow$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[annotationId],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[annotationId]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1880,13 +1843,17 @@ class AppleMapHostApi {
   }
 
   Future<bool?> isMarkerInfoWindowShown(String annotationId) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isMarkerInfoWindowShown$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isMarkerInfoWindowShown$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[annotationId],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[annotationId]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1903,12 +1870,14 @@ class AppleMapHostApi {
   }
 
   Future<double?> getZoomLevel() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.getZoomLevel$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.getZoomLevel$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -1926,12 +1895,14 @@ class AppleMapHostApi {
   }
 
   Future<PlatformLatLngBounds> getVisibleRegion() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.getVisibleRegion$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.getVisibleRegion$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -1953,14 +1924,20 @@ class AppleMapHostApi {
     }
   }
 
-  Future<PlatformScreenCoordinate?> getScreenCoordinate(PlatformLatLng latLng) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.getScreenCoordinate$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+  Future<PlatformScreenCoordinate?> getScreenCoordinate(
+    PlatformLatLng latLng,
+  ) async {
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.getScreenCoordinate$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[latLng],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[latLng]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -1976,14 +1953,20 @@ class AppleMapHostApi {
     }
   }
 
-  Future<PlatformLatLng?> getLatLng(PlatformScreenCoordinate screenCoordinate) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.getLatLng$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+  Future<PlatformLatLng?> getLatLng(
+    PlatformScreenCoordinate screenCoordinate,
+  ) async {
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.getLatLng$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[screenCoordinate],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[screenCoordinate]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -2000,13 +1983,17 @@ class AppleMapHostApi {
   }
 
   Future<Uint8List?> takeSnapshot(PlatformSnapshotOptions options) async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.takeSnapshot$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.takeSnapshot$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[options],
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[options]);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
     if (pigeonVar_replyList == null) {
@@ -2023,12 +2010,14 @@ class AppleMapHostApi {
   }
 
   Future<void> dispose() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.dispose$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.dispose$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -2046,12 +2035,14 @@ class AppleMapHostApi {
   }
 
   Future<bool> isCompassEnabled() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isCompassEnabled$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isCompassEnabled$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -2074,12 +2065,14 @@ class AppleMapHostApi {
   }
 
   Future<PlatformMinMaxZoomPreference> getMinMaxZoomLevels() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.getMinMaxZoomLevels$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.getMinMaxZoomLevels$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -2102,12 +2095,14 @@ class AppleMapHostApi {
   }
 
   Future<bool> isZoomGesturesEnabled() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isZoomGesturesEnabled$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isZoomGesturesEnabled$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -2130,12 +2125,14 @@ class AppleMapHostApi {
   }
 
   Future<bool> isRotateGesturesEnabled() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isRotateGesturesEnabled$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isRotateGesturesEnabled$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -2158,12 +2155,14 @@ class AppleMapHostApi {
   }
 
   Future<bool> isPitchGesturesEnabled() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isPitchGesturesEnabled$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isPitchGesturesEnabled$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -2186,12 +2185,14 @@ class AppleMapHostApi {
   }
 
   Future<bool> isScrollGesturesEnabled() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isScrollGesturesEnabled$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isScrollGesturesEnabled$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -2214,12 +2215,14 @@ class AppleMapHostApi {
   }
 
   Future<bool> isMyLocationButtonEnabled() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isMyLocationButtonEnabled$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isMyLocationButtonEnabled$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -2242,12 +2245,14 @@ class AppleMapHostApi {
   }
 
   Future<bool> isBuildingsEnabled() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isBuildingsEnabled$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isBuildingsEnabled$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -2270,12 +2275,14 @@ class AppleMapHostApi {
   }
 
   Future<bool> isPointsOfInterestEnabled() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isPointsOfInterestEnabled$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isPointsOfInterestEnabled$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -2298,12 +2305,14 @@ class AppleMapHostApi {
   }
 
   Future<bool> isScaleEnabled() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isScaleEnabled$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isScaleEnabled$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -2326,12 +2335,14 @@ class AppleMapHostApi {
   }
 
   Future<bool> isTrafficEnabled() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isTrafficEnabled$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.isTrafficEnabled$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -2354,12 +2365,14 @@ class AppleMapHostApi {
   }
 
   Future<PlatformCameraTargetBounds?> getCameraTargetBounds() async {
-    final String pigeonVar_channelName = 'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.getCameraTargetBounds$pigeonVar_messageChannelSuffix';
-    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-      pigeonVar_channelName,
-      pigeonChannelCodec,
-      binaryMessenger: pigeonVar_binaryMessenger,
-    );
+    final String pigeonVar_channelName =
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.getCameraTargetBounds$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel =
+        BasicMessageChannel<Object?>(
+          pigeonVar_channelName,
+          pigeonChannelCodec,
+          binaryMessenger: pigeonVar_binaryMessenger,
+        );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
     final List<Object?>? pigeonVar_replyList =
         await pigeonVar_sendFuture as List<Object?>?;
@@ -2411,12 +2424,21 @@ abstract class AppleMapFlutterApi {
   /// landmark. Only fires on iOS 16+; ignored on earlier OS versions.
   void onMapFeatureTapped(PlatformMapFeature feature);
 
-  static void setUp(AppleMapFlutterApi? api, {BinaryMessenger? binaryMessenger, String messageChannelSuffix = '',}) {
-    messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
+  static void setUp(
+    AppleMapFlutterApi? api, {
+    BinaryMessenger? binaryMessenger,
+    String messageChannelSuffix = '',
+  }) {
+    messageChannelSuffix = messageChannelSuffix.isNotEmpty
+        ? '.$messageChannelSuffix'
+        : '';
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onCameraMoveStarted$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onCameraMoveStarted$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
@@ -2426,41 +2448,56 @@ abstract class AppleMapFlutterApi {
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onCameraMove$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onCameraMove$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onCameraMove was null.');
+          assert(
+            message != null,
+            'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onCameraMove was null.',
+          );
           final List<Object?> args = (message as List<Object?>?)!;
-          final PlatformCameraPosition? arg_position = (args[0] as PlatformCameraPosition?);
-          assert(arg_position != null,
-              'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onCameraMove was null, expected non-null PlatformCameraPosition.');
+          final PlatformCameraPosition? arg_position =
+              (args[0] as PlatformCameraPosition?);
+          assert(
+            arg_position != null,
+            'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onCameraMove was null, expected non-null PlatformCameraPosition.',
+          );
           try {
             api.onCameraMove(arg_position!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onCameraIdle$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onCameraIdle$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
@@ -2470,247 +2507,337 @@ abstract class AppleMapFlutterApi {
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onMapTap$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onMapTap$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onMapTap was null.');
+          assert(
+            message != null,
+            'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onMapTap was null.',
+          );
           final List<Object?> args = (message as List<Object?>?)!;
           final PlatformLatLng? arg_position = (args[0] as PlatformLatLng?);
-          assert(arg_position != null,
-              'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onMapTap was null, expected non-null PlatformLatLng.');
+          assert(
+            arg_position != null,
+            'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onMapTap was null, expected non-null PlatformLatLng.',
+          );
           try {
             api.onMapTap(arg_position!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onMapLongPress$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onMapLongPress$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onMapLongPress was null.');
+          assert(
+            message != null,
+            'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onMapLongPress was null.',
+          );
           final List<Object?> args = (message as List<Object?>?)!;
           final PlatformLatLng? arg_position = (args[0] as PlatformLatLng?);
-          assert(arg_position != null,
-              'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onMapLongPress was null, expected non-null PlatformLatLng.');
+          assert(
+            arg_position != null,
+            'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onMapLongPress was null, expected non-null PlatformLatLng.',
+          );
           try {
             api.onMapLongPress(arg_position!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationTap$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationTap$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationTap was null.');
+          assert(
+            message != null,
+            'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationTap was null.',
+          );
           final List<Object?> args = (message as List<Object?>?)!;
           final String? arg_annotationId = (args[0] as String?);
-          assert(arg_annotationId != null,
-              'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationTap was null, expected non-null String.');
+          assert(
+            arg_annotationId != null,
+            'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationTap was null, expected non-null String.',
+          );
           try {
             api.onAnnotationTap(arg_annotationId!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationDragEnd$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationDragEnd$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationDragEnd was null.');
+          assert(
+            message != null,
+            'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationDragEnd was null.',
+          );
           final List<Object?> args = (message as List<Object?>?)!;
           final String? arg_annotationId = (args[0] as String?);
-          assert(arg_annotationId != null,
-              'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationDragEnd was null, expected non-null String.');
+          assert(
+            arg_annotationId != null,
+            'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationDragEnd was null, expected non-null String.',
+          );
           final PlatformLatLng? arg_position = (args[1] as PlatformLatLng?);
-          assert(arg_position != null,
-              'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationDragEnd was null, expected non-null PlatformLatLng.');
+          assert(
+            arg_position != null,
+            'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationDragEnd was null, expected non-null PlatformLatLng.',
+          );
           try {
             api.onAnnotationDragEnd(arg_annotationId!, arg_position!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationZIndexChanged$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationZIndexChanged$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationZIndexChanged was null.');
+          assert(
+            message != null,
+            'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationZIndexChanged was null.',
+          );
           final List<Object?> args = (message as List<Object?>?)!;
           final String? arg_annotationId = (args[0] as String?);
-          assert(arg_annotationId != null,
-              'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationZIndexChanged was null, expected non-null String.');
+          assert(
+            arg_annotationId != null,
+            'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationZIndexChanged was null, expected non-null String.',
+          );
           final double? arg_zIndex = (args[1] as double?);
-          assert(arg_zIndex != null,
-              'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationZIndexChanged was null, expected non-null double.');
+          assert(
+            arg_zIndex != null,
+            'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onAnnotationZIndexChanged was null, expected non-null double.',
+          );
           try {
             api.onAnnotationZIndexChanged(arg_annotationId!, arg_zIndex!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onInfoWindowTap$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onInfoWindowTap$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onInfoWindowTap was null.');
+          assert(
+            message != null,
+            'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onInfoWindowTap was null.',
+          );
           final List<Object?> args = (message as List<Object?>?)!;
           final String? arg_annotationId = (args[0] as String?);
-          assert(arg_annotationId != null,
-              'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onInfoWindowTap was null, expected non-null String.');
+          assert(
+            arg_annotationId != null,
+            'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onInfoWindowTap was null, expected non-null String.',
+          );
           try {
             api.onInfoWindowTap(arg_annotationId!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onPolylineTap$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onPolylineTap$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onPolylineTap was null.');
+          assert(
+            message != null,
+            'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onPolylineTap was null.',
+          );
           final List<Object?> args = (message as List<Object?>?)!;
           final String? arg_polylineId = (args[0] as String?);
-          assert(arg_polylineId != null,
-              'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onPolylineTap was null, expected non-null String.');
+          assert(
+            arg_polylineId != null,
+            'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onPolylineTap was null, expected non-null String.',
+          );
           try {
             api.onPolylineTap(arg_polylineId!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onPolygonTap$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onPolygonTap$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onPolygonTap was null.');
+          assert(
+            message != null,
+            'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onPolygonTap was null.',
+          );
           final List<Object?> args = (message as List<Object?>?)!;
           final String? arg_polygonId = (args[0] as String?);
-          assert(arg_polygonId != null,
-              'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onPolygonTap was null, expected non-null String.');
+          assert(
+            arg_polygonId != null,
+            'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onPolygonTap was null, expected non-null String.',
+          );
           try {
             api.onPolygonTap(arg_polygonId!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onCircleTap$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onCircleTap$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onCircleTap was null.');
+          assert(
+            message != null,
+            'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onCircleTap was null.',
+          );
           final List<Object?> args = (message as List<Object?>?)!;
           final String? arg_circleId = (args[0] as String?);
-          assert(arg_circleId != null,
-              'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onCircleTap was null, expected non-null String.');
+          assert(
+            arg_circleId != null,
+            'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onCircleTap was null, expected non-null String.',
+          );
           try {
             api.onCircleTap(arg_circleId!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onPermissionDenied$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onPermissionDenied$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
@@ -2720,33 +2847,45 @@ abstract class AppleMapFlutterApi {
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }
     }
     {
-      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onMapFeatureTapped$messageChannelSuffix', pigeonChannelCodec,
-          binaryMessenger: binaryMessenger);
+      final BasicMessageChannel<Object?>
+      pigeonVar_channel = BasicMessageChannel<Object?>(
+        'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onMapFeatureTapped$messageChannelSuffix',
+        pigeonChannelCodec,
+        binaryMessenger: binaryMessenger,
+      );
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
-          assert(message != null,
-          'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onMapFeatureTapped was null.');
+          assert(
+            message != null,
+            'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onMapFeatureTapped was null.',
+          );
           final List<Object?> args = (message as List<Object?>?)!;
-          final PlatformMapFeature? arg_feature = (args[0] as PlatformMapFeature?);
-          assert(arg_feature != null,
-              'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onMapFeatureTapped was null, expected non-null PlatformMapFeature.');
+          final PlatformMapFeature? arg_feature =
+              (args[0] as PlatformMapFeature?);
+          assert(
+            arg_feature != null,
+            'Argument for dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.onMapFeatureTapped was null, expected non-null PlatformMapFeature.',
+          );
           try {
             api.onMapFeatureTapped(arg_feature!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+              error: PlatformException(code: 'error', message: e.toString()),
+            );
           }
         });
       }

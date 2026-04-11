@@ -18,12 +18,12 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
     weak var mapContainerView: UIView?
     var flutterApi: AppleMapFlutterApi?
     var oldBounds: CGRect?
-    var options: Dictionary<String, Any>?
+    var storedOptions: PlatformMapOptions?
     var isMyLocationButtonShowing: Bool = false
     var currentMapTypeIndex: Int = 0
     // Persists the last applied emphasis style so it survives map-type switches.
     // Reading preferredConfiguration is unreliable when swapping between hybrid/satellite and standard.
-    private var currentEmphasisStyle: Int = 0
+    private var currentEmphasisStyle: PlatformMapEmphasisStyle = .defaultStyle
     // Tracks whether location services should start once the user grants permission.
     // Set when requestWhenInUseAuthorization is called; cleared on authorization or removal.
     private var pendingUserLocationEnabled = false
@@ -45,10 +45,10 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
         MKUserTrackingMode.followWithHeading,
     ]
     
-    convenience init(flutterApi: AppleMapFlutterApi, options: Dictionary<String, Any>) {
+    convenience init(flutterApi: AppleMapFlutterApi, options: PlatformMapOptions) {
         self.init(frame: CGRect.zero)
         self.flutterApi = flutterApi
-        self.options = options
+        self.storedOptions = options
         // Delegate is set once here so the callback is active for the view's full lifetime.
         locationManager.delegate = self
         initialiseTapGestureRecognizers()
@@ -83,8 +83,8 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
     override func layoutSubviews() {
         // Only update the map in layoutSubviews if the bounds changed
         if self.bounds != oldBounds {
-            if let options = self.options {
-                self.interpretOptions(options: options)
+            if let options = self.storedOptions {
+                self.applyOptions(options)
             }
             setCenterCoordinateWithAltitude(centerCoordinate: centerCoordinate, zoomLevel: zoomLevel, animated: false)
             mapContainerView = self.findViewOfType("MKScrollContainerView", inView: self)
@@ -119,39 +119,32 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
       }
     }
     
-    func interpretOptions(options: Dictionary<String, Any>) {
-        if let isCompassEnabled: Bool = options["compassEnabled"] as? Bool {
+    func applyOptions(_ options: PlatformMapOptions) {
+        // Store latest options so that layoutSubviews re-applies them on bounds changes.
+        self.storedOptions = options
+
+        if let isCompassEnabled = options.compassEnabled {
             self.showsCompass = isCompassEnabled
+            // Reposition the tracking button now that the compass may have appeared or disappeared.
+            // The button visibility is updated at the end when myLocationButtonEnabled is processed.
             self.mapTrackingButton(isVisible: isMyLocationButtonShowing)
         }
-        if let padding: Array<Any> = options["padding"] as? Array<Any> {
-            var margins = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
-            
-            if padding.count >= 1, let top: Double = padding[0] as? Double {
-                margins.top = CGFloat(top)
-            }
-            
-            if padding.count >= 2, let left: Double = padding[1] as? Double {
-                margins.left = CGFloat(left)
-            }
-            
-            if padding.count >= 3, let bottom: Double = padding[2] as? Double {
-                margins.bottom = CGFloat(bottom)
-            }
-            
-            if padding.count >= 4, let right: Double = padding[3] as? Double {
-                margins.right = CGFloat(right)
-            }
-            
-            self.layoutMargins = margins
+
+        if let padding = options.padding {
+            self.layoutMargins = UIEdgeInsets(
+                top: CGFloat(padding.top),
+                left: CGFloat(padding.left),
+                bottom: CGFloat(padding.bottom),
+                right: CGFloat(padding.right)
+            )
         }
-        
-        let newMapType = options["mapType"] as? Int
-        let newTraffic = options["trafficEnabled"] as? Bool
-        let newPoi = options["pointsOfInterestEnabled"] as? Bool
-        let newBuildings = options["buildingsEnabled"] as? Bool
-        let newEmphasisStyle = options["emphasisStyle"] as? Int
-        let newSelectableFeatures = options["selectableFeatures"] as? Int
+
+        let newMapType = options.mapType.map { Int($0) }
+        let newTraffic = options.trafficEnabled
+        let newPoi = options.pointsOfInterestEnabled
+        let newBuildings = options.buildingsEnabled
+        let newEmphasisStyle = options.emphasisStyle
+        let newSelectableFeatures = options.selectableFeatures.map { Int($0) }
         if newMapType != nil || newTraffic != nil || newPoi != nil || newBuildings != nil
             || newEmphasisStyle != nil || newSelectableFeatures != nil {
             let mapTypeIndex = newMapType ?? self.currentMapTypeIndex
@@ -179,24 +172,37 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
                     // Standard map: apply emphasis style (iOS 16+).
                     // Use the persisted currentEmphasisStyle as the fallback rather than casting
                     // preferredConfiguration, which fails when switching through non-standard types.
-                    let emphasisRaw = newEmphasisStyle ?? self.currentEmphasisStyle
+                    let emphasisStyle = newEmphasisStyle ?? self.currentEmphasisStyle
                     if let new = newEmphasisStyle { self.currentEmphasisStyle = new }
                     let c = MKStandardMapConfiguration(elevationStyle: elevation)
                     c.showsTraffic = traffic
                     c.pointOfInterestFilter = poi
-                    c.emphasisStyle = emphasisRaw == 1
+                    c.emphasisStyle = emphasisStyle == .muted
                         ? .muted
                         : MKStandardMapConfiguration.EmphasisStyle.default
                     config = c
                 }
                 self.preferredConfiguration = config
             } else {
-                self.mapType = self.mapTypes[mapTypeIndex]
+                // Clamp to a valid index. Guard both ends: a negative value or a value
+                // beyond the array length (e.g. a future Dart MapType added before the
+                // plugin is updated) would otherwise crash. Standard (0) is the safest
+                // fallback for unknown types.
+                let safeIndex = mapTypeIndex >= 0 && mapTypeIndex < mapTypes.count ? mapTypeIndex : 0
+                self.mapType = self.mapTypes[safeIndex]
                 self.showsTraffic = traffic
                 self.showsBuildings = buildings
                 self.pointOfInterestFilter = poi
             }
-            self.currentMapTypeIndex = mapTypeIndex
+            // Track the index that was actually applied so that state stays consistent
+            // when a future option update omits mapType and falls back to currentMapTypeIndex.
+            // On iOS 16+ the index was validated by the switch default; on iOS < 16 use safeIndex.
+            if #available(iOS 16.0, *) {
+                self.currentMapTypeIndex = mapTypeIndex
+            } else {
+                let appliedIndex = mapTypeIndex >= 0 && mapTypeIndex < mapTypes.count ? mapTypeIndex : 0
+                self.currentMapTypeIndex = appliedIndex
+            }
 
             // Selectable map features sit on MKMapView directly (iOS 16+).
             // bit 0=pointsOfInterest, bit 1=territories, bit 2=physicalFeatures.
@@ -209,52 +215,55 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
                 self.selectableMapFeatures = features
             }
         }
-        
-        if let rotateGesturesEnabled: Bool = options["rotateGesturesEnabled"] as? Bool {
+
+        if let rotateGesturesEnabled = options.rotateGesturesEnabled {
             self.isRotateEnabled = rotateGesturesEnabled
         }
-        
-        if let scrollGesturesEnabled: Bool = options["scrollGesturesEnabled"] as? Bool {
+
+        if let scrollGesturesEnabled = options.scrollGesturesEnabled {
             self.isScrollEnabled = scrollGesturesEnabled
         }
-        
-        if let pitchGesturesEnabled: Bool = options["pitchGesturesEnabled"] as? Bool {
+
+        if let pitchGesturesEnabled = options.pitchGesturesEnabled {
             self.isPitchEnabled = pitchGesturesEnabled
         }
-        
-        if let zoomGesturesEnabled: Bool = options["zoomGesturesEnabled"] as? Bool{
+
+        if let zoomGesturesEnabled = options.zoomGesturesEnabled {
             self.isZoomEnabled = zoomGesturesEnabled
         }
-        
-        if let myLocationEnabled: Bool = options["myLocationEnabled"] as? Bool {
+
+        if let myLocationEnabled = options.myLocationEnabled {
             myLocationEnabled ? self.setUserLocation() : self.removeUserLocation()
         }
-        
-        if let myLocationButtonEnabled: Bool = options["myLocationButtonEnabled"] as? Bool {
+
+        if let myLocationButtonEnabled = options.myLocationButtonEnabled {
             self.mapTrackingButton(isVisible: myLocationButtonEnabled)
         }
-        
-        if let userTrackingMode: Int = options["trackingMode"] as? Int {
-            self.setUserTrackingMode(self.userTrackingModes[userTrackingMode], animated: false)
-        }
-        
-        if let minMaxZoom: Array<Any> = options["minMaxZoomPreference"] as? Array<Any>{
-            if let _minZoom: Double = minMaxZoom[0] as? Double {
-                self.minZoomLevel = _minZoom
-            }
-            if let _maxZoom: Double = minMaxZoom[1] as? Double {
-                self.maxZoomLevel = _maxZoom
+
+        if let trackingMode = options.trackingMode {
+            let index = Int(trackingMode)
+            if index >= 0 && index < userTrackingModes.count {
+                self.setUserTrackingMode(userTrackingModes[index], animated: false)
             }
         }
-        
-        if let insetsSafeArea: Bool = options["insetsLayoutMarginsFromSafeArea"] as? Bool {
+
+        if let minMaxZoom = options.minMaxZoomPreference {
+            if let minZoom = minMaxZoom.minZoom {
+                self.minZoomLevel = minZoom
+            }
+            if let maxZoom = minMaxZoom.maxZoom {
+                self.maxZoomLevel = maxZoom
+            }
+        }
+
+        if let insetsSafeArea = options.insetsLayoutMarginsFromSafeArea {
             self.insetsLayoutMarginsFromSafeArea = insetsSafeArea
         }
 
-        if options.keys.contains("cameraTargetBounds") {
-            if let boundsData = options["cameraTargetBounds"] as? [[Double]] {
-                let sw = CLLocationCoordinate2D(latitude: boundsData[0][0], longitude: boundsData[0][1])
-                let ne = CLLocationCoordinate2D(latitude: boundsData[1][0], longitude: boundsData[1][1])
+        if let cameraTargetBounds = options.cameraTargetBounds {
+            if let bounds = cameraTargetBounds.bounds {
+                let sw = bounds.southwest.asCoordinate
+                let ne = bounds.northeast.asCoordinate
                 let center = CLLocationCoordinate2D(
                     latitude: (sw.latitude + ne.latitude) / 2.0,
                     longitude: (sw.longitude + ne.longitude) / 2.0
@@ -270,10 +279,9 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
             }
         }
 
-        if let scaleEnabled: Bool = options["scaleEnabled"] as? Bool {
+        if let scaleEnabled = options.scaleEnabled {
             self.showsScale = scaleEnabled
         }
-
     }
     
     func setUserLocation() {

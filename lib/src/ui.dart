@@ -107,12 +107,8 @@ class MapFeature {
   }
 
   @override
-  int get hashCode => Object.hash(
-    coordinate,
-    featureType,
-    title,
-    pointOfInterestCategory,
-  );
+  int get hashCode =>
+      Object.hash(coordinate, featureType, title, pointOfInterestCategory);
 }
 
 /// Bounds for the map camera target.
