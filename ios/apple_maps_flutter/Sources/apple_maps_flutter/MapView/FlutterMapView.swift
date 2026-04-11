@@ -242,7 +242,7 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
 
         if let trackingMode = options.trackingMode {
             let index = Int(trackingMode)
-            if index < userTrackingModes.count {
+            if index >= 0 && index < userTrackingModes.count {
                 self.setUserTrackingMode(userTrackingModes[index], animated: false)
             }
         }
