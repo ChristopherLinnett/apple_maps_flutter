@@ -347,6 +347,15 @@ CocoaPods support was removed in 2.0.0. The iOS integration uses Swift Package M
 
 There is no Android implementation. If you need cross-platform maps, see [platform_maps_flutter](https://pub.dev/packages/platform_maps_flutter).
 
+## Attribution
+
+This package is a fork of [apple_maps_flutter](https://pub.dev/packages/apple_maps_flutter),
+originally created by [Luis Thein](https://github.com/LuisThein) and maintained under the
+[Flutter Community](https://github.com/fluttercommunity) organisation with contributions from
+[12 authors](https://github.com/fluttercommunity/apple_maps_flutter/graphs/contributors).
+The original project is no longer actively maintained. This fork has been substantially
+rewritten but retains its BSD-2-Clause license.
+
 ## Contributing
 
 Pull requests are welcome. Before submitting, please ensure:
