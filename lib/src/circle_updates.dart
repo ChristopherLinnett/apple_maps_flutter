@@ -61,10 +61,10 @@ class _CircleUpdates {
 
   @override
   int get hashCode => Object.hash(
-        Object.hashAllUnordered(circlesToAdd),
-        Object.hashAllUnordered(circleIdsToRemove),
-        Object.hashAllUnordered(circlesToChange),
-      );
+    Object.hashAllUnordered(circlesToAdd),
+    Object.hashAllUnordered(circleIdsToRemove),
+    Object.hashAllUnordered(circlesToChange),
+  );
 
   @override
   String toString() {

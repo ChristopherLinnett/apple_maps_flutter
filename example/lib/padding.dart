@@ -8,7 +8,8 @@ import 'package:flutter/material.dart';
 import 'page.dart';
 
 class PaddingPage extends ExamplePage {
-  const PaddingPage({super.key}) : super(const Icon(Icons.map), 'Add padding to the map');
+  const PaddingPage({super.key})
+    : super(const Icon(Icons.map), 'Add padding to the map');
 
   @override
   Widget build(BuildContext context) {

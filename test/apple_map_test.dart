@@ -1745,7 +1745,10 @@ void main() {
     const LatLng droppedAt = LatLng(11.0, 16.0);
     await platformAppleMap.sendFlutterApiEvent('onAnnotationDragEnd', <Object?>[
       'ann_1',
-      PlatformLatLng(latitude: droppedAt.latitude, longitude: droppedAt.longitude),
+      PlatformLatLng(
+        latitude: droppedAt.latitude,
+        longitude: droppedAt.longitude,
+      ),
     ]);
 
     expect(dragEndPosition, isNotNull);
@@ -1851,29 +1854,30 @@ void main() {
     debugDefaultTargetPlatformOverride = null;
   });
 
-  testWidgets('onPermissionDenied fires widget callback when permission is denied', (
-    WidgetTester tester,
-  ) async {
-    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-    bool wasCalled = false;
+  testWidgets(
+    'onPermissionDenied fires widget callback when permission is denied',
+    (WidgetTester tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      bool wasCalled = false;
 
-    await tester.pumpWidget(
-      Directionality(
-        textDirection: TextDirection.ltr,
-        child: AppleMap(
-          initialCameraPosition: const CameraPosition(target: LatLng(0, 0)),
-          onPermissionDenied: () => wasCalled = true,
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: AppleMap(
+            initialCameraPosition: const CameraPosition(target: LatLng(0, 0)),
+            onPermissionDenied: () => wasCalled = true,
+          ),
         ),
-      ),
-    );
+      );
 
-    final FakePlatformAppleMap platformAppleMap =
-        fakePlatformViewsController.lastCreatedView!;
-    await platformAppleMap.sendFlutterApiEvent('onPermissionDenied');
+      final FakePlatformAppleMap platformAppleMap =
+          fakePlatformViewsController.lastCreatedView!;
+      await platformAppleMap.sendFlutterApiEvent('onPermissionDenied');
 
-    expect(wasCalled, isTrue);
-    debugDefaultTargetPlatformOverride = null;
-  });
+      expect(wasCalled, isTrue);
+      debugDefaultTargetPlatformOverride = null;
+    },
+  );
 
   testWidgets('takeSnapshot with default options forwards all-true flags', (
     WidgetTester tester,

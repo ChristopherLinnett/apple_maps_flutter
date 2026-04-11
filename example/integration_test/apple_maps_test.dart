@@ -46,9 +46,7 @@ Future<T> _waitForValue<T>({
   );
 }
 
-Future<AppleMapController> _pumpMapAndGetController(
-  WidgetTester tester,
-) async {
+Future<AppleMapController> _pumpMapAndGetController(WidgetTester tester) async {
   final Completer<AppleMapController> completer =
       Completer<AppleMapController>();
   await _pumpMap(
@@ -911,10 +909,12 @@ void main() {
     expect(moveStartedIndex, lessThan(idleIndex));
   });
 
-  testWidgets('takeSnapshot returns image bytes for default options',
-      (WidgetTester tester) async {
-    final AppleMapController controller =
-        await _pumpMapAndGetController(tester);
+  testWidgets('takeSnapshot returns image bytes for default options', (
+    WidgetTester tester,
+  ) async {
+    final AppleMapController controller = await _pumpMapAndGetController(
+      tester,
+    );
 
     final Uint8List? bytes = await controller.takeSnapshot();
     expect(bytes, isNotNull);
@@ -922,15 +922,17 @@ void main() {
   });
 
   testWidgets(
-      'takeSnapshot with annotations and buildings disabled returns image bytes',
-      (WidgetTester tester) async {
-    final AppleMapController controller =
-        await _pumpMapAndGetController(tester);
+    'takeSnapshot with annotations and buildings disabled returns image bytes',
+    (WidgetTester tester) async {
+      final AppleMapController controller = await _pumpMapAndGetController(
+        tester,
+      );
 
-    final Uint8List? bytes = await controller.takeSnapshot(
-      const SnapshotOptions(showAnnotations: false, showBuildings: false),
-    );
-    expect(bytes, isNotNull);
-    expect(bytes!.isNotEmpty, isTrue);
-  });
+      final Uint8List? bytes = await controller.takeSnapshot(
+        const SnapshotOptions(showAnnotations: false, showBuildings: false),
+      );
+      expect(bytes, isNotNull);
+      expect(bytes!.isNotEmpty, isTrue);
+    },
+  );
 }

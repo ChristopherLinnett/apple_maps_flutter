@@ -26,7 +26,11 @@ class SnapshotOptions {
 
   @override
   int get hashCode => Object.hash(
-        showBuildings, showPointsOfInterest, showAnnotations, showOverlays);
+    showBuildings,
+    showPointsOfInterest,
+    showAnnotations,
+    showOverlays,
+  );
 
   @override
   String toString() =>

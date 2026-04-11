@@ -64,10 +64,10 @@ class _PolylineUpdates {
 
   @override
   int get hashCode => Object.hash(
-        Object.hashAllUnordered(polylinesToAdd),
-        Object.hashAllUnordered(polylineIdsToRemove),
-        Object.hashAllUnordered(polylinesToChange),
-      );
+    Object.hashAllUnordered(polylinesToAdd),
+    Object.hashAllUnordered(polylineIdsToRemove),
+    Object.hashAllUnordered(polylinesToChange),
+  );
 
   @override
   String toString() {

@@ -3,7 +3,8 @@ import 'package:apple_maps_flutter_example/page.dart';
 import 'package:flutter/material.dart';
 
 class MapUpdatePage extends ExamplePage {
-  const MapUpdatePage({super.key}) : super(const Icon(Icons.refresh), 'Update Map');
+  const MapUpdatePage({super.key})
+    : super(const Icon(Icons.refresh), 'Update Map');
 
   @override
   Widget build(BuildContext context) {

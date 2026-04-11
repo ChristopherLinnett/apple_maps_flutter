@@ -61,10 +61,10 @@ class _PolygonUpdates {
 
   @override
   int get hashCode => Object.hash(
-        Object.hashAllUnordered(polygonsToAdd),
-        Object.hashAllUnordered(polygonIdsToRemove),
-        Object.hashAllUnordered(polygonsToChange),
-      );
+    Object.hashAllUnordered(polygonsToAdd),
+    Object.hashAllUnordered(polygonIdsToRemove),
+    Object.hashAllUnordered(polygonsToChange),
+  );
 
   @override
   String toString() {

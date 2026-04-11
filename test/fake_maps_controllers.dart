@@ -125,10 +125,7 @@ class FakePlatformAppleMap {
   /// `'onAnnotationDragEnd'`). [args] is the ordered list of typed arguments
   /// that Pigeon encodes into the channel message. For methods with no
   /// arguments, Pigeon sends `null` rather than an empty list.
-  Future<void> sendFlutterApiEvent(
-    String method, [
-    List<Object?>? args,
-  ]) async {
+  Future<void> sendFlutterApiEvent(String method, [List<Object?>? args]) async {
     final String channelName =
         'dev.flutter.pigeon.apple_maps_flutter.AppleMapFlutterApi.$method.$id';
     final Object? message = (args == null || args.isEmpty) ? null : args;

@@ -12,7 +12,8 @@ import 'package:flutter/material.dart';
 import 'page.dart';
 
 class PlacePolygonPage extends ExamplePage {
-  const PlacePolygonPage({super.key}) : super(const Icon(Icons.linear_scale), 'Place polygon');
+  const PlacePolygonPage({super.key})
+    : super(const Icon(Icons.linear_scale), 'Place polygon');
 
   @override
   Widget build(BuildContext context) {

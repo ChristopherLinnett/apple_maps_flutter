@@ -8,7 +8,8 @@ import 'package:flutter/material.dart';
 import 'page.dart';
 
 class AnnotationIconsPage extends ExamplePage {
-  const AnnotationIconsPage({super.key}) : super(const Icon(Icons.image), 'Annotation icons');
+  const AnnotationIconsPage({super.key})
+    : super(const Icon(Icons.image), 'Annotation icons');
 
   @override
   Widget build(BuildContext context) {

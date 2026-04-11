@@ -10,7 +10,8 @@ import 'package:flutter/material.dart';
 import 'page.dart';
 
 class PlacePolylinePage extends ExamplePage {
-  const PlacePolylinePage({super.key}) : super(const Icon(Icons.linear_scale), 'Place polyline');
+  const PlacePolylinePage({super.key})
+    : super(const Icon(Icons.linear_scale), 'Place polyline');
 
   @override
   Widget build(BuildContext context) {

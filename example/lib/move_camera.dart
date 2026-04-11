@@ -8,7 +8,8 @@ import 'package:flutter/material.dart';
 import 'page.dart';
 
 class MoveCameraPage extends ExamplePage {
-  const MoveCameraPage({super.key}) : super(const Icon(Icons.map), 'Camera control');
+  const MoveCameraPage({super.key})
+    : super(const Icon(Icons.map), 'Camera control');
 
   @override
   Widget build(BuildContext context) {

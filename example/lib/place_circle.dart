@@ -12,7 +12,8 @@ import 'package:flutter/material.dart';
 import 'page.dart';
 
 class PlaceCirclePage extends ExamplePage {
-  const PlaceCirclePage({super.key}) : super(const Icon(Icons.linear_scale), 'Place circle');
+  const PlaceCirclePage({super.key})
+    : super(const Icon(Icons.linear_scale), 'Place circle');
 
   @override
   Widget build(BuildContext context) {

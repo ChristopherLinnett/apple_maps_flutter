@@ -13,7 +13,8 @@ import 'package:flutter/services.dart';
 import 'page.dart';
 
 class PlaceAnnotationPage extends ExamplePage {
-  const PlaceAnnotationPage({super.key}) : super(const Icon(Icons.place), 'Place annotation');
+  const PlaceAnnotationPage({super.key})
+    : super(const Icon(Icons.place), 'Place annotation');
 
   @override
   Widget build(BuildContext context) {
@@ -196,9 +197,7 @@ class PlaceAnnotationBodyState extends State<PlaceAnnotationBody> {
     if (id == null) return;
     final Annotation annotation = annotations[id]!;
     setState(() {
-      annotations[id] = annotation.copyWith(
-        visibleParam: !annotation.visible,
-      );
+      annotations[id] = annotation.copyWith(visibleParam: !annotation.visible);
     });
   }
 
@@ -247,9 +246,7 @@ class PlaceAnnotationBodyState extends State<PlaceAnnotationBody> {
     debugPrint(
       'Is InfowWindow visible: ${await controller.isMarkerInfoWindowShown(annotation.annotationId)}',
     );
-    return (await controller.isMarkerInfoWindowShown(
-      annotation.annotationId,
-    ))!;
+    return (await controller.isMarkerInfoWindowShown(annotation.annotationId))!;
   }
 
   Future<void> _getBytesFromAsset(String path, int width) async {

@@ -12,7 +12,8 @@ import 'package:flutter/material.dart';
 import 'page.dart';
 
 class ScrollingMapPage extends ExamplePage {
-  const ScrollingMapPage({super.key}) : super(const Icon(Icons.map), 'Scrolling map');
+  const ScrollingMapPage({super.key})
+    : super(const Icon(Icons.map), 'Scrolling map');
 
   @override
   Widget build(BuildContext context) {
