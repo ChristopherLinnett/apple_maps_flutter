@@ -400,7 +400,10 @@ class FakePlatformAppleMap {
       }
     }
     if (options.containsKey('emphasisStyle')) {
-      emphasisStyle = MapEmphasisStyle.values[options['emphasisStyle'] as int];
+      final int raw = options['emphasisStyle'] as int;
+      if (raw >= 0 && raw < MapEmphasisStyle.values.length) {
+        emphasisStyle = MapEmphasisStyle.values[raw];
+      }
     }
     if (options.containsKey('selectableFeatures')) {
       final int mask = options['selectableFeatures'] as int;

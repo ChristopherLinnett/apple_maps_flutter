@@ -21,6 +21,9 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
     var options: Dictionary<String, Any>?
     var isMyLocationButtonShowing: Bool = false
     var currentMapTypeIndex: Int = 0
+    // Persists the last applied emphasis style so it survives map-type switches.
+    // Reading preferredConfiguration is unreliable when swapping between hybrid/satellite and standard.
+    private var currentEmphasisStyle: Int = 0
     // Tracks whether location services should start once the user grants permission.
     // Set when requestWhenInUseAuthorization is called; cleared on authorization or removal.
     private var pendingUserLocationEnabled = false
@@ -174,9 +177,10 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
                     config = c
                 default:
                     // Standard map: apply emphasis style (iOS 16+).
-                    let emphasisRaw = newEmphasisStyle ?? (self.preferredConfiguration as? MKStandardMapConfiguration).map {
-                        $0.emphasisStyle == .muted ? 1 : 0
-                    } ?? 0
+                    // Use the persisted currentEmphasisStyle as the fallback rather than casting
+                    // preferredConfiguration, which fails when switching through non-standard types.
+                    let emphasisRaw = newEmphasisStyle ?? self.currentEmphasisStyle
+                    if let new = newEmphasisStyle { self.currentEmphasisStyle = new }
                     let c = MKStandardMapConfiguration(elevationStyle: elevation)
                     c.showsTraffic = traffic
                     c.pointOfInterestFilter = poi
