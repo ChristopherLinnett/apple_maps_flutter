@@ -2193,4 +2193,173 @@ void main() {
       expect(opts.showOverlays, isTrue);
     });
   });
+
+  testWidgets('Can update trafficEnabled', (WidgetTester tester) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: CameraPosition(target: LatLng(10.0, 15.0)),
+          trafficEnabled: false,
+        ),
+      ),
+    );
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+
+    expect(platformAppleMap.trafficEnabled, false);
+
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: CameraPosition(target: LatLng(10.0, 15.0)),
+          trafficEnabled: true,
+        ),
+      ),
+    );
+
+    expect(platformAppleMap.trafficEnabled, true);
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets('Can update insetsLayoutMarginsFromSafeArea', (
+    WidgetTester tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: CameraPosition(target: LatLng(10.0, 15.0)),
+          insetsLayoutMarginsFromSafeArea: false,
+        ),
+      ),
+    );
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+
+    expect(platformAppleMap.insetsLayoutMarginsFromSafeArea, false);
+
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: CameraPosition(target: LatLng(10.0, 15.0)),
+          insetsLayoutMarginsFromSafeArea: true,
+        ),
+      ),
+    );
+
+    expect(platformAppleMap.insetsLayoutMarginsFromSafeArea, true);
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets('Can update selectableFeatures', (WidgetTester tester) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: CameraPosition(target: LatLng(10.0, 15.0)),
+          selectableFeatures: {MapSelectableFeature.pointsOfInterest},
+        ),
+      ),
+    );
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+
+    expect(
+      platformAppleMap.selectableFeatures,
+      equals({MapSelectableFeature.pointsOfInterest}),
+    );
+
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: CameraPosition(target: LatLng(10.0, 15.0)),
+          selectableFeatures: {
+            MapSelectableFeature.territories,
+            MapSelectableFeature.physicalFeatures,
+          },
+        ),
+      ),
+    );
+
+    expect(
+      platformAppleMap.selectableFeatures,
+      equals({
+        MapSelectableFeature.territories,
+        MapSelectableFeature.physicalFeatures,
+      }),
+    );
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets('Can update selectableFeatures to empty set', (
+    WidgetTester tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: CameraPosition(target: LatLng(10.0, 15.0)),
+          selectableFeatures: {MapSelectableFeature.pointsOfInterest},
+        ),
+      ),
+    );
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: CameraPosition(target: LatLng(10.0, 15.0)),
+          selectableFeatures: {},
+        ),
+      ),
+    );
+
+    expect(platformAppleMap.selectableFeatures, isEmpty);
+    debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets('Can update emphasisStyle', (WidgetTester tester) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: CameraPosition(target: LatLng(10.0, 15.0)),
+          emphasisStyle: MapEmphasisStyle.defaultStyle,
+        ),
+      ),
+    );
+
+    final FakePlatformAppleMap platformAppleMap =
+        fakePlatformViewsController.lastCreatedView!;
+
+    expect(platformAppleMap.emphasisStyle, MapEmphasisStyle.defaultStyle);
+
+    await tester.pumpWidget(
+      const Directionality(
+        textDirection: TextDirection.ltr,
+        child: AppleMap(
+          initialCameraPosition: CameraPosition(target: LatLng(10.0, 15.0)),
+          emphasisStyle: MapEmphasisStyle.muted,
+        ),
+      ),
+    );
+
+    expect(platformAppleMap.emphasisStyle, MapEmphasisStyle.muted);
+    debugDefaultTargetPlatformOverride = null;
+  });
 }
