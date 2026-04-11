@@ -350,6 +350,10 @@ extension AppleMapController: MKMapViewDelegate {
               let annotation = view.annotation as? FlutterAnnotation else {
             return
         }
+        // Mark as dragged so that if the app has no onDragEnd handler, the
+        // stale pre-drag position Flutter sends back is discarded by
+        // annotationsToChange rather than snapping the pin back.
+        annotation.wasDragged = true
         let coordinate = annotation.coordinate
         flutterApi.onAnnotationDragEnd(
             annotationId: annotation.id,
