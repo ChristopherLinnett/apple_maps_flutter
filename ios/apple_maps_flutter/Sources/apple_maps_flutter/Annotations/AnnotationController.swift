@@ -28,6 +28,35 @@ extension AppleMapController: AnnotationDelegate {
                 tapGestureRecognizer.annotationView = view
                 view.addGestureRecognizer(tapGestureRecognizer)
             }
+        } else if #available(iOS 16.0, *), let featureAnnotation = view.annotation as? MKMapFeatureAnnotation {
+            // Built-in map feature tapped (POI, landmark, territory, physical feature).
+            // Deselect immediately so the native callout does not appear over Flutter content.
+            mapView.deselectAnnotation(featureAnnotation, animated: false)
+            let flutterApi = self.flutterApi
+            let featureType: PlatformMapFeatureType
+            switch featureAnnotation.featureType {
+            case .pointOfInterest:
+                featureType = .pointOfInterest
+            case .territory:
+                featureType = .territory
+            case .physicalFeature:
+                featureType = .physicalFeature
+            @unknown default:
+                // Forward-compatible fallback for future MKMapFeatureType cases.
+                return
+            }
+            let coordinate = PlatformLatLng(
+                latitude: featureAnnotation.coordinate.latitude,
+                longitude: featureAnnotation.coordinate.longitude
+            )
+            let poiCategory = featureAnnotation.pointOfInterestCategory?.rawValue
+            let platformFeature = PlatformMapFeature(
+                coordinate: coordinate,
+                featureType: featureType,
+                title: featureAnnotation.title,
+                pointOfInterestCategory: poiCategory
+            )
+            flutterApi.onMapFeatureTapped(feature: platformFeature, completion: pigeonLogOnError)
         }
     }
 

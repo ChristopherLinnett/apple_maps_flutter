@@ -76,6 +76,10 @@ class FakePlatformAppleMap {
 
   CameraTargetBounds? cameraTargetBounds;
 
+  MapEmphasisStyle? emphasisStyle;
+
+  Set<MapSelectableFeature>? selectableFeatures;
+
   Set<AnnotationId>? annotationIdsToRemove;
 
   Set<Annotation>? annotationsToAdd;
@@ -395,6 +399,20 @@ class FakePlatformAppleMap {
         );
       }
     }
+    if (options.containsKey('emphasisStyle')) {
+      final int raw = options['emphasisStyle'] as int;
+      if (raw >= 0 && raw < MapEmphasisStyle.values.length) {
+        emphasisStyle = MapEmphasisStyle.values[raw];
+      }
+    }
+    if (options.containsKey('selectableFeatures')) {
+      final int mask = options['selectableFeatures'] as int;
+      selectableFeatures = <MapSelectableFeature>{
+        if (mask & 1 != 0) MapSelectableFeature.pointsOfInterest,
+        if (mask & 2 != 0) MapSelectableFeature.territories,
+        if (mask & 4 != 0) MapSelectableFeature.physicalFeatures,
+      };
+    }
   }
 
   void updateOptionsFromPlatform(PlatformMapOptions options) {
@@ -466,6 +484,17 @@ class FakePlatformAppleMap {
           ),
         );
       }
+    }
+    if (options.emphasisStyle != null) {
+      emphasisStyle = MapEmphasisStyle.values[options.emphasisStyle!.index];
+    }
+    if (options.selectableFeatures != null) {
+      final int mask = options.selectableFeatures!;
+      selectableFeatures = <MapSelectableFeature>{
+        if (mask & 1 != 0) MapSelectableFeature.pointsOfInterest,
+        if (mask & 2 != 0) MapSelectableFeature.territories,
+        if (mask & 4 != 0) MapSelectableFeature.physicalFeatures,
+      };
     }
   }
 

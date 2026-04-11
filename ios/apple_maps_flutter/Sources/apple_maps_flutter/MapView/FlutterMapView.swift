@@ -21,6 +21,9 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
     var options: Dictionary<String, Any>?
     var isMyLocationButtonShowing: Bool = false
     var currentMapTypeIndex: Int = 0
+    // Persists the last applied emphasis style so it survives map-type switches.
+    // Reading preferredConfiguration is unreliable when swapping between hybrid/satellite and standard.
+    private var currentEmphasisStyle: Int = 0
     // Tracks whether location services should start once the user grants permission.
     // Set when requestWhenInUseAuthorization is called; cleared on authorization or removal.
     private var pendingUserLocationEnabled = false
@@ -147,7 +150,10 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
         let newTraffic = options["trafficEnabled"] as? Bool
         let newPoi = options["pointsOfInterestEnabled"] as? Bool
         let newBuildings = options["buildingsEnabled"] as? Bool
-        if newMapType != nil || newTraffic != nil || newPoi != nil || newBuildings != nil {
+        let newEmphasisStyle = options["emphasisStyle"] as? Int
+        let newSelectableFeatures = options["selectableFeatures"] as? Int
+        if newMapType != nil || newTraffic != nil || newPoi != nil || newBuildings != nil
+            || newEmphasisStyle != nil || newSelectableFeatures != nil {
             let mapTypeIndex = newMapType ?? self.currentMapTypeIndex
             let traffic = newTraffic ?? self.showsTraffic
             let buildings = newBuildings ?? self.showsBuildings
@@ -170,9 +176,17 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
                     c.pointOfInterestFilter = poi
                     config = c
                 default:
+                    // Standard map: apply emphasis style (iOS 16+).
+                    // Use the persisted currentEmphasisStyle as the fallback rather than casting
+                    // preferredConfiguration, which fails when switching through non-standard types.
+                    let emphasisRaw = newEmphasisStyle ?? self.currentEmphasisStyle
+                    if let new = newEmphasisStyle { self.currentEmphasisStyle = new }
                     let c = MKStandardMapConfiguration(elevationStyle: elevation)
                     c.showsTraffic = traffic
                     c.pointOfInterestFilter = poi
+                    c.emphasisStyle = emphasisRaw == 1
+                        ? .muted
+                        : MKStandardMapConfiguration.EmphasisStyle.default
                     config = c
                 }
                 self.preferredConfiguration = config
@@ -184,6 +198,16 @@ class FlutterMapView: MKMapView, UIGestureRecognizerDelegate {
             }
             self.currentMapTypeIndex = mapTypeIndex
 
+            // Selectable map features sit on MKMapView directly (iOS 16+).
+            // bit 0=pointsOfInterest, bit 1=territories, bit 2=physicalFeatures.
+            // Guard with `let` so unrelated option updates do not reset the user's setting.
+            if #available(iOS 16.0, *), let mask = newSelectableFeatures {
+                var features: MKMapFeatureOptions = []
+                if mask & 1 != 0 { features.insert(.pointsOfInterest) }
+                if mask & 2 != 0 { features.insert(.territories) }
+                if mask & 4 != 0 { features.insert(.physicalFeatures) }
+                self.selectableMapFeatures = features
+            }
         }
         
         if let rotateGesturesEnabled: Bool = options["rotateGesturesEnabled"] as? Bool {

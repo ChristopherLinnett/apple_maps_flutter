@@ -22,6 +22,18 @@ enum CapType { buttCap, roundCap, squareCap }
 
 enum PatternItemType { dot, dash, gap }
 
+/// Emphasis style for the standard map configuration (iOS 16+).
+enum PlatformMapEmphasisStyle {
+  /// The default map appearance.
+  defaultStyle,
+
+  /// A muted appearance that de-emphasises labels and icons.
+  muted,
+}
+
+/// The type of a built-in map feature tapped by the user (iOS 16+).
+enum PlatformMapFeatureType { pointOfInterest, territory, physicalFeature }
+
 class PlatformOffset {
   PlatformOffset({required this.x, required this.y});
 
@@ -91,6 +103,26 @@ class PlatformCameraTargetBounds {
   PlatformLatLngBounds? bounds;
 }
 
+/// A built-in map feature (e.g. POI, landmark) selected by the user (iOS 16+).
+class PlatformMapFeature {
+  PlatformMapFeature({
+    required this.coordinate,
+    required this.featureType,
+    this.title,
+    this.pointOfInterestCategory,
+  });
+
+  PlatformLatLng coordinate;
+  PlatformMapFeatureType featureType;
+
+  /// The display title of the feature, if available.
+  String? title;
+
+  /// The raw `MKPointOfInterestCategory` string value for `.pointOfInterest`
+  /// features, e.g. `"MKPOICategoryRestaurant"`. Null for other feature types.
+  String? pointOfInterestCategory;
+}
+
 class PlatformMapOptions {
   PlatformMapOptions({
     this.compassEnabled,
@@ -129,6 +161,13 @@ class PlatformMapOptions {
   bool? buildingsEnabled;
   bool? pointsOfInterestEnabled;
   bool? scaleEnabled;
+
+  /// Emphasis style for the standard map (iOS 16+, no-op on other map types).
+  PlatformMapEmphasisStyle? emphasisStyle;
+
+  /// Bitmask of selectable built-in map features (iOS 16+).
+  /// Bit 0 = pointsOfInterest, bit 1 = territories, bit 2 = physicalFeatures.
+  int? selectableFeatures;
 }
 
 class PlatformInfoWindow {
@@ -440,4 +479,8 @@ abstract class AppleMapFlutterApi {
   void onCircleTap(String circleId);
 
   void onPermissionDenied();
+
+  /// Called when the user taps a built-in map feature such as a POI or
+  /// landmark. Only fires on iOS 16+; ignored on earlier OS versions.
+  void onMapFeatureTapped(PlatformMapFeature feature);
 }

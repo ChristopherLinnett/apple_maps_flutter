@@ -49,6 +49,8 @@ class MapUiBodyState extends State<MapUiBody> {
   bool _zoomGesturesEnabled = true;
   bool _myLocationEnabled = true;
   final TrackingMode _trackingMode = TrackingMode.none;
+  MapEmphasisStyle _emphasisStyle = MapEmphasisStyle.defaultStyle;
+  String? _lastTappedFeature;
   @override
   void initState() {
     super.initState();
@@ -155,6 +157,20 @@ class MapUiBodyState extends State<MapUiBody> {
     );
   }
 
+  Widget _emphasisStyleToggler() {
+    final bool isMuted = _emphasisStyle == MapEmphasisStyle.muted;
+    return TextButton(
+      child: Text('map emphasis: ${isMuted ? 'muted' : 'default'}'),
+      onPressed: () {
+        setState(() {
+          _emphasisStyle = isMuted
+              ? MapEmphasisStyle.defaultStyle
+              : MapEmphasisStyle.muted;
+        });
+      },
+    );
+  }
+
   Widget _myLocationButtonToggler() {
     return TextButton(
       child: Text(
@@ -177,6 +193,7 @@ class MapUiBodyState extends State<MapUiBody> {
       compassEnabled: _compassEnabled,
       minMaxZoomPreference: _minMaxZoomPreference,
       mapType: _mapType,
+      emphasisStyle: _emphasisStyle,
       rotateGesturesEnabled: _rotateGesturesEnabled,
       scrollGesturesEnabled: _scrollGesturesEnabled,
       pitchGesturesEnabled: _pitchGesturesEnabled,
@@ -185,6 +202,12 @@ class MapUiBodyState extends State<MapUiBody> {
       myLocationButtonEnabled: _myLocationButtonEnabled,
       padding: const EdgeInsets.all(10),
       onCameraMove: _updateCameraPosition,
+      onFeatureTapped: (MapFeature feature) {
+        setState(() {
+          _lastTappedFeature =
+              '${feature.title ?? feature.featureType.name} (${feature.featureType.name})';
+        });
+      },
     );
 
     final List<Widget> columnChildren = <Widget>[Expanded(child: appleMap)];
@@ -203,6 +226,8 @@ class MapUiBodyState extends State<MapUiBody> {
               Text('camera zoom: ${_position.zoom}'),
               Text('camera tilt: ${_position.pitch}'),
               Text(_isMoving ? '(Camera moving)' : '(Camera idle)'),
+              if (_lastTappedFeature != null)
+                Text('Last tapped feature: $_lastTappedFeature'),
               Wrap(
                 alignment: WrapAlignment.spaceEvenly,
                 children: <Widget>[
@@ -215,6 +240,7 @@ class MapUiBodyState extends State<MapUiBody> {
                   _zoomToggler(),
                   _myLocationToggler(),
                   _myLocationButtonToggler(),
+                  _emphasisStyleToggler(),
                 ],
               ),
             ],
