@@ -1353,6 +1353,7 @@ protocol AppleMapHostApi {
   func isScaleEnabled() throws -> Bool
   func isTrafficEnabled() throws -> Bool
   func getCameraTargetBounds() throws -> PlatformCameraTargetBounds?
+  func deselectSelectedAnnotation() throws
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -1752,6 +1753,19 @@ class AppleMapHostApiSetup {
       }
     } else {
       getCameraTargetBoundsChannel.setMessageHandler(nil)
+    }
+    let deselectSelectedAnnotationChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.apple_maps_flutter.AppleMapHostApi.deselectSelectedAnnotation\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      deselectSelectedAnnotationChannel.setMessageHandler { _, reply in
+        do {
+          try api.deselectSelectedAnnotation()
+          reply(wrapResult(nil))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      deselectSelectedAnnotationChannel.setMessageHandler(nil)
     }
   }
 }

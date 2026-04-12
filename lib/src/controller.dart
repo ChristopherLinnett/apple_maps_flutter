@@ -251,6 +251,15 @@ class AppleMapController implements AppleMapFlutterApi {
     return _hostApi.hideMarkerInfoWindow(annotationId.value);
   }
 
+  /// Deselects the currently selected annotation, if any, with the native
+  /// shrink animation.
+  ///
+  /// Has no effect when no annotation is selected.
+  Future<void> deselectSelectedAnnotation() {
+    _throwIfDisposed();
+    return _hostApi.deselectSelectedAnnotation();
+  }
+
   /// Returns `true` when the [InfoWindow] is showing, `false` otherwise.
   ///
   /// The `markerId` must match one of the markers on the map.

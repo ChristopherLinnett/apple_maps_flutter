@@ -139,6 +139,12 @@ public class AppleMapController: NSObject, FlutterPlatformView, AppleMapHostApi 
         self.hideAnnotation(with: annotationId)
     }
 
+    func deselectSelectedAnnotation() throws {
+        if let selected = self.mapView.selectedAnnotations.first {
+            self.mapView.deselectAnnotation(selected, animated: true)
+        }
+    }
+
     func isMarkerInfoWindowShown(annotationId: String) throws -> Bool? {
         self.isAnnotationSelected(with: annotationId)
     }
